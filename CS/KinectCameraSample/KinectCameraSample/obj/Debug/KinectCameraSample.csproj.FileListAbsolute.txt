@@ -1,0 +1,22 @@
+C:\Users\komot\Documents\Visual Studio 2015\Projects\GIT\KinectCameraSample\KinectCameraSample\bin\Debug\KinectCameraSample.exe.config
+C:\Users\komot\Documents\Visual Studio 2015\Projects\GIT\KinectCameraSample\KinectCameraSample\bin\Debug\KinectCameraSample.exe
+C:\Users\komot\Documents\Visual Studio 2015\Projects\GIT\KinectCameraSample\KinectCameraSample\bin\Debug\KinectCameraSample.pdb
+C:\Users\komot\Documents\Visual Studio 2015\Projects\GIT\KinectCameraSample\KinectCameraSample\bin\Debug\Microsoft.Kinect.dll
+C:\Users\komot\Documents\Visual Studio 2015\Projects\GIT\KinectCameraSample\KinectCameraSample\bin\Debug\Microsoft.Kinect.xml
+C:\Users\komot\Documents\Visual Studio 2015\Projects\GIT\KinectCameraSample\KinectCameraSample\obj\Debug\KinectCameraSample.csprojResolveAssemblyReference.cache
+C:\Users\komot\Documents\Visual Studio 2015\Projects\GIT\KinectCameraSample\KinectCameraSample\obj\Debug\MainWindow.g.cs
+C:\Users\komot\Documents\Visual Studio 2015\Projects\GIT\KinectCameraSample\KinectCameraSample\obj\Debug\App.g.cs
+C:\Users\komot\Documents\Visual Studio 2015\Projects\GIT\KinectCameraSample\KinectCameraSample\obj\Debug\KinectCameraSample_MarkupCompile.cache
+C:\Users\komot\Documents\Visual Studio 2015\Projects\GIT\KinectCameraSample\KinectCameraSample\obj\Debug\KinectCameraSample_MarkupCompile.lref
+C:\Users\komot\Documents\Visual Studio 2015\Projects\GIT\KinectCameraSample\KinectCameraSample\obj\Debug\MainWindow.baml
+C:\Users\komot\Documents\Visual Studio 2015\Projects\GIT\KinectCameraSample\KinectCameraSample\obj\Debug\KinectCameraSample.g.resources
+C:\Users\komot\Documents\Visual Studio 2015\Projects\GIT\KinectCameraSample\KinectCameraSample\obj\Debug\KinectCameraSample.Properties.Resources.resources
+C:\Users\komot\Documents\Visual Studio 2015\Projects\GIT\KinectCameraSample\KinectCameraSample\obj\Debug\KinectCameraSample.csproj.GenerateResource.Cache
+C:\Users\komot\Documents\Visual Studio 2015\Projects\GIT\KinectCameraSample\KinectCameraSample\obj\Debug\KinectCameraSample.exe
+C:\Users\komot\Documents\Visual Studio 2015\Projects\GIT\KinectCameraSample\KinectCameraSample\obj\Debug\KinectCameraSample.pdb
+C:\Users\komot\Documents\Visual Studio 2015\Projects\GIT\KinectCameraSample\KinectCameraSample\bin\Debug\Microsoft.Speech.dll
+C:\Users\komot\Documents\Visual Studio 2015\Projects\GIT\KinectCameraSample\KinectCameraSample\bin\Debug\Microsoft.Kinect.Toolkit.dll
+C:\Users\komot\Documents\Visual Studio 2015\Projects\GIT\KinectCameraSample\KinectCameraSample\bin\Debug\Microsoft.Kinect.Toolkit.pdb
+C:\Users\komot\Documents\MyMasterStudies\CS\KinectCameraSample\KinectCameraSample\bin\Debug\KinectCameraSample.exe.config
+C:\Users\komot\Documents\MyMasterStudies\CS\KinectCameraSample\KinectCameraSample\obj\Debug\KinectCameraSample.exe
+C:\Users\komot\Documents\MyMasterStudies\CS\KinectCameraSample\KinectCameraSample\obj\Debug\KinectCameraSample.pdb

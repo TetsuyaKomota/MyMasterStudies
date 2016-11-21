@@ -1,0 +1,16 @@
+﻿<Window x:Class="KinectCameraSample.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:KinectCameraSample"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="350" Width="525" Loaded="windowLoaded" Closed="WindowClosed">
+    <Grid>
+        <Image x:Name="rgbimage"/>
+        <TextBlock x:Name="textBlockStatus" HorizontalAlignment="Left" Height="20" TextWrapping="Wrap" VerticalAlignment="Top" Width="447" Margin="33,0,0,0"/>
+        <Button x:Name="button" Content="start" HorizontalAlignment="Left" VerticalAlignment="Top" Click="ButtonClicked"/>
+        <TextBlock x:Name="CapTimer" HorizontalAlignment="Left" Height="20" Margin="4,25,0,0" TextWrapping="Wrap" Text="CapTimer" VerticalAlignment="Top" Width="513"/>
+
+    </Grid>
+</Window>
