@@ -5,6 +5,7 @@
 import numpy as np
 import random
 import matplotlib.pyplot as plt
+from time import sleep
 
 def getData(c, means, sigmas, rates, size):
 
@@ -33,8 +34,8 @@ def getData(c, means, sigmas, rates, size):
 
 if __name__ == "__main__":
 	c = 3
-	means = [[0, 0], [-10, -10], [5, 10]]
-	sigmas = [[[1, 0], [0, 1]], [[1, 0.5], [0.5, 1]], [[3, 2], [2, 1]]]
+	means = [[0, 0], [-1, -1], [0.5, 1]]
+	sigmas = [[[1, 0], [0, 1]], [[1, 0.5], [0.5, 1]], [[1, 0], [0, 2]]]
 	rates = [0.3, 0.4, 0.3]
 	size = 10000
 
@@ -43,17 +44,21 @@ if __name__ == "__main__":
 	print(data)
 
 	# 描画しよう
-	fig = plt.figure()
-	ax = fig.add_subplot(1,1,1)
 	pi = 0
 	for i in range(c):
 		n = int(size*rates[i])
-		ax.scatter(data[pi:pi+n][0], data[pi:pi+n][1], s=20*i, label=str(i))
+		print(n)
+		# plt.scatter(data[pi:pi+n][0], data[pi:pi+n][1], s=20+10*i,color = [(np.sqrt(2)*i)%1, (np.sqrt(3)*i)%1, (np.sqrt(5)*i)%1],  label=str(i))
 		pi = pi + n
-	ax.set_xlabel('x')
-	ax.set_ylabel('y')
 
-	ax.grid(True)
 
-	ax.legend(loc='upper left')
-	fig.show()
+	plt.scatter(data[0:3000][0], data[0:3000][1], s=20,color = [0,0,0],  label="1")
+	plt.scatter(data[3000:7000][0], data[3000:7000][1], s=30,color = [0.5, 0.5, 0.5],  label="2")
+	plt.scatter(data[7000:10000][0], data[7000:10000][1], s=40,color = [0.75, 0.75, 0.75],  label="3")
+
+
+	plt.grid(True)
+
+	plt.legend(loc='upper left')
+	plt.show()
+	sleep(3)
