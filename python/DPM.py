@@ -24,6 +24,8 @@ class DPM:
         self.num = 0
         self.labels = []
         self.params = {}
+        # Sステップで変更があったクラスにチェックし，Mステップではそのクラスだけ計算するためのフラグ
+        self.flags = {}
 
     # クラスタリングするパターンを登録,初期化
     def input(self, data):
@@ -35,6 +37,7 @@ class DPM:
         #
         # パラメータを初期化．平均，共分散ともに全データの平均と共分散
         self.params[0] = self.getPartialParam(0)
+        self.myu0 = self.params[0][0]
         # CRP も初期化
         self.crp.setInitCustomers(self.num)
         
@@ -91,17 +94,37 @@ class DPM:
     #   - 正規分布は平均で最大となる
     #   - 正規分布の平均の位置は分散（精度行列)に依らない
     #   - ウィシャート分布に関しても平均で最大となる
-    def calcParamwithEstimatedLabel(self):
-        print("まだ作ってないよ")        
-        return 0
+    def calcParamwithEstimatedLabel(self, label):
+        # 指定クラスタに所属するパターンの数を数える
+        ni = 0
+        x_mean = 0 
+        for i in self.num:
+            if self.labels[i] == label:
+                ni = ni+1
+                x_mean = x_mean + self.data[i]
+            #
+        #
+        x_mean = x_mean / ni
+        #諸々計算
+        # 正規分布の平均は分散に依らないとすると μi = μc
+        myu = (ni*x_mean + self.beta*self.myu0)/(ni + self.beta)
+        # ウィシャート分布の最大は平均に等しいとすると，続パタ付録より Λ = df*scale
+        lamda = self.df * self.scale
+        sigma = np.linalg.inv(lamda)
+    
+        return [myu, sigma]
         
         
         
     # 学習の Sステップ
     # ギブスサンプリングによって現在のパラメータとパターンからラベルをサンプリング
     def stepS(self):
+        # フラグの初期化
+        for m in self.crp.customers.keys():
+            self.flags[m] = False
         for k in self.num:
             # CRP から k 番目の客を削除する
+            before = self.labels[k]
             self.crp.decline(self.labels[k])
             # 各クラスタと未知クラスタについて, k 番目のパターンの事後確率を求める
             p = {}
@@ -122,11 +145,25 @@ class DPM:
                 temp = temp + p[m]
                 if rand < temp:
                     self.labels[k] = m
+                    # クラスラベルが変化したら，フラグを立てる
+                    if before != m:
+                        self.flags[before] = True
+                        self.flags[m] = True
                     self.crp.addNewCustomer(m)
                     break
                 #
             #
         #
+                    
+    # 学習の Mステップ
+    # Sステップによってサンプリングしたクラスラベルをもとにパラメータを更新する
+    def stepM(self):
+        for m in self.flags.keys():
+            if self.flags[m] == True:
+                self.params[m] = self.calcParamwithEstimatedLabel(m)
+            #
+        #
+                
 
 if __name__ == "__main__":
     print("Welcome to DPM_test")
