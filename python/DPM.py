@@ -5,15 +5,16 @@ Created on Wed Dec 28 13:59:17 2016
 @author: komot
 """
 
+import MyStatics as st
 import scipy.stats as ss
 import numpy as np
-import random.random
+from random import random
 import GMMv2 as gmm
 import CRP
 import math
 
 class DPM:
-    def __init__(self, alpha=1.0, beta=1/3, df=15, scale=np.matrix([[1.0, 0], [0, 0.1]])):
+    def __init__(self, alpha=st.ALPHA, beta=st.BETA, df=st.DF, scale=st.SCALE):
         self.beta = beta
         self.df = df
         self.scale = scale
@@ -26,6 +27,14 @@ class DPM:
         self.params = {}
         # Sステップで変更があったクラスにチェックし，Mステップではそのクラスだけ計算するためのフラグ
         self.flags = {}
+        # 最尤度
+        self.score = 0
+        # 最尤ラベル
+        self.likelylabels = []
+        # 非更新回数
+        self.iter_non = 0
+        # 停止フラグ.Vステップで操作する
+        self.stop_flag = False
 
     # クラスタリングするパターンを登録,初期化
     def input(self, data):
@@ -98,7 +107,7 @@ class DPM:
         # 指定クラスタに所属するパターンの数を数える
         ni = 0
         x_mean = 0 
-        for i in self.num:
+        for i in range(self.num):
             if self.labels[i] == label:
                 ni = ni+1
                 x_mean = x_mean + self.data[i]
@@ -122,7 +131,7 @@ class DPM:
         # フラグの初期化
         for m in self.crp.customers.keys():
             self.flags[m] = False
-        for k in self.num:
+        for k in range(self.num):
             # CRP から k 番目の客を削除する
             before = self.labels[k]
             self.crp.decline(self.labels[k])
@@ -163,7 +172,25 @@ class DPM:
                 self.params[m] = self.calcParamwithEstimatedLabel(m)
             #
         #
-                
+
+    # 学習の Vステップ
+    #尤度を計算する．終了判定もここで行う
+    def stepV(self):
+        curscore = 1
+        for k in range(self.num):
+            curscore = curscore + math.log(self.mnd(self.data[k], self.params[self.labels[k]][0], self.params[self.labels[k]][1]))
+        #
+        if curscore > self.score:
+            self.score = curscore
+            self.likelylabels = self.labels
+            self.iter_non = 0
+        else:
+            self.labels = self.likelylabels
+            self.iter_non = self.iter_non + 1
+            if self.iter_non > st.MAX_ITER_NON:
+                self.stop_flag = True
+            #
+        #
 
 if __name__ == "__main__":
     print("Welcome to DPM_test")
@@ -181,7 +208,12 @@ if __name__ == "__main__":
     dpm = DPM()
     # パターンを登録
     dpm.input(data)
-    
-    
+    # 学習開始
+    while(dpm.stop_flag == False):
+        dpm.stepS()
+        dpm.stepM()
+        dpm.stepV()
+    # 学習結果を表示
+    print("ほげほげ")
     
     
