@@ -79,10 +79,10 @@ class DPM:
         
     # 多次元正規分布から確率を求める．
     # 参考 http://emoson.hateblo.jp/entry/2015/02/06/182256    
-    def mnd(_x, _mu, _sig):
-        x = np.matrix(_x)
-        mu = np.matrix(_mu)
-        sig = np.matrix(_sig)
+    def mnd(self, data, myu, sigma):
+        x = np.matrix(data)
+        mu = np.matrix(myu)
+        sig = np.matrix(sigma)
         a = np.sqrt(np.linalg.det(sig)*(2*np.pi)**sig.ndim)
         b = np.linalg.det(-0.5*(x-mu)*sig.I*(x-mu).T)
         return np.exp(b)/a

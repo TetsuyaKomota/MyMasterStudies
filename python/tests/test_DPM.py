@@ -31,6 +31,9 @@ class TestDPM(unittest.TestCase):
         print(result)
         self.assertEqual(np.allclose(result[0], np.array([2, 4])), True)
         self.assertEqual(np.allclose(result[1], np.array([[1, 2], [2, 4]])), True)
+        
+    def test_mnd(self):
+        self.assertEqual(self.dpm.mnd(0, 0, 1) , 0.3989422804014327)
 
     def tearDown(self):
         print("tear Down")        
