@@ -32,10 +32,15 @@ class DPM:
         for _ in range(self.num):
             self.labels.append(0)
         #
-        mx0 = sum(self.data[0])/self.num
-        my0 = sum(self.data[1])/self.num
+        # mx0 = sum(self.data[0])/self.num
+        # my0 = sum(self.data[1])/self.num
+        # mean0 = [mx0, my0]
         
-        mean0 = [mx0, my0]
+    # ラベル指定．デバッグ用
+    def setLabel(self, labels):
+        if len(labels) == len(self.labels):
+            self.labels = labels
+            
         
         
     # 指定したラベルのパターンの平均と共分散行列を求める
@@ -44,14 +49,10 @@ class DPM:
         # → だから，やっぱりGMM_2d の出力はこの形にしよう
         x = []
         n = 0        
-        for _ in range(self.dimension):
-            x.append([])
         for i in range(self.num):
             if self.labels[i] == label:
                 n = n + 1                
-                for d in range(self.dimension):
-                    x[d].append(self.data[d][i])
-                #
+                x.append(self.data[i])
             #
         #
         # 平均を求める
