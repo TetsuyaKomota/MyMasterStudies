@@ -13,6 +13,10 @@ class CRP:
         self.alpha = alpha
         self.customers = {}
 
+    # 初期化．指定した人数を一つのクラスに入れる        
+    def setInitCustomers(self, size):
+        self.customers[0] = size
+
     def getNumofCustomers(self):
         output = 0
         for i in self.customers:
@@ -28,13 +32,25 @@ class CRP:
                 break
         return idx
 
+    def getProbability(self, label):
+        n = self.getNumofCustomers()
+        if label in self.customers.keys():
+            return self.customers[label]/(n+self.alpha)
+        else:
+            return self.alpha/(n+self.alpha)
+    
+    def addNewCustomer(self, label):
+        if label in self.customers.keys():
+            self.customers[label] = self.customers[label]+1
+        else:
+            self.customers[label] = 1
+
     def getPattern(self):
         output = -1
         rand = np.random.random()
-        n = self.getNumofCustomers()
         tempsum = 0
-        for i in self.customers:
-            tempsum = tempsum + (self.customers[i]/(n+self.alpha))
+        for i in self.customers.keys():
+            tempsum = tempsum + self.getProbability(i)
             if rand < tempsum:
                 output = i
                 break
@@ -42,9 +58,7 @@ class CRP:
         #
         if output == -1:
             output = self.getNewLabel()
-            self.customers[output] = 1
-        else:
-            self.customers[output] = self.customers[output] + 1
+        self.addNewCustomer(output)
         return output
     
     def decline(self, idx):

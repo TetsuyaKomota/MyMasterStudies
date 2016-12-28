@@ -7,6 +7,7 @@ Created on Wed Dec 28 13:59:17 2016
 
 import scipy.stats as ss
 import numpy as np
+import random.random
 import GMMv2 as gmm
 import CRP
 import math
@@ -32,9 +33,10 @@ class DPM:
         for _ in range(self.num):
             self.labels.append(0)
         #
-        # mx0 = sum(self.data[0])/self.num
-        # my0 = sum(self.data[1])/self.num
-        # mean0 = [mx0, my0]
+        # パラメータを初期化．平均，共分散ともに全データの平均と共分散
+        self.params[0] = self.getPartialParam(0)
+        # CRP も初期化
+        self.crp.setInitCustomers(self.num)
         
     # ラベル指定．デバッグ用
     def setLabel(self, labels):
@@ -63,6 +65,15 @@ class DPM:
         return [mean, sigma]        
         
         
+    # 多次元正規分布から確率を求める．
+    # 参考 http://emoson.hateblo.jp/entry/2015/02/06/182256    
+    def mnd(_x, _mu, _sig):
+        x = np.matrix(_x)
+        mu = np.matrix(_mu)
+        sig = np.matrix(_sig)
+        a = np.sqrt(np.linalg.det(sig)*(2*np.pi)**sig.ndim)
+        b = np.linalg.det(-0.5*(x-mu)*sig.I*(x-mu).T)
+        return np.exp(b)/a
 
     # 未知クラスタが選択された際の事後確率を求める．
     # 基底分布に正規ウィシャート分布を用いてパラメータθを積分消去したらこうなる（らしい）
@@ -83,10 +94,39 @@ class DPM:
     def calcParamwithEstimatedLabel(self):
         print("まだ作ってないよ")        
         return 0
-
-
-
-
+        
+        
+        
+    # 学習の Sステップ
+    # ギブスサンプリングによって現在のパラメータとパターンからラベルをサンプリング
+    def stepS(self):
+        for k in self.num:
+            # CRP から k 番目の客を削除する
+            self.crp.decline(self.labels[k])
+            # 各クラスタと未知クラスタについて, k 番目のパターンの事後確率を求める
+            p = {}
+            for m in self.crp.customers.keys():
+                p[m] = self.crp.getProbability(m)*self.mnd(self.data[k], self.params[m][0], self.params[m][1])
+            #
+            newlabel = self.crp.getNewLabel
+            p[newlabel]=self.crp.getProbability(newlabel)*self.calcProbwithNewClass(self.data[k])
+            # 正規化
+            # しなくていいかもだけどしちゃダメな理由もないしな
+            tempsum = sum(p.values())
+            for i in p.keys():
+                p[i] = p[i] / tempsum
+            # サンプリング
+            temp = 0
+            rand = random()
+            for m in p.keys():
+                temp = temp + p[m]
+                if rand < temp:
+                    self.labels[k] = m
+                    self.crp.addNewCustomer(m)
+                    break
+                #
+            #
+        #
 
 if __name__ == "__main__":
     print("Welcome to DPM_test")
@@ -103,4 +143,8 @@ if __name__ == "__main__":
     # DPM を生成
     dpm = DPM()
     # パターンを登録
-
+    dpm.input(data)
+    
+    
+    
+    

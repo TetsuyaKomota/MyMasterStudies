@@ -5,7 +5,7 @@ Created on Wed Dec 28 18:02:40 2016
 @author: komot
 """
 import unittest
-import DPM_test
+import DPM
 import GMMv2
 import numpy as np
 
@@ -13,7 +13,7 @@ class TestDPM(unittest.TestCase):
     
     def setUp(self):
         print("set up")
-        self.dpm = DPM_test.DPM()
+        self.dpm = DPM.DPM()
         c = 3
         means = [[0, 0], [-10, -10], [5, 10]]
         sigmas = [[[1, 0], [0, 1]], [[1, 0.5], [0.5, 1]], [[1, 0], [0, 2]]]
