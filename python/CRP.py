@@ -54,11 +54,11 @@ class CRP:
                 del self.customers[idx]
         
 if __name__ == "__main__":
-    crp = CRP(100)
+    crp = CRP(5)
     x = []
     for _ in range(10000):
         x.append(crp.getPattern())
     #
-    plt.hist(x, bins = 100)
+    plt.hist(x, bins = 50)
     plt.show()
     
