@@ -64,9 +64,17 @@ class CRP:
     def decline(self, idx):
         if idx in self.customers.keys():
             self.customers[idx] = self.customers[idx] - 1
-            if self.customers[idx] == 0:
+            if self.customers[idx] <= 0:
                 del self.customers[idx]
+    
+    #内部変数表示．デバッグ用
+    def debug_show(self, idx):
+        print("debug for CRP idx="+str(idx)+" : ")
+        print("customers : ", end="")
+        print(self.customers)
         
+
+
 if __name__ == "__main__":
     crp = CRP(5)
     x = []

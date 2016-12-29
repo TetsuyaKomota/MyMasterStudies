@@ -49,6 +49,8 @@ class DPM:
         self.myu0 = self.params[0][0]
         # CRP も初期化
         self.crp.setInitCustomers(self.num)
+        # デバッグ用
+        self.debug_show(53)
         
     # ラベル指定．デバッグ用
     def setLabel(self, labels):
@@ -90,6 +92,12 @@ class DPM:
     # 未知クラスタが選択された際の事後確率を求める．
     # 基底分布に正規ウィシャート分布を用いてパラメータθを積分消去したらこうなる（らしい）
     # 続パタ p.269 を参照のこと        
+    # *************************************************************************
+    # *************************************************************************
+    # 動作確認したところ，どうやらこれが見当違いな値を出しているっぽい．
+    # 本当に教科書通りにできているか，教科書の式の解釈がそもそもあっているかの２通りで検証
+    # *************************************************************************
+    # *************************************************************************
     def calcProbwithNewClass(self, x):
         Sb = np.linalg.inv(self.scale) + (self.beta/(1+self.beta))*(x-self.myu0)*(x-self.myu0).T
         coef = math.pow(self.beta/((1+self.beta)*math.pi) , self.dimension/2)
@@ -131,22 +139,39 @@ class DPM:
         # フラグの初期化
         for m in self.crp.customers.keys():
             self.flags[m] = False
+        #サンプリング前のクラスタの種類と未知クラスタラベルを取得しておく
+        # サンプリングの過程で新たなクラスタが生じた場合，Mステップでパラメータを取得する前に次のパターンのサンプリングを行うとエラーになる
+        # その解決方法として，一度のSステップでは新クラスタは1種類のみとするか，パターンごとのサンプリングのたびにパラメータ更新するか
+        # 今回は前者で実装することにしたが，どっちが正解かはわからない
+        curkind = []
+        for m in self.crp.customers.keys():
+            curkind.append(m)
+        curnew =self.crp.getNewLabel()
         for k in range(self.num):
             # CRP から k 番目の客を削除する
             before = self.labels[k]
             self.crp.decline(self.labels[k])
             # 各クラスタと未知クラスタについて, k 番目のパターンの事後確率を求める
             p = {}
-            for m in self.crp.customers.keys():
+            # for m in self.crp.customers.keys():
+            # デバッグ用
+            self.crp.debug_show(150)
+            print("curkind:",end="")
+            print(curkind)
+            for m in curkind:
                 p[m] = self.crp.getProbability(m)*self.mnd(self.data[k], self.params[m][0], self.params[m][1])
             #
-            newlabel = self.crp.getNewLabel
-            p[newlabel]=self.crp.getProbability(newlabel)*self.calcProbwithNewClass(self.data[k])
+            # newlabel = self.crp.getNewLabel()
+            # p[newlabel]=self.crp.getProbability(newlabel)*self.calcProbwithNewClass(self.data[k])
+            p[curnew]=self.crp.getProbability(curnew)*self.calcProbwithNewClass(self.data[k])
             # 正規化
             # しなくていいかもだけどしちゃダメな理由もないしな
             tempsum = sum(p.values())
             for i in p.keys():
                 p[i] = p[i] / tempsum
+            # デバッグ．p を表示
+            print("debug p=",end="")
+            print(p)
             # サンプリング
             temp = 0
             rand = random()
@@ -163,6 +188,8 @@ class DPM:
                 #
             #
         #
+        # デバッグ用．サンプリング結果を表示する
+        self.debug_show(167)
                     
     # 学習の Mステップ
     # Sステップによってサンプリングしたクラスラベルをもとにパラメータを更新する
@@ -191,6 +218,17 @@ class DPM:
                 self.stop_flag = True
             #
         #
+        
+        
+    # 内部変数表示．デバッグ用
+    def debug_show(self, idx):
+        print("debug for DPM idx="+str(idx)+" : ")
+        print("data : ", end="")
+        print(self.data)
+        print("labels : ",end="")
+        print(self.labels)
+        print("params : ",end="")
+        print(self.params)
 
 if __name__ == "__main__":
     print("Welcome to DPM_test")
