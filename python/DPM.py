@@ -141,6 +141,12 @@ class DPM:
                 x_mean = x_mean + self.data[i]
             #
         #
+        # サンプリングの結果客がいなくなったクラスタのパラメータは削除し，削除信号を返す
+        if ni == 0:
+            if label in self.params.keys():
+                del self.params[label]
+            return ["DELETED"]
+        
         x_mean = x_mean / ni
         #諸々計算
         # 正規分布の平均は分散に依らないとすると μi = μc
@@ -180,11 +186,14 @@ class DPM:
             p = {}
             # for m in self.crp.customers.keys():
             # デバッグ用
-            self.crp.debug_show(150)
+            self.crp.debug_show(183)
             print("curkind:",end="")
             print(curkind)
             for m in curkind:
-                p[m] = self.crp.getProbability(m)*self.mnd(self.data[k], self.params[m][0], self.params[m][1])
+                #サンプリングの過程でなくなったクラスタは考慮しない
+                if m in self.crp.customers.keys():
+                    p[m] = self.crp.getProbability(m)*self.mnd(self.data[k], self.params[m][0], self.params[m][1])
+                #
             #
             # newlabel = self.crp.getNewLabel()
             # p[newlabel]=self.crp.getProbability(newlabel)*self.calcProbwithNewClass(self.data[k])
@@ -221,7 +230,10 @@ class DPM:
     def stepM(self):
         for m in self.flags.keys():
             if self.flags[m] == True:
-                self.params[m] = self.calcParamwithEstimatedLabel(m)
+                newparams = self.calcParamwithEstimatedLabel(m)
+                # すでに消滅しているクラスタの場合，パラメータの更新は行わない
+                if newparams[0] != "DELETED":
+                    self.params[m] = newparams
             #
         #
 
