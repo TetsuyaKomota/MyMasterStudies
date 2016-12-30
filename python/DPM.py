@@ -105,6 +105,7 @@ class DPM:
         t = math.pow(np.linalg.det(Sb), (self.df+1)/2) * math.gamma((self.df+1)/2)
         b = math.pow(np.linalg.det(self.scale), self.df/2) * math.gamma((self.df+1-self.dimension)/2)
         # デバッグ
+        '''
         print("debug dimension :", end="")
         print(self.dimension)
         print("debug df :", end="")
@@ -123,6 +124,7 @@ class DPM:
         print(t)
         print("debug b :", end="")
         print(b)
+        '''
         return coef*(t/b)
 
     # クラスラベルが推定された際のパラメータの最尤値（事後確率最大となる値）を求める
@@ -173,12 +175,10 @@ class DPM:
         for m in self.crp.customers.keys():
             curkind.append(m)
         curnew =self.crp.getNewLabel()
+        # デバッグ
+        print("debug curnew :", end="")
+        print(curnew)
         for k in range(self.num):
-            # デバッグ．すぐ消す
-            print("debug (num, len(labels), k) :(", end="")
-            print(self.num, end=", ")
-            print(len(self.labels), end=", ")
-            print(k)
             # CRP から k 番目の客を削除する
             before = self.labels[k]
             self.crp.decline(self.labels[k])
@@ -186,9 +186,11 @@ class DPM:
             p = {}
             # for m in self.crp.customers.keys():
             # デバッグ用
+            '''            
             self.crp.debug_show(183)
             print("curkind:",end="")
             print(curkind)
+            '''
             for m in curkind:
                 #サンプリングの過程でなくなったクラスタは考慮しない
                 if m in self.crp.customers.keys():
@@ -260,8 +262,8 @@ class DPM:
     # 内部変数表示．デバッグ用
     def debug_show(self, idx):
         print("debug for DPM idx="+str(idx)+" : ")
-        print("data : ", end="")
-        print(self.data)
+        # print("data : ", end="")
+        # print(self.data)
         print("labels : ",end="")
         print(self.labels)
         print("params : ",end="")
