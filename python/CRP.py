@@ -6,15 +6,12 @@ Created on Mon Dec 26 22:36:10 2016
 """
 
 import numpy as np
-import copy
 import matplotlib.pyplot as plt
 
 class CRP:
     def __init__(self, alpha):
         self.alpha = alpha
         self.customers = {}
-        # サンプリングの棄却時に元に戻すためのセーブ
-        self.logs = {}
 
     # 初期化．指定した人数を一つのクラスに入れる        
     def setInitCustomers(self, size):
@@ -70,14 +67,15 @@ class CRP:
             if self.customers[idx] <= 0:
                 del self.customers[idx]
     
-    # 客の状態を保存
-    def save(self):
-        self.logs = copy.deepcopy(self.customers)
+    # ラベル配列から 客状態再生成
+    def setCustomers(self, labels):
+        self.customer = {}
+        for i in labels:
+            if i in self.customer.keys():
+                self.customer[i] = self.customer[i] + 1
+            else:
+                self.customer[i] = 1
         
-    # 客の状態を呼び出し
-    def load(self):
-        self.customers = copy.deepcopy(self.logs)
-    
     #内部変数表示．デバッグ用
     def debug_show(self, idx):
         print("debug for CRP idx="+str(idx)+" : ")
