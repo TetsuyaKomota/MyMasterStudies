@@ -99,10 +99,19 @@ class DPM:
     # *************************************************************************
     # *************************************************************************
     def calcProbwithNewClass(self, x):
-        Sb = np.linalg.inv(self.scale) + (self.beta/(1+self.beta))*(x-self.myu0)*(x-self.myu0).T
+        Sb = np.linalg.inv(np.linalg.inv(self.scale) + (self.beta/(1+self.beta))*(x-self.myu0)*((x-self.myu0).T))
         coef = math.pow(self.beta/((1+self.beta)*math.pi) , self.dimension/2)
         t = math.pow(np.linalg.det(Sb), (self.df+1)/2) * math.gamma((self.df+1)/2)
         b = math.pow(np.linalg.det(self.scale), self.df/2) * math.gamma((self.df+1-self.dimension)/2)
+        # デバッグ
+        print("debug Sb :", end="")
+        print(Sb)
+        print("debug coef :", end="")
+        print(coef)
+        print("debug t :", end="")
+        print(t)
+        print("debug b :", end="")
+        print(b)
         return coef*(t/b)
 
     # クラスラベルが推定された際のパラメータの最尤値（事後確率最大となる値）を求める
