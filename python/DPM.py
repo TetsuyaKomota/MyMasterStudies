@@ -43,6 +43,7 @@ class DPM:
         self.num = len(self.data)
         for _ in range(self.num):
             self.labels.append(0)
+            self.likelylabels.append(0)
         #
         # パラメータを初期化．平均，共分散ともに全データの平均と共分散
         self.params[0] = self.getPartialParam(0)
@@ -167,6 +168,11 @@ class DPM:
             curkind.append(m)
         curnew =self.crp.getNewLabel()
         for k in range(self.num):
+            # デバッグ．すぐ消す
+            print("debug (num, len(labels), k) :(", end="")
+            print(self.num, end=", ")
+            print(len(self.labels), end=", ")
+            print(k)
             # CRP から k 番目の客を削除する
             before = self.labels[k]
             self.crp.decline(self.labels[k])
