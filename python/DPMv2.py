@@ -239,13 +239,18 @@ class DPM:
         for k in range(self.num):
             curscore = curscore + math.log(self.mnd(self.data[k], self.params[self.labels[k]][0], self.params[self.labels[k]][1]))
         #
+        # デバッグ
+        if self.labels != self.likelylabels:
+            print("正常")
+        else:
+            print("なんかおかしい")
         if self.score > 0 or curscore > self.score:
             self.score = curscore
-            self.likelylabels = self.labels
+            self.likelylabels = self.labels[:]
             self.iter_non = 0
         else:
             self.crp.load()
-            self.labels = self.likelylabels
+            self.labels = self.likelylabels[:]
             self.iter_non = self.iter_non + 1
             if self.iter_non > st.MAX_ITER_NON:
                 self.stop_flag = True
