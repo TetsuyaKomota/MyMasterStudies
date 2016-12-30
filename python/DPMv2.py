@@ -245,7 +245,7 @@ class DPM:
             self.likelylabels = copy.deepcopy(self.labels)
             self.iter_non = 0
         else:
-            self.labels = copy.deepcopy(self.likelylabels)
+            # self.labels = copy.deepcopy(self.likelylabels)
             self.crp.setCustomers(self.labels)
             # なんかこれ行き当たりばったり感があるから修正できそうなら修正する
             self.stepM()
@@ -301,6 +301,7 @@ class DPM:
             plt3.scatter(x[0], x[1], s=2+1*m,color = [(np.sqrt(2)*m)%1, (np.sqrt(3)*m)%1, (np.sqrt(5)*m)%1],  label=str(m))
         
         plt.show()
+        
 
 if __name__ == "__main__":
     print("Welcome to DPM_test")
@@ -309,7 +310,7 @@ if __name__ == "__main__":
     means = [[0, 0], [-10, -10], [5, 10]]
     sigmas = [[[1, 0], [0, 1]], [[1, 0.5], [0.5, 1]], [[1, 0], [0, 2]]]
     rates = [0.3, 0.4, 0.3]
-    size = 1000
+    size = 100
 
     data = gmm.getData(c, means, sigmas, rates, size)
     print(data)

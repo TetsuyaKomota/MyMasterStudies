@@ -18,10 +18,13 @@ class CRP:
         self.customers[0] = size
 
     def getNumofCustomers(self):
+        '''
         output = 0
         for i in self.customers:
             output = output + self.customers[i]
         return output
+        '''
+        return sum(self.customers.values())
         
     def getNewLabel(self):
         idx = 0
@@ -69,12 +72,12 @@ class CRP:
     
     # ラベル配列から 客状態再生成
     def setCustomers(self, labels):
-        self.customer = {}
+        self.customers = {}
         for i in labels:
-            if i in self.customer.keys():
-                self.customer[i] = self.customer[i] + 1
+            if i in self.customers.keys():
+                self.customers[i] = self.customers[i] + 1
             else:
-                self.customer[i] = 1
+                self.customers[i] = 1
         
     #内部変数表示．デバッグ用
     def debug_show(self, idx):
