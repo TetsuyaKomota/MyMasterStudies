@@ -9,6 +9,7 @@ Created on Wed Dec 28 13:59:17 2016
 import MyStatics as st
 import scipy.stats as ss
 import numpy as np
+import copy
 from random import random
 import GMMv2 as gmm
 import CRP
@@ -246,11 +247,11 @@ class DPM:
             print("なんかおかしい")
         if self.score > 0 or curscore > self.score:
             self.score = curscore
-            self.likelylabels = self.labels[:]
+            self.likelylabels = copy.deepcopy(self.labels)
             self.iter_non = 0
         else:
             self.crp.load()
-            self.labels = self.likelylabels[:]
+            self.labels = copy.deepcopy(self.likelylabels)
             self.iter_non = self.iter_non + 1
             if self.iter_non > st.MAX_ITER_NON:
                 self.stop_flag = True

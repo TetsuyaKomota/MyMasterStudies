@@ -6,6 +6,7 @@ Created on Mon Dec 26 22:36:10 2016
 """
 
 import numpy as np
+import copy
 import matplotlib.pyplot as plt
 
 class CRP:
@@ -71,11 +72,11 @@ class CRP:
     
     # 客の状態を保存
     def save(self):
-        self.logs = self.customers
+        self.logs = copy.deepcopy(self.customers)
         
     # 客の状態を呼び出し
     def load(self):
-        self.customers = self.logs
+        self.customers = copy.deepcopy(self.logs)
     
     #内部変数表示．デバッグ用
     def debug_show(self, idx):
