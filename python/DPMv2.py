@@ -164,7 +164,7 @@ class DPM:
         
     # 学習の Sステップ
     # ギブスサンプリングによって現在のパラメータとパターンからラベルをサンプリング
-    def stepS(self):
+    def stepS(self, k):
         # フラグの初期化
         for m in self.crp.customers.keys():
             self.flags[m] = False
@@ -172,60 +172,48 @@ class DPM:
         # サンプリングの過程で新たなクラスタが生じた場合，Mステップでパラメータを取得する前に次のパターンのサンプリングを行うとエラーになる
         # その解決方法として，一度のSステップでは新クラスタは1種類のみとするか，パターンごとのサンプリングのたびにパラメータ更新するか
         # 今回は前者で実装することにしたが，どっちが正解かはわからない
-        curkind = []
+        # CRP から k 番目の客を削除する
+        before = self.labels[k]
+        self.crp.decline(self.labels[k])
+        # 各クラスタと未知クラスタについて, k 番目のパターンの事後確率を求める
+        p = {}
+        # for m in self.crp.customers.keys():
+        # デバッグ用
+        '''            
+        self.crp.debug_show(183)
+        print("curkind:",end="")
+        print(curkind)
+        '''
         for m in self.crp.customers.keys():
-            curkind.append(m)
-        curnew =self.crp.getNewLabel()
-        # デバッグ
-        print("debug curnew :", end="")
-        print(curnew)
-        for k in range(self.num):
-            # CRP から k 番目の客を削除する
-            before = self.labels[k]
-            self.crp.decline(self.labels[k])
-            # 各クラスタと未知クラスタについて, k 番目のパターンの事後確率を求める
-            p = {}
-            # for m in self.crp.customers.keys():
-            # デバッグ用
-            '''            
-            self.crp.debug_show(183)
-            print("curkind:",end="")
-            print(curkind)
-            '''
-            for m in curkind:
-                #サンプリングの過程でなくなったクラスタは考慮しない
-                if m in self.crp.customers.keys():
-                    p[m] = self.crp.getProbability(m)*self.mnd(self.data[k], self.params[m][0], self.params[m][1])
-                #
-            #
-            # newlabel = self.crp.getNewLabel()
-            # p[newlabel]=self.crp.getProbability(newlabel)*self.calcProbwithNewClass(self.data[k])
-            p[curnew]=self.crp.getProbability(curnew)*self.calcProbwithNewClass(self.data[k])
-            # 正規化
-            # しなくていいかもだけどしちゃダメな理由もないしな
-            tempsum = sum(p.values())
-            for i in p.keys():
-                p[i] = p[i] / tempsum
-            # デバッグ．p を表示
-            print("debug p=",end="")
-            print(p)
-            # サンプリング
-            temp = 0
-            rand = random()
-            for m in p.keys():
-                temp = temp + p[m]
-                if rand < temp:
-                    self.labels[k] = m
-                    # クラスラベルが変化したら，フラグを立てる
-                    if before != m:
-                        self.flags[before] = True
-                        self.flags[m] = True
-                    self.crp.addNewCustomer(m)
-                    break
-                #
+            p[m] = self.crp.getProbability(m)*self.mnd(self.data[k], self.params[m][0], self.params[m][1])
+        #
+        newlabel = self.crp.getNewLabel()
+        p[newlabel]=self.crp.getProbability(newlabel)*self.calcProbwithNewClass(self.data[k])
+        # 正規化
+        # しなくていいかもだけどしちゃダメな理由もないしな
+        tempsum = sum(p.values())
+        for i in p.keys():
+            p[i] = p[i] / tempsum
+        # デバッグ．p を表示
+        print("debug p=",end="")
+        print(p)
+        # サンプリング
+        temp = 0
+        rand = random()
+        for m in p.keys():
+            temp = temp + p[m]
+            if rand < temp:
+                self.labels[k] = m
+                # クラスラベルが変化したら，フラグを立てる
+                if before != m:
+                    self.flags[before] = True
+                    self.flags[m] = True
+                self.crp.addNewCustomer(m)
+                break
             #
         #
         # デバッグ用．サンプリング結果を表示する
+        # ここでやる必要はない．サンプリング全体の最後にやる
         self.debug_show(167)
                     
     # 学習の Mステップ
@@ -288,8 +276,9 @@ if __name__ == "__main__":
     dpm.input(data)
     # 学習開始
     while(dpm.stop_flag == False):
-        dpm.stepS()
-        dpm.stepM()
+        for k in range(dpm.num):        
+            dpm.stepS(k)
+            dpm.stepM()
         dpm.stepV()
     # 学習結果を表示
     print("ほげほげ")
