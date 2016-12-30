@@ -13,6 +13,7 @@ from random import random
 import GMMv2 as gmm
 import CRP
 import math
+import matplotlib.pyplot as plt
 
 class DPM:
     def __init__(self, alpha=st.ALPHA, beta=st.BETA, df=st.DF, scale=st.SCALE):
@@ -29,13 +30,17 @@ class DPM:
         # Sステップで変更があったクラスにチェックし，Mステップではそのクラスだけ計算するためのフラグ
         self.flags = {}
         # 最尤度
-        self.score = 0
+        self.score = 1
         # 最尤ラベル
         self.likelylabels = []
         # 非更新回数
         self.iter_non = 0
         # 停止フラグ.Vステップで操作する
         self.stop_flag = False
+        # 結果描画用．スコアの推移
+        self.log_v = []
+        # 結果描画用．クラスタ数の推移
+        self.log_c = []
 
     # クラスタリングするパターンを登録,初期化
     def input(self, data):
@@ -51,6 +56,8 @@ class DPM:
         self.myu0 = self.params[0][0]
         # CRP も初期化
         self.crp.setInitCustomers(self.num)
+        # 結果ログも初期化
+        self.log_c.append(len(self.crp.customers.keys()))
         # デバッグ用
         self.debug_show(53)
         
@@ -195,8 +202,8 @@ class DPM:
         for i in p.keys():
             p[i] = p[i] / tempsum
         # デバッグ．p を表示
-        print("debug p=",end="")
-        print(p)
+        # print("debug p=",end="")
+        # print(p)
         # サンプリング
         temp = 0
         rand = random()
@@ -212,9 +219,6 @@ class DPM:
                 break
             #
         #
-        # デバッグ用．サンプリング結果を表示する
-        # ここでやる必要はない．サンプリング全体の最後にやる
-        self.debug_show(167)
                     
     # 学習の Mステップ
     # Sステップによってサンプリングしたクラスラベルをもとにパラメータを更新する
@@ -223,7 +227,7 @@ class DPM:
             if self.flags[m] == True:
                 newparams = self.calcParamwithEstimatedLabel(m)
                 # すでに消滅しているクラスタの場合，パラメータの更新は行わない
-                if newparams[0] != "DELETED":
+                if type(newparams[0]) != type("DELETED"):
                     self.params[m] = newparams
             #
         #
@@ -235,17 +239,21 @@ class DPM:
         for k in range(self.num):
             curscore = curscore + math.log(self.mnd(self.data[k], self.params[self.labels[k]][0], self.params[self.labels[k]][1]))
         #
-        if curscore > self.score:
+        if self.score > 0 or curscore > self.score:
             self.score = curscore
             self.likelylabels = self.labels
             self.iter_non = 0
         else:
+            self.crp.load()
             self.labels = self.likelylabels
             self.iter_non = self.iter_non + 1
             if self.iter_non > st.MAX_ITER_NON:
                 self.stop_flag = True
             #
         #
+        # 結果を保存
+        self.log_v.append(self.score)
+        self.log_c.append(len(self.crp.customers.keys()))
         
         
     # 内部変数表示．デバッグ用
@@ -257,6 +265,39 @@ class DPM:
         print(self.labels)
         print("params : ",end="")
         print(self.params)
+        
+    # 結果描画.
+    def show(self):
+        
+        fig = plt.figure(figsize = (24, 6))        
+        
+        plt1 = fig.add_subplot(1, 3, 1)        
+        
+        plt1.plot(self.log_v)
+        plt1.set_xlim(0, len(self.log_v)-1)
+        # plt1.xlabel("Times")
+        # plt1.ylabel("likelihood")
+        
+        plt2 = fig.add_subplot(1, 3, 2)        
+        
+        plt2.plot(self.log_c)
+        plt2.set_xlim(0, len(self.log_c)-1)
+        # plt2.xlabel("Times")
+        # plt2.ylabel("number of classes")
+        
+        plt3 = fig.add_subplot(1, 3, 3)        
+        
+        for m in self.crp.customers.keys():
+            x = [[], []]
+            for k in range(self.num):
+                if self.labels[k] == m:
+                    x[0].append(self.data[k][0])
+                    x[1].append(self.data[k][1])
+                #
+            #
+            plt3.scatter(x[0], x[1], s=2+1*m,color = [(np.sqrt(2)*m)%1, (np.sqrt(3)*m)%1, (np.sqrt(5)*m)%1],  label=str(m))
+        
+        plt.show()
 
 if __name__ == "__main__":
     print("Welcome to DPM_test")
@@ -276,10 +317,13 @@ if __name__ == "__main__":
     dpm.input(data)
     # 学習開始
     while(dpm.stop_flag == False):
-        for k in range(dpm.num):        
+        dpm.crp.save()
+        for k in range(dpm.num):
             dpm.stepS(k)
             dpm.stepM()
+        # dpm.debug_show(287)
         dpm.stepV()
+        dpm.show()
     # 学習結果を表示
     print("ほげほげ")
     

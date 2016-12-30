@@ -12,6 +12,8 @@ class CRP:
     def __init__(self, alpha):
         self.alpha = alpha
         self.customers = {}
+        # サンプリングの棄却時に元に戻すためのセーブ
+        self.logs = {}
 
     # 初期化．指定した人数を一つのクラスに入れる        
     def setInitCustomers(self, size):
@@ -66,6 +68,14 @@ class CRP:
             self.customers[idx] = self.customers[idx] - 1
             if self.customers[idx] <= 0:
                 del self.customers[idx]
+    
+    # 客の状態を保存
+    def save(self):
+        self.logs = self.customers
+        
+    # 客の状態を呼び出し
+    def load(self):
+        self.customers = self.logs
     
     #内部変数表示．デバッグ用
     def debug_show(self, idx):
