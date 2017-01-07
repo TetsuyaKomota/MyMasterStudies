@@ -270,7 +270,7 @@ class DPM:
         print(self.params)
         
     # 結果描画.
-    def show(self):
+    def show(self, isSave = "NON"):
         
         fig = plt.figure(figsize = (24, 6))        
         
@@ -300,34 +300,42 @@ class DPM:
             #
             plt3.scatter(x[0], x[1], s=2+1*m,color = [(np.sqrt(2)*m)%1, (np.sqrt(3)*m)%1, (np.sqrt(5)*m)%1],  label=str(m))
         
+        if isSave != "NON":
+            plt.savefig("figs/"+isSave+".png")
         plt.show()
         
 
 if __name__ == "__main__":
     print("Welcome to DPM_test")
     # クラスタリングを行うデータを生成
-    c = 3
-    means = [[0, 0], [-10, -10], [5, 10]]
-    sigmas = [[[1, 0], [0, 1]], [[1, 0.5], [0.5, 1]], [[1, 0], [0, 2]]]
-    rates = [0.3, 0.4, 0.3]
-    size = 100
-
-    data = gmm.getData(c, means, sigmas, rates, size)
-    print(data)
-
-    # DPM を生成
-    dpm = DPM()
-    # パターンを登録
-    dpm.input(data)
-    # 学習開始
-    while(dpm.stop_flag == False):
-        for k in range(dpm.num):
-            dpm.stepS(k)
-            dpm.stepM()
-        # dpm.debug_show(287)
-        dpm.stepV()
-        dpm.show()
-    # 学習結果を表示
-    print("ほげほげ")
+    for i in range(5):
+        size = 10
+        for t in range(3):
+            c = 3
+            means = [[0, 0], [-10, -10], [5, 10]]
+            sigmas = [[[1, 0], [0, 1]], [[1, 0.5], [0.5, 1]], [[1, 0], [0, 2]]]
+            rates = [0.3, 0.4, 0.3]
+            size = size * 10
+            
+            data = gmm.getData(c, means, sigmas, rates, size)
+            print(data)
+            
+            # DPM を生成
+            dpm = DPM()
+            # パターンを登録
+            dpm.input(data)
+            # 学習開始
+            while(dpm.stop_flag == False):
+                for k in range(dpm.num):
+                    dpm.stepS(k)
+                    dpm.stepM()
+                # dpm.debug_show(287)
+                dpm.stepV()
+                dpm.show()
+            # 学習結果を表示
+            dpm.labels = copy.deepcopy(dpm.likelylabels)
+            dpm.crp.setCustomers(dpm.labels)
+            dpm.log_c.append(len(dpm.crp.customers.keys()))
+            dpm.show(isSave=str(size)+"_("+ str(i) + ")")
     
     
