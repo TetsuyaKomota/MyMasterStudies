@@ -69,33 +69,46 @@ class CRF(CRP):
     # 中身の表示．デバッグ用
     # これも結局 SubR とまんま一緒なんだよな．ゼミ終わったらこの辺書き直そう
     def show(self, isSave="NON"):
-        print("まだ制作中です")
+        min = 0
+        max = 0
+        print("Super distribution")
         x= []
         for i in range(len(self.customers)):
+            if min == 0 and max == 0:
+                min = self.params[i]
+                max = self.params[i]
+            elif min > self.params[i]:
+                min = self.params[i]
+            elif max < self.params[i]:
+                max = self.params[i]
             for t in range(self.customers[i]):
                 x.append(self.params[i])
             #
         #
-        plt.hist(x, bins=50)
+        if min >= max:
+            plt.hist(x, bins=50)
+        else:
+            plt.hist(x, bins=50, range = (min, max))
         plt.show()
         
+        print("Sub distribution")
         for r in self.subRs:
-            r.show()
+            r.show(min=min, max=max)
 
                     
             
             
 if __name__ == "__main__":
     H = ss.norm(loc = 0, scale = 1)
-    gamma = 0.1    
-    alpha = 1.0
+    gamma = 1    
+    alpha = 5
     num = 5
     
     crf = CRF(H, gamma, alpha, num)
     
     crf.chorus()
     
-    for _ in range(10):
+    for _ in range(10000):
         for r in crf.subRs:
             print("pick : ", end="")
             print(r.getPattern())

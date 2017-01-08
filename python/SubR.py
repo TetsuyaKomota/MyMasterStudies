@@ -56,12 +56,15 @@ class SubR(CRP):
                 del self.params[idx]
                 
     # 描画するよ
-    def show(self, isSave="NON"):
+    def show(self, min=0, max=0, isSave="NON"):
         x= []
         for i in range(len(self.customers)):
             for t in range(self.customers[i]):
                 x.append(self.params[i])
             #
         #
-        plt.hist(x, bins=50)
+        if min >= max:
+            plt.hist(x, bins=50)
+        else:
+            plt.hist(x, bins=50, range = (min, max))
         plt.show()
