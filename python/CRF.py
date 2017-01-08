@@ -12,6 +12,8 @@ import SubR
 from CRP import CRP
 import scipy.stats as ss
 
+import matplotlib.pyplot as plt
+
 class CRF(CRP):
     '''
     H     : 基底測度. scipy.stats で定義すること
@@ -63,6 +65,22 @@ class CRF(CRP):
                 del self.customers[idx]
                 # これのためだけにオーバーライド...  CRP を作り直した方が美しいな
                 del self.params[idx]
+                
+    # 中身の表示．デバッグ用
+    # これも結局 SubR とまんま一緒なんだよな．ゼミ終わったらこの辺書き直そう
+    def show(self, isSave="NON"):
+        print("まだ制作中です")
+        x= []
+        for i in range(len(self.customers)):
+            for t in range(self.customers[i]):
+                x.append(self.params[i])
+            #
+        #
+        plt.hist(x, bins=50)
+        plt.show()
+        
+        for r in self.subRs:
+            r.show()
 
                     
             
@@ -76,3 +94,9 @@ if __name__ == "__main__":
     crf = CRF(H, gamma, alpha, num)
     
     crf.chorus()
+    
+    for _ in range(10):
+        for r in crf.subRs:
+            print("pick : ", end="")
+            print(r.getPattern())
+    crf.show()

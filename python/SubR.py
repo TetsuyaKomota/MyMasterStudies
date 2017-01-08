@@ -6,6 +6,7 @@ Created on Sat Jan  7 21:27:16 2017
 """
 
 from CRP import CRP
+import matplotlib.pyplot as plt
 
 class SubR(CRP):
     '''
@@ -53,3 +54,14 @@ class SubR(CRP):
                 # 下位分布のテーブルと料理を削除する
                 del self.customers[idx]
                 del self.params[idx]
+                
+    # 描画するよ
+    def show(self, isSave="NON"):
+        x= []
+        for i in range(len(self.customers)):
+            for t in range(self.customers[i]):
+                x.append(self.params[i])
+            #
+        #
+        plt.hist(x, bins=50)
+        plt.show()
