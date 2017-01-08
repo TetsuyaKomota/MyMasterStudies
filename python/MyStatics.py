@@ -7,6 +7,8 @@ Created on Wed Dec 28 21:34:38 2016
 
 import numpy as np
 
+# -- CRP, CRF のパラメータ
+
 ALPHA=0.25
 BETA=1/3
 DF=15

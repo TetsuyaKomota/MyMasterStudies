@@ -48,6 +48,7 @@ class CRP:
         else:
             self.customers[label] = 1
 
+    # CRP に従ってラベルを取得する
     def getPattern(self):
         output = -1
         rand = np.random.random()
