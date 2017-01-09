@@ -71,7 +71,6 @@ class CRF(CRP):
     def show(self, isSave="NON"):
         min = 0
         max = 0
-        print("Super distribution")
         x= []
         for i in range(len(self.customers)):
             if min == 0 and max == 0:
@@ -85,6 +84,11 @@ class CRF(CRP):
                 x.append(self.params[i])
             #
         #
+        print("Base measure")
+        plt.hist(self.H.rvs(100000), bins=50)
+        plt.show()
+
+        print("Super distribution")                
         if min >= max:
             plt.hist(x, bins=50)
         else:
