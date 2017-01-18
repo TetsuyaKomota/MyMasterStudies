@@ -13,8 +13,16 @@ import matplotlib.pyplot as plt
 
 # データを適当に作る
 
-def testfunc(x):
+def testfunc_circle(x):
     return [np.sin(x), np.cos(x)]
+
+def testfunc_cubic(x):
+    a = 1
+    b = -10
+    c = -1
+    d = 1
+
+    return [x, a*x*x*x + b*x*x + c*x + d]
 
 
 def makeData(func, size, start, end, noize):
@@ -42,7 +50,8 @@ def makeData(func, size, start, end, noize):
 if __name__ == "__main__":
     datas = []
     for _ in range(10):
-        data = makeData(testfunc, 100, 0, 2*np.pi, 0.02)
+        # data = makeData(testfunc_circle, 100, 0, 2*np.pi, 0.02)
+        data = makeData(testfunc_cubic, 100, 0, 2*np.pi, 0.05)
         print(data)
         datas.append(np.array(data))
         # 転置
@@ -52,7 +61,7 @@ if __name__ == "__main__":
         plt.plot(invdata[0], invdata[1])
     plt.show()
     
-    model = hmm.GaussianHMM(n_components=10, covariance_type="full")    
+    model = hmm.GaussianHMM(n_components=80, covariance_type="full")    
     
     model.fit(datas[0])
 
