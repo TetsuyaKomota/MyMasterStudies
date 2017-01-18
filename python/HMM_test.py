@@ -40,12 +40,34 @@ def makeData(func, size, start, end, noize):
     return output
 
 if __name__ == "__main__":
+    datas = []
     for _ in range(10):
         data = makeData(testfunc, 100, 0, 2*np.pi, 0.02)
         print(data)
+        datas.append(np.array(data))
         # 転置
         invdata = np.array(data).T
         print(invdata)
         
         plt.plot(invdata[0], invdata[1])
     plt.show()
+    
+    model = hmm.GaussianHMM(n_components=10, covariance_type="full")    
+    
+    model.fit(datas[0])
+
+    print("startprob_")
+    print(model.startprob_)
+    print("means_")
+    print(model.means_)
+    print("covars_")
+    print(model.covars_)
+    print("transmat_")
+    print(model.transmat_)    
+    
+    for _ in range(10):
+        sampleX, sampleZ = model.sample(100)
+        sample = np.array(sampleX).T
+        plt.plot(sample[0], sample[1])
+    plt.show()
+    
