@@ -6,6 +6,7 @@ Created on Wed Jan 18 13:56:15 2017
 """
 
 import numpy as np
+import random
 import time
 from hmmlearn import hmm
 import scipy.stats as ss
@@ -51,8 +52,52 @@ def makeData(func, size, start, end, noize):
             temp[j] = temp[j] + ep
         output.append(copy.deepcopy(temp))
         x = x + delta
-        
+               
     return output
+# ====================================================================================
+# 結果測定用のメソッド
+    
+    # 比較用のランダムなヒストグラムを生成する
+def generate_random_hist (inputList, numofSample):
+    output = []
+    print(inputList)
+    for _ in range(numofSample):
+         # 境界の場所を探す 
+        div = int(random.random() * len(inputList))
+        idx = div
+        tempMin = -1
+        while True:
+            if idx <= 0:
+                tempMin = 2 * len(inputList)
+                break
+            #
+            if inputList[idx] != inputList[idx-1]:
+                tempMin = abs(div - idx)
+                break
+            else:
+                idx = idx - 1
+           #
+        #
+        idx = div 
+        while True:
+            if idx+1 >= len(inputList):
+                break
+            #
+            if inputList[idx] != inputList[idx+1]:
+                tempMin = min(tempMin, abs(div - idx+1))
+                break
+            else:
+                idx = idx + 1
+           #
+        #
+        output.append(tempMin)
+    #
+    plt.hist(output, bins = len(inputList))
+    plt.show()
+    print(output)
+    return output
+
+
 # ====================================================================================
 # テスト関数
 
@@ -149,10 +194,11 @@ def experiment_1(n_components, dataLength, div):
     print(result)
     plt.hist(result, bins = dataLength)
     plt.show()
-    print("Successly terminated.")
+    print("Successfully terminated.")
 
 
 
 if __name__ == "__main__":
     # experiment_0()
-    experiment_1(30, 200, 100)
+    # experiment_1(30, 200, 100)
+    generate_random_hist([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4], 1000)
