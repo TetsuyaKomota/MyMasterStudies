@@ -331,7 +331,7 @@ if __name__ == "__main__":
                     dpm.stepM()
                 # dpm.debug_show(287)
                 dpm.stepV()
-                dpm.show()
+                # dpm.show()
             # 学習結果を表示
             dpm.labels = copy.deepcopy(dpm.likelylabels)
             dpm.crp.setCustomers(dpm.labels)
