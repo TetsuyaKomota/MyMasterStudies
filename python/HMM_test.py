@@ -163,7 +163,7 @@ def experiment_1(n_components, dataLength, div):
     result = []
     score = []
     result.append(0)
-    for step in range(10000):
+    for step in range(1000):
         print("HMM_test : experiment_1 : STEP " + str(step))
         # データを生成
         print("HMM_test : experiment_1 : making data ")
@@ -172,7 +172,7 @@ def experiment_1(n_components, dataLength, div):
         datas.extend(makeData(testfunc_sigmoid, dataLength - div, 0, 600, 10))
         # datas.extend(makeData(testfunc_cubic, 100, 0, 2*np.pi, 0.1))
         # モデルを生成
-        model = hmm.GaussianHMM(n_components=n_components, covariance_type="full")    
+        model = hmm.GaussianHMM(n_components=n_components, covariance_type="diag")    
         print("HMM_test : experiment_1 : fitting model")
         model.fit(datas[0:dataLength])
         # 符号化
