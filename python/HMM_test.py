@@ -62,7 +62,8 @@ def makeData(func, size, start, end, noize):
     # 比較用のランダムなヒストグラムを生成する
 def generate_random_hist (inputList, numofSample):
     output = []
-    print(inputList)
+    # print("HMM_test : generate_random_hist : inputList")
+    # print(inputList)
     for _ in range(numofSample):
          # 境界の場所を探す 
         div = int(random.random() * len(inputList))
@@ -158,21 +159,27 @@ def experiment_0():
 
     # 符号化後の境界と本当の境界との距離をヒストグラムで表示する関数
 def experiment_1(n_components, dataLength, div):
+    print("HMM_test : experiment_1 : start")
     result = []
     score = []
     result.append(0)
-    for _ in range(500):
+    for step in range(10000):
+        print("HMM_test : experiment_1 : STEP " + str(step))
         # データを生成
+        print("HMM_test : experiment_1 : making data ")
         datas = []
         datas.extend(makeData(testfunc_circle, div, 0, 2*np.pi, 10))
         datas.extend(makeData(testfunc_sigmoid, dataLength - div, 0, 600, 10))
         # datas.extend(makeData(testfunc_cubic, 100, 0, 2*np.pi, 0.1))
         # モデルを生成
         model = hmm.GaussianHMM(n_components=n_components, covariance_type="full")    
+        print("HMM_test : experiment_1 : fitting model")
         model.fit(datas[0:dataLength])
         # 符号化
+        print("HMM_test : experiment_1 : predict label")
         res = model.predict(datas[0:dataLength])
         # 境界の場所を探す 
+        print("HMM_test : experiment_1 : counting div")
         idx = div
         tempMin = -1
         while True:
@@ -194,6 +201,7 @@ def experiment_1(n_components, dataLength, div):
         #
         # ヒストグラムに加える
         result.append(tempMin)
+        print("HMM_test : experiment_1 : get pbobability")
         # tempMin が乱択されたヒストグラムに対して有意な値であるか検証
         #   ・res を用いてランダムなヒストグラムを生成
         randomHist = generate_random_hist(res, 10000)
@@ -206,20 +214,23 @@ def experiment_1(n_components, dataLength, div):
         score.append(tempScore)
     #
     # ヒストグラムを書く
+    print("HMM_test : experiment_1 : result (the set of distance between truth and estmated div)")
     print(result)
     plt.hist(result, bins = dataLength)
-    plt.title(u"HMMによる推定値と真値との距離")
+    plt.title("result")
     plt.show()
+    print("HMM_test : experiment_1 : score (the set of probability that the estimated div was picked from random-Hist)")
     print(score)
     plt.hist(score, bins = dataLength)
-    plt.title("推定値の検定")
+    plt.title("score")
     plt.show()
-    print("Successfully terminated.")
+    print("experiment_1 : Successfully terminated.")
 
 
 
 if __name__ == "__main__":
-    with warnings.catch_warnings()
-    # experiment_0()
-    experiment_1(30, 200, 100)
-    # generate_random_hist([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4], 1000)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        # experiment_0()
+        experiment_1(30, 200, 100)
+        # generate_random_hist([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4], 1000)
