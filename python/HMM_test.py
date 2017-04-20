@@ -7,6 +7,8 @@ Created on Wed Jan 18 13:56:15 2017
 
 import numpy as np
 import random
+import math
+import warnings
 import time
 from hmmlearn import hmm
 import scipy.stats as ss
@@ -92,9 +94,11 @@ def generate_random_hist (inputList, numofSample):
         #
         output.append(tempMin)
     #
+    '''
     plt.hist(output, bins = len(inputList))
     plt.show()
     print(output)
+    '''
     return output
 
 
@@ -155,8 +159,9 @@ def experiment_0():
     # 符号化後の境界と本当の境界との距離をヒストグラムで表示する関数
 def experiment_1(n_components, dataLength, div):
     result = []
+    score = []
     result.append(0)
-    for _ in range(100):
+    for _ in range(500):
         # データを生成
         datas = []
         datas.extend(makeData(testfunc_circle, div, 0, 2*np.pi, 10))
@@ -189,16 +194,32 @@ def experiment_1(n_components, dataLength, div):
         #
         # ヒストグラムに加える
         result.append(tempMin)
+        # tempMin が乱択されたヒストグラムに対して有意な値であるか検証
+        #   ・res を用いてランダムなヒストグラムを生成
+        randomHist = generate_random_hist(res, 10000)
+        #   ・ヒストグラムをもとにガウス分布を生成
+        myu = sum(randomHist)/len(randomHist)
+        var = np.var(np.array(randomHist))
+        #   ・生成された ガウス分布のパラメータを用いてtempMin の生成確立を算出
+        tempScore = 1/math.sqrt(2 * math.pi * var) * math.exp(-1*(tempMin - myu) * (tempMin - myu) / var)
+        # 記録
+        score.append(tempScore)
     #
     # ヒストグラムを書く
     print(result)
     plt.hist(result, bins = dataLength)
+    plt.title(u"HMMによる推定値と真値との距離")
+    plt.show()
+    print(score)
+    plt.hist(score, bins = dataLength)
+    plt.title("推定値の検定")
     plt.show()
     print("Successfully terminated.")
 
 
 
 if __name__ == "__main__":
+    with warnings.catch_warnings()
     # experiment_0()
-    # experiment_1(30, 200, 100)
-    generate_random_hist([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4], 1000)
+    experiment_1(30, 200, 100)
+    # generate_random_hist([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4], 1000)
