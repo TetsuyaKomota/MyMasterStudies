@@ -34,6 +34,10 @@ class Restaurant:
     def getU(self):
         return self.u
 
+    # 子店数のゲッター．ほぼテスト用
+    def getNumofChilds(self):
+        return len(self.childs)
+
     # （相対的な）文脈を引数に，子店を取得，ない場合は生成するメソッド
     def getChildofForrowedU(self, u):
         # もし u が空配列なら，自分を返す
