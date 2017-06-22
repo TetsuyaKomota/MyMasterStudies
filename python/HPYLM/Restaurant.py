@@ -38,6 +38,11 @@ class Restaurant:
     def getNumofChilds(self):
         return len(self.childs)
 
+    # 引数に与えた料理を提供するテーブルを新設する
+        # w : str : 料理
+    def addNewTable(self, w):
+        self.tables.append(w)
+
     # （相対的な）文脈を引数に，子店を取得，ない場合は生成するメソッド
     def getChildofForrowedU(self, u):
         # もし u が空配列なら，自分を返す
@@ -59,6 +64,27 @@ class Restaurant:
             self.childs[U[0]] = Restaurant(self, self.getU() + [U[0]])
         # 子供に対して再帰的に関数を呼ぶ
         return self.childs[U[0]].getChildofForrowedU(U[1:])
+
+
+    # --------------------------------------------------------------------------------------
+    # 以下仮置きメソッド．順次実装
+
+    # テーブルのID を引数に，そのテーブルに客を一人追加する
+        # tableId : int : テーブルのID(配列のインデックス)
+    def addCustomeratTable(self, tableId):
+        print("hogehoge")
+
+    # 料理を引数に，その料理のおかれたテーブルのいずれかに客を一人追加する
+    # 現段階では料理一種につきテーブル一つなので成立する
+        # w : str : 料理
+    def addCustomeratWord(self, w):
+        print("hogehoge")
+
+    # 料理を引数に，親店からその料理のテーブル新設を要求する
+    # 親店にもない場合は再帰的に要求する
+        # w : str : 料理
+    def orderNewWord(self, w):
+        print("hogehoge")
 
     # 料理を引数に，その料理のおかれているテーブルの数を返す
     # 現段階ではt_uw = 1 なので0 or 1 を返す
