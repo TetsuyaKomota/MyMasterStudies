@@ -137,6 +137,9 @@ class Restaurant:
         # u : list : 文脈の配列
         # w : str  : 料理
     def calcProbability(self, u, w):
+        # -------------------------------------------
+        # 指定した文脈にあたる店まで移動する
+        # -------------------------------------------
         # 計算に必要な値を用意する
             # 文脈 u で料理 w が生成された回数
         c_uw = self.getNumofCustomersofWord(w)
@@ -146,6 +149,9 @@ class Restaurant:
         t_uw = self.getNumberofTablesofWord(w)
             # 文脈 u での全テーブル数
         t_u = len(self.tables)
+            # θ, d を求めておく
+        theta = self.getTheta()
+        d     = self.getD()
             # 親店での確率
             # 根店の場合はその店自体の全料理数の逆数(全料理等確率)
             # 根店には全料理が存在するはず
@@ -154,5 +160,9 @@ class Restaurant:
             Pdash = 1.0/set(self.tables)
         else:
             Pdash = self.parent.calcProbability(u[1:], w)
-        return 0.0        
+        # -------------------------------------------
+        # 確率を計算する
+        term1 =  (1.0*(c_uw - d*t_uw)) / (theta + c_u)
+        term2 = ((1.0*(theta + d*t_u)) / (theta + c_u)) * Pdash
+        return term1 + term2
 
