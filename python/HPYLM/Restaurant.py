@@ -18,7 +18,7 @@ class Restaurant:
         self.customers = []
         self.childs    = {}
         # デバッグ用．自分の文脈を表示する
-        print(self.getU())
+        print("generated new Context :"+ str(self.getU()))
 
     # 親店のゲッター
     def getParent(self):
@@ -48,9 +48,8 @@ class Restaurant:
     # テーブルのID を引数に，そのテーブルに客を一人追加する
         # tableId : int : テーブルのID(配列のインデックス)
     def addCustomeratTable(self, tableId):
-        self.tables[tableId] = self.tables[tableId] + 1
         self.customers.append(tableId)
-        print("hogehoge")
+        # print("add - at Table")
 
     # 料理を引数に，その料理のおかれたテーブルのいずれかに客を一人追加する
     # 現段階では料理一種につきテーブル一つなので成立する
@@ -65,8 +64,8 @@ class Restaurant:
         if self.parent is not None:
             self.parent.addCustomeratWord(w)
         newId = self.addNewTable(w)
-        self.addCustomeatTable(newId)
-        print("hogehoge")
+        self.addCustomeratTable(newId)
+        # print("add - at word")
 
     # 引数に与えた料理を提供するテーブルを新設する
         # w      : str : 料理

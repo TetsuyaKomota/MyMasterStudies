@@ -58,5 +58,43 @@ class TestGetChildofForrowedU(unittest.TestCase):
         expected = [1, 2, 2, 0]
         self.assertEqual(expected, result)
 
+    # 文章からの客生成が適切に行えているかのテスト
+    def test_isCollectCustomers(self):
+ 
+        # 根店を生成
+        rest = Restaurant.Restaurant(None, [])
+        # 文脈を適当に挿入
+        
+        u1 = ["今日", "も", "また", "人が", "死んだよ"]
+        u2 = ["今日", "も", "また", "俺は", "元気"]
+        u3 = ["今日", "も", "また", "俺は", "残業"]
+        rest.addCustomerfromSentence(u1)
+        rest.addCustomerfromSentence(u2)
+        rest.addCustomerfromSentence(u3)
+
+        uA = ["今日", "も"]
+        uB = ["今日", "も", "また"]
+        uC = ["今日", "も", "また", "俺は"]
+        chiA = rest.getChildofForrowedU(uA)
+        chiB = rest.getChildofForrowedU(uB)
+        chiC = rest.getChildofForrowedU(uC)
+
+        chiA.toPrint()
+        chiB.toPrint()
+        chiC.toPrint()
+
+        result = []
+        result.append(chiA.getNumofChilds())
+        result.append(chiB.getNumofChilds())
+        result.append(chiC.getNumofChilds())
+
+        # (今日も            )  の子は  （また）
+        # (今日もまた        )  の子は  （人が，俺は）
+        # (今日もまた俺は    )  の子は  （元気，残業）
+        # (今日もまた俺は元気)  の子は　いない
+        expected = [1, 2, 2, 0]
+        self.assertEqual(expected, result)
+
+
 if __name__ == "__main__":
     unittest.main()
