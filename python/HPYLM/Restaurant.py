@@ -18,7 +18,7 @@ class Restaurant:
         self.customers = []
         self.childs    = {}
         # デバッグ用．自分の文脈を表示する
-        print("generated new Context :"+ str(self.getU()))
+        # print("generated new Context :"+ str(self.getU()))
 
     # 親店のゲッター
     def getParent(self):
@@ -76,8 +76,10 @@ class Restaurant:
         self.tables.append(w)
         return len(self.tables)  - 1
 
-    # 下のメソッドが根本的に間違ってたので修正版
-
+    # （相対的な）文章(文脈 + 料理)を引数に，客を追加，
+    # 子店がない場合は生成するメソッド
+    # 下の getChildofForrowedU と混同しないように注意
+        # u : list : 文章（文脈 + 料理） 最後の要素を料理として扱う
     def addCustomerfromSentence(self, u):
         # もし u が配列ならそのまま使う
         if isinstance(u, list):
@@ -118,7 +120,11 @@ class Restaurant:
         # self.addCustomeratWord(nextU)
         return self.childs[nextU].addCustomerfromSentence(U)
 
-    # 下のメソッドが間違ってたので修正版
+    # 文脈を引数に，その文脈の子店のオブジェクトを返す
+    # その文脈のオブジェクトが存在しない場合は None を返す
+    # 外部から叩く場合は根店限定
+        # u      : list   : 文脈
+        # return : object : 指定した文脈の子店
     def getChildofForrowedU(self, u):
         # もし u が配列ならそのまま使う
         if isinstance(u, list):
@@ -142,44 +148,6 @@ class Restaurant:
                 print("[Restaurant]getChildofForrowedU:no childs")
                 return None
             return self.childs[nextU].getChildofForrowedU(U)
-
-
-
-    # （相対的な）文章(文脈 + 料理)を引数に，客を追加，
-    # 子店がない場合は生成するメソッド
-    # 下の getChildofForrowedU と混同しないように注意
-    # というか，もしかしたら下の方はいらないかも
-        # u : list : 文章（文脈 + 料理） 最後の要素を料理として扱う
-    def old_addCustomerfromSentence(self, u):
-        # もし u が要素一つのみの配列なら，自分に客を追加する
-        if isinstance(u, list) == True and len(u) == 1:
-            self.addCustomeratWord(u[0])
-            return True
-        # 一つの文章から，開始位置によって多数の文脈を取得できる
-        # 根店の場合のみ，多数の開始位置に対応する再帰を行う
-        if self.parent is None:
-            rec = self.addCustomerfromSentence(u[1:])
-            if rec == False:
-                print("[Restaurant]addCustomerfromSentence:error")
-                return False
-            
-        # もし u が配列ならそのまま使う
-        if isinstance(u, list):
-            U = u
-        # もし u が文字列なら，要素一つの配列に変える
-        elif isinstance(u, str) == True:
-            U = []
-            U.append(u)
-        # 文字列でも配列でもないときは間違いなのでエラー終了
-        else:
-            print("[Restaurant]addCustomerfromSentence:invalid inputs")
-            return False
-        # もしU[0] を文脈とする子店がないなら，新規に作成する
-        if U[0] not in self.childs.keys():
-            self.childs[U[0]] = Restaurant(self, self.getU() + [U[0]])
-        # 子供に対して再帰的に関数を呼ぶ
-        self.addCustomeratWord(U[0])
-        return self.childs[U[0]].addCustomerfromSentence(U[1:])
 
     # （相対的な）文脈を引数に，子店を取得，ない場合は生成するメソッド
     def old_getChildofForrowedU(self, u):
