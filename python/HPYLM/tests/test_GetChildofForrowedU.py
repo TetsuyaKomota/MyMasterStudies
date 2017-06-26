@@ -6,7 +6,7 @@ import Restaurant
 class TestGetChildofForrowedU(unittest.TestCase):
     
     # 新規文脈によって生成された子店の文脈が適切になっているかテスト
-    def test_isCollectTerminalNode(self):
+    def _test_isCollectTerminalNode(self):
         
         # 根店を生成
         rest = Restaurant.Restaurant(None, [])
@@ -18,7 +18,7 @@ class TestGetChildofForrowedU(unittest.TestCase):
 
     # 途中まで共通した文脈で子店を生成した際に
     # 木構造が適切にできているかテスト
-    def test_isCollectTree(self):
+    def _test_isCollectTree(self):
  
         # 根店を生成
         rest = Restaurant.Restaurant(None, [])
@@ -72,16 +72,26 @@ class TestGetChildofForrowedU(unittest.TestCase):
         rest.addCustomerfromSentence(u2)
         rest.addCustomerfromSentence(u3)
 
-        uA = ["今日", "も"]
-        uB = ["今日", "も", "また"]
-        uC = ["今日", "も", "また", "俺は"]
+        """
+        uA = []
+        uB = ["今日"]
+        uC = ["今日", "も"]
+        uD = ["今日", "も", "また"]
+        uE = ["今日", "も", "また", "俺は"]
+        """
+        uA = []
+        uB = ["俺は"]
+        uC = ["また", "俺は"]
+        uD = ["も", "また", "俺は"]
+        uE = ["今日", "も", "また", "俺は"]
+        
         chiA = rest.getChildofForrowedU(uA)
         chiB = rest.getChildofForrowedU(uB)
         chiC = rest.getChildofForrowedU(uC)
+        chiD = rest.getChildofForrowedU(uD)
+        chiE = rest.getChildofForrowedU(uE)
 
-        chiA.toPrint()
-        chiB.toPrint()
-        chiC.toPrint()
+        rest.toPrint()
 
         result = []
         result.append(chiA.getNumofChilds())

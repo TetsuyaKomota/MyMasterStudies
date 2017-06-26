@@ -64,10 +64,10 @@ class Restaurant:
         # 指定した料理のテーブルがない場合は新設する
         if flag == False:
             newId = self.addNewTable(w)
+            # 新設した場合，親店へ代理客を送る
+            if self.parent is not None:
+                self.parent.addCustomeratWord(w)
         self.addCustomeratTable(newId)
-        # 親店へ代理客を送る
-        if self.parent is not None:
-            self.parent.addCustomeratWord(w)
 
     # 引数に与えた料理を提供するテーブルを新設する
         # w      : str : 料理
@@ -94,12 +94,13 @@ class Restaurant:
         # 一つの文章から，開始位置によって多数の文脈を取得できる
         # 根店の場合のみ，多数の開始位置に対応する再帰を行う
         if self.parent is None and len(U) >= 2:
-            rec = self.addCustomerfromSentence(U[1:])
+            rec = self.addCustomerfromSentence(U[:-1])
             if rec == False:
                 print("[Restaurant]addCustomerfromSentence:error")
                 return False
-        # まず，先頭単語（料理）のテーブルに客を配置する
-        self.addCustomeratWord(U[-1])
+        # 最も深い文脈である場合，料理に対応するテーブルに客を配置する
+        if len(self.getU()) + 1 >= len(U):
+            self.addCustomeratWord(U[-1])
         # もし u が要素一つのみの配列ならそこで終了
         if len(U) == 1:
             return True
@@ -110,9 +111,10 @@ class Restaurant:
             return True
         # 1個目の -1 は調整用，2個目は料理分を表す
         nextU = U[-1-1-len(self.getU())]
+        # 対応する子店が存在しない場合，子店を生成する
         if nextU not in self.childs.keys():
             self.childs[nextU] = Restaurant(self, [nextU] + self.getU())
-        # 子供に対して再帰的に関数を呼ぶ
+        # 子店に対して再帰的に関数を呼ぶ
         # self.addCustomeratWord(nextU)
         return self.childs[nextU].addCustomerfromSentence(U)
 
@@ -206,24 +208,28 @@ class Restaurant:
         return self.childs[U[0]].getChildofForrowedU(U[1:])
 
     # デバッグ用．ステータス表示
-    def toPrint(self):
-        print("====")
+    def toPrint(self, t=0):
+        tab = ""
+        for i in range(t):
+            tab = tab + "\t"
+        print(tab + "====")
         # 文脈を表示
-        print("U : " + str(self.u))
+        print(tab + "U : " + str(self.u))
         # テーブルの状態を表示する
-        print("T : " + str(self.tables))
+        print(tab + "T : " + str(self.tables))
         # 客の状態を表示する
-        print("W : ")
+        print(tab + "W : ")
         line = ""
         for i, c in enumerate(self.customers):
             line = line + self.tables[c] + ","
             if (i+1)%10 == 0:
                 print(line)
                 line = ""
-        print(line)
-
-        print("====")
-
+        print(tab + line)
+        print(tab + "====")
+        
+        for c in self.childs:
+            self.childs[c].toPrint(t+1)
     # --------------------------------------------------------------------------------------
     # 以下仮置きメソッド．順次実装
 
