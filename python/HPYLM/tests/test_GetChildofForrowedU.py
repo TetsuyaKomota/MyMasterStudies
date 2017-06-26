@@ -23,13 +23,14 @@ class TestGetChildofForrowedU(unittest.TestCase):
         # 根店を生成
         rest = Restaurant.Restaurant(None, [])
         # 文脈を適当に挿入
+        
         u1 = ["今日", "も", "また", "人が", "死んだよ"]
         u2 = ["今日", "も", "また", "俺は", "元気"]
         u3 = ["今日", "も", "また", "俺は", "残業"]
         rest.getChildofForrowedU(u1)
         rest.getChildofForrowedU(u2)
         rest.getChildofForrowedU(u3)
-        
+
         uA = ["今日", "も"]
         uB = ["今日", "も", "また"]
         uC = ["今日", "も", "また", "俺は"]

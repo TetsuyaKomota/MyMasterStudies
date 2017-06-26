@@ -45,10 +45,34 @@ class Restaurant:
     # つまりこれはPY ではなくIKN
        return 0.5
 
-    # 引数に与えた料理を提供するテーブルを新設する
+    # テーブルのID を引数に，そのテーブルに客を一人追加する
+        # tableId : int : テーブルのID(配列のインデックス)
+    def addCustomeratTable(self, tableId):
+        self.tables[tableId] = self.tables[tableId] + 1
+        print("hogehoge")
+
+    # 料理を引数に，その料理のおかれたテーブルのいずれかに客を一人追加する
+    # 現段階では料理一種につきテーブル一つなので成立する
         # w : str : 料理
+    def addCustomeratWord(self, w):
+        for i in range(len(self.tables)):
+            if self.tables[i] == w:
+                self.addCustomeratTable(i)
+                break
+        # 指定した 料理のテーブルが存在しない場合，親店にテーブル新設を要求する
+        # 根店の場合は親への要求なしに新設できる
+        if self.parent is not None:
+            self.parent.addCustomeratWord(w)
+        newId = self.addNewTable(w)
+        self.addCustomeatTable(newId)
+        print("hogehoge")
+
+    # 引数に与えた料理を提供するテーブルを新設する
+        # w      : str : 料理
+        # return : int : 新設されたテーブルの番号
     def addNewTable(self, w):
         self.tables.append(w)
+        return len(self.tables)  - 1
 
     # （相対的な）文脈を引数に，子店を取得，ない場合は生成するメソッド
     def getChildofForrowedU(self, u):
@@ -79,17 +103,6 @@ class Restaurant:
 
     # --------------------------------------------------------------------------------------
     # 以下仮置きメソッド．順次実装
-
-    # テーブルのID を引数に，そのテーブルに客を一人追加する
-        # tableId : int : テーブルのID(配列のインデックス)
-    def addCustomeratTable(self, tableId):
-        print("hogehoge")
-
-    # 料理を引数に，その料理のおかれたテーブルのいずれかに客を一人追加する
-    # 現段階では料理一種につきテーブル一つなので成立する
-        # w : str : 料理
-    def addCustomeratWord(self, w):
-        print("hogehoge")
 
     # 料理を引数に，親店からその料理のテーブル新設を要求する
     # 親店にもない場合は再帰的に要求する
