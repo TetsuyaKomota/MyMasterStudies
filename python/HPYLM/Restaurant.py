@@ -49,23 +49,25 @@ class Restaurant:
         # tableId : int : テーブルのID(配列のインデックス)
     def addCustomeratTable(self, tableId):
         self.customers.append(tableId)
-        # print("add - at Table")
 
     # 料理を引数に，その料理のおかれたテーブルのいずれかに客を一人追加する
     # 現段階では料理一種につきテーブル一つなので成立する
         # w : str : 料理
     def addCustomeratWord(self, w):
+        flag = False
+        newId = -1
         for i in range(len(self.tables)):
             if self.tables[i] == w:
-                self.addCustomeratTable(i)
+                newId = i
+                flag = True
                 break
-        # 指定した 料理のテーブルが存在しない場合，親店にテーブル新設を要求する
-        # 根店の場合は親への要求なしに新設できる
+        # 指定した料理のテーブルがない場合は新設する
+        if flag == False:
+            newId = self.addNewTable(w)
+        self.addCustomeratTable(newId)
+        # 親店へ代理客を送る
         if self.parent is not None:
             self.parent.addCustomeratWord(w)
-        newId = self.addNewTable(w)
-        self.addCustomeratTable(newId)
-        # print("add - at word")
 
     # 引数に与えた料理を提供するテーブルを新設する
         # w      : str : 料理
@@ -74,20 +76,48 @@ class Restaurant:
         self.tables.append(w)
         return len(self.tables)  - 1
 
-    # （相対的な）文章(文脈 + 料理)を引数に，客を追加，
-    # 子店がない場合は生成するメソッド
-    # 下の getChildofForrowedU と混同しないように注意
-    # というか，もしかしたら下の方はいらないかも
-        # u : list : 文章（文脈 + 料理） 最後の要素を料理として扱う
+    # 下のメソッドが根本的に間違ってたので修正版
+
     def addCustomerfromSentence(self, u):
-        # もし u が要素一つのみの配列なら，自分に客を追加する
-        if isinstance(u, list) == True and len(u) == 1:
-            self.addCustomeratWord(u[0])
-            return True
+        # もし u が配列ならそのまま使う
+        if isinstance(u, list):
+            U = u
+        # もし u が文字列なら，要素一つの配列に変える
+        elif isinstance(u, str) == True:
+            U = []
+            U.append(u)
+        # 文字列でも配列でもないときは間違いなのでエラー終了
+        else:
+            print("[Restaurant]addCustomerfromSentence:invalid inputs")
+            return False
+
         # 一つの文章から，開始位置によって多数の文脈を取得できる
         # 根店の場合のみ，多数の開始位置に対応する再帰を行う
-        if self.parent is None:
-            self.addCustomerfromSentence(u[1:])
+        if self.parent is None and len(U) >= 2:
+            rec = self.addCustomerfromSentence(U[1:])
+            if rec == False:
+                print("[Restaurant]addCustomerfromSentence:error")
+                return False
+        # まず，先頭単語（料理）のテーブルに客を配置する
+        self.addCustomeratWord(U[-1])
+        # もし u が要素一つのみの配列ならそこで終了
+        if len(U) == 1:
+            return True
+        # U から「自分の文脈 + 料理」を除いた部分が「さらに深いngram」
+        # なので，次の文脈を取得する
+        # 文脈 + 料理 の長さが与えられた文章以上ならそれが最も深い文脈
+        if len(self.getU()) + 1 >= len(U):
+            return True
+        # 1個目の -1 は調整用，2個目は料理分を表す
+        nextU = U[-1-1-len(self.getU())]
+        if nextU not in self.childs.keys():
+            self.childs[nextU] = Restaurant(self, [nextU] + self.getU())
+        # 子供に対して再帰的に関数を呼ぶ
+        # self.addCustomeratWord(nextU)
+        return self.childs[nextU].addCustomerfromSentence(U)
+
+    # 下のメソッドが間違ってたので修正版
+    def getChildofForrowedU(self, u):
         # もし u が配列ならそのまま使う
         if isinstance(u, list):
             U = u
@@ -99,15 +129,58 @@ class Restaurant:
         else:
             print("[Restaurant]getChildofForrowedU:invalid inputs")
             return None
+        # U が自分の文脈と同じなら自分を返す
+        if U == self.getU():
+            return self
+        else:
+        # より深い適切な子店を取得する
+            nextU = U[-1-len(self.getU())]
+            # 適切な子店が存在しない場合，エラーを返す
+            if nextU not in self.childs.keys():
+                print("[Restaurant]getChildofForrowedU:no childs")
+                return None
+            return self.childs[nextU].getChildofForrowedU(U)
+
+
+
+    # （相対的な）文章(文脈 + 料理)を引数に，客を追加，
+    # 子店がない場合は生成するメソッド
+    # 下の getChildofForrowedU と混同しないように注意
+    # というか，もしかしたら下の方はいらないかも
+        # u : list : 文章（文脈 + 料理） 最後の要素を料理として扱う
+    def old_addCustomerfromSentence(self, u):
+        # もし u が要素一つのみの配列なら，自分に客を追加する
+        if isinstance(u, list) == True and len(u) == 1:
+            self.addCustomeratWord(u[0])
+            return True
+        # 一つの文章から，開始位置によって多数の文脈を取得できる
+        # 根店の場合のみ，多数の開始位置に対応する再帰を行う
+        if self.parent is None:
+            rec = self.addCustomerfromSentence(u[1:])
+            if rec == False:
+                print("[Restaurant]addCustomerfromSentence:error")
+                return False
+            
+        # もし u が配列ならそのまま使う
+        if isinstance(u, list):
+            U = u
+        # もし u が文字列なら，要素一つの配列に変える
+        elif isinstance(u, str) == True:
+            U = []
+            U.append(u)
+        # 文字列でも配列でもないときは間違いなのでエラー終了
+        else:
+            print("[Restaurant]addCustomerfromSentence:invalid inputs")
+            return False
         # もしU[0] を文脈とする子店がないなら，新規に作成する
         if U[0] not in self.childs.keys():
             self.childs[U[0]] = Restaurant(self, self.getU() + [U[0]])
         # 子供に対して再帰的に関数を呼ぶ
+        self.addCustomeratWord(U[0])
         return self.childs[U[0]].addCustomerfromSentence(U[1:])
 
-
     # （相対的な）文脈を引数に，子店を取得，ない場合は生成するメソッド
-    def getChildofForrowedU(self, u):
+    def old_getChildofForrowedU(self, u):
         # もし u が空配列なら，自分を返す
         if isinstance(u, list) == True and len(u) == 0:
             return self
@@ -139,6 +212,16 @@ class Restaurant:
         print("U : " + str(self.u))
         # テーブルの状態を表示する
         print("T : " + str(self.tables))
+        # 客の状態を表示する
+        print("W : ")
+        line = ""
+        for i, c in enumerate(self.customers):
+            line = line + self.tables[c] + ","
+            if (i+1)%10 == 0:
+                print(line)
+                line = ""
+        print(line)
+
         print("====")
 
     # --------------------------------------------------------------------------------------
