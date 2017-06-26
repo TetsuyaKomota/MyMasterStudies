@@ -40,6 +40,11 @@ class TestGetChildofForrowedU(unittest.TestCase):
         chiC = rest.getChildofForrowedU(uC)
         chiD = rest.getChildofForrowedU(uD)
 
+        chiA.toPrint()
+        chiB.toPrint()
+        chiC.toPrint()
+        chiD.toPrint()
+
         result = []
         result.append(chiA.getNumofChilds())
         result.append(chiB.getNumofChilds())

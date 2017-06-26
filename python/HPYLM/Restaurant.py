@@ -6,7 +6,7 @@
 # 定数
 class Restaurant:
 
-    # u         : 文脈．店のインデックスと考えてもよい
+    # u         : 文脈（根店からの絶対文脈）．店のインデックスと考えてもよい
     # parent    : 親店のオブジェクト
     # childs    : 子店のオブジェクトの辞書．キーを文脈の最後の単語（相対文脈）とする
     # tables    : テーブルの配列,料理（そのテーブルが提供する料理）を要素とする
@@ -49,6 +49,7 @@ class Restaurant:
         # tableId : int : テーブルのID(配列のインデックス)
     def addCustomeratTable(self, tableId):
         self.tables[tableId] = self.tables[tableId] + 1
+        self.customers.append(tableId)
         print("hogehoge")
 
     # 料理を引数に，その料理のおかれたテーブルのいずれかに客を一人追加する
@@ -73,6 +74,38 @@ class Restaurant:
     def addNewTable(self, w):
         self.tables.append(w)
         return len(self.tables)  - 1
+
+    # （相対的な）文章(文脈 + 料理)を引数に，客を追加，
+    # 子店がない場合は生成するメソッド
+    # 下の getChildofForrowedU と混同しないように注意
+    # というか，もしかしたら下の方はいらないかも
+        # u : list : 文章（文脈 + 料理） 最後の要素を料理として扱う
+    def addCustomerfromSentence(self, u):
+        # もし u が要素一つのみの配列なら，自分に客を追加する
+        if isinstance(u, list) == True and len(u) == 1:
+            self.addCustomeratWord(u[0])
+            return True
+        # 一つの文章から，開始位置によって多数の文脈を取得できる
+        # 根店の場合のみ，多数の開始位置に対応する再帰を行う
+        if self.parent is None:
+            self.addCustomerfromSentence(u[1:])
+        # もし u が配列ならそのまま使う
+        if isinstance(u, list):
+            U = u
+        # もし u が文字列なら，要素一つの配列に変える
+        elif isinstance(u, str) == True:
+            U = []
+            U.append(u)
+        # 文字列でも配列でもないときは間違いなのでエラー終了
+        else:
+            print("[Restaurant]getChildofForrowedU:invalid inputs")
+            return None
+        # もしU[0] を文脈とする子店がないなら，新規に作成する
+        if U[0] not in self.childs.keys():
+            self.childs[U[0]] = Restaurant(self, self.getU() + [U[0]])
+        # 子供に対して再帰的に関数を呼ぶ
+        return self.childs[U[0]].addCustomerfromSentence(U[1:])
+
 
     # （相対的な）文脈を引数に，子店を取得，ない場合は生成するメソッド
     def getChildofForrowedU(self, u):
@@ -100,6 +133,14 @@ class Restaurant:
         # 子供に対して再帰的に関数を呼ぶ
         return self.childs[U[0]].getChildofForrowedU(U[1:])
 
+    # デバッグ用．ステータス表示
+    def toPrint(self):
+        print("====")
+        # 文脈を表示
+        print("U : " + str(self.u))
+        # テーブルの状態を表示する
+        print("T : " + str(self.tables))
+        print("====")
 
     # --------------------------------------------------------------------------------------
     # 以下仮置きメソッド．順次実装
@@ -149,6 +190,7 @@ class Restaurant:
     # 文脈と単語を引数に，その店および親店での確率を評価して返す
         # u : list : 文脈の配列
         # w : str  : 料理
+    # テスト成功確認次第仮置きじゃなくす仮置きじゃなくす
     def calcProbability(self, u, w):
         # -------------------------------------------
         # 指定した文脈にあたる店まで移動する
