@@ -69,6 +69,43 @@ class Restaurant:
                 self.parent.addCustomeratWord(w)
         self.addCustomeratTable(newId)
 
+    # テーブルのID を引数に，そのテーブルの客を一人削除する
+        # tableId : int : テーブルのID(配列のインデックス)
+    def eliminateCustomeratTable(self, tableId):
+        # 選択したテーブルの客を適当に探してきて削除
+        for i in range(len(self.customers)):
+            if self.customers[i] == tableId:
+               self.customers.pop(i)
+        # 削除後のそのテーブルの客数を確認
+        # ゼロ人ならそのテーブルを削除
+        if self.getNumofCustomersofTable(tableId) == 0:
+        # テーブルを削除したなら，全客に対して以下を行う
+            for c in self.customers:
+        #   テーブル番号が削除したテーブル以上の客のインデックスを1減らす
+                if c > tableId:
+                    c = c - 1
+        self.customers.append(tableId)
+        
+
+    # 料理を引数に，その料理のおかれたテーブルのいずれかに客を一人追加する
+    # 現段階では料理一種につきテーブル一つなので成立する
+        # w : str : 料理
+    def addCustomeratWord(self, w):
+        flag = False
+        newId = -1
+        for i in range(len(self.tables)):
+            if self.tables[i] == w:
+                newId = i
+                flag = True
+                break
+        # 指定した料理のテーブルがない場合は新設する
+        if flag == False:
+            newId = self.addNewTable(w)
+            # 新設した場合，親店へ代理客を送る
+            if self.parent is not None:
+                self.parent.addCustomeratWord(w)
+        self.addCustomeratTable(newId)
+
     # 引数に与えた料理を提供するテーブルを新設する
         # w      : str : 料理
         # return : int : 新設されたテーブルの番号
