@@ -115,13 +115,15 @@ class Restaurant:
         nextU = U[-1-1-len(self.getU())]
         # 対応する子店が存在しない場合，子店を生成する
         if nextU not in self.childs.keys():
-            self.childs[nextU] = Restaurant(self, [nextU] + self.getU())
+            self.childs[nextU] = Restaurant(self,[nextU]+self.getU())
         # 子店に対して再帰的に関数を呼ぶ
         # self.addCustomeratWord(nextU)
         return self.childs[nextU].addCustomerfromSentence(U)
 
     # 文脈を引数に，その文脈の子店のオブジェクトを返す
     # その文脈のオブジェクトが存在しない場合は None を返す
+    # →存在しない場合，新設するように変更．
+    # 確率計算の際に未学習の文脈に遭遇することはあるため
     # 外部から叩く場合は根店限定
         # u      : list   : 文脈
         # return : object : 指定した文脈の子店
@@ -144,11 +146,11 @@ class Restaurant:
         # より深い適切な子店を取得する
             nextU = U[-1-len(self.getU())]
             # 適切な子店が存在しない場合，エラーを返す
+            # →存在しない場合，新設するよう変更
             if nextU not in self.childs.keys():
-                print("[Restaurant]getChildofForrowedU:no childs")
-                return None
+                self.childs[nextU] = Restaurant(self,[nextU]+self.getU()) 
             return self.childs[nextU].getChildofForrowedU(U)
-
+    """
     # （相対的な）文脈を引数に，子店を取得，ない場合は生成するメソッド
     def old_getChildofForrowedU(self, u):
         # もし u が空配列なら，自分を返す
@@ -174,7 +176,7 @@ class Restaurant:
             self.childs[U[0]] = Restaurant(self, self.getU() + [U[0]])
         # 子供に対して再帰的に関数を呼ぶ
         return self.childs[U[0]].getChildofForrowedU(U[1:])
-
+    """
     # デバッグ用．ステータス表示
     def toPrint(self, t=0):
         tab = ""
@@ -268,5 +270,21 @@ class Restaurant:
     # 以下仮置きメソッド．順次実装
 
     # 一文を引数に，その文章の生成確率を返す
+    # そのまま計算するとかなり確率が小さくなってしまう気がするが，とりあえずそのまま計算する
     def calcProbability(self, sentence):
-        return 0.0
+        # このメソッドは根店限定なので，根店以外で呼ばれていたら終了する
+        if self.parent is not None:
+            return -1
+        output = 1
+        tempUandW = []
+        while tempUandW != sentence:
+            # 計算対象の単語と文脈を更新
+            tempUandW.append(sentence[len(tempUandW)])
+            # 計算を行う文脈の店を取得する
+            # TODO ここで店が存在しないとエラーになってしまうが，「初めて見た文脈」というのもありなはず
+            # TODO つまり最初に作ってた「getChildofForrowedU で子店新設できる」というのが正しかったので修正する
+            chi = self.getChildofForrowedU(tempUandW[:-1])
+            # 確率を反映
+            output = output * chi.calcProbabilityofForrowedU(tempUandW[-1])
+            
+        return output
