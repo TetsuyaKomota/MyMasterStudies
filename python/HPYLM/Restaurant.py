@@ -265,10 +265,10 @@ class Restaurant:
     def toJSON(self):
         output = {}
         output["U"] = self.getU()
-        output["T"] = self.tables
-        childs_dict = []
+        output["T"] = set(self.tables)
+        childs_dict = {}
         for c in self.childs:
-            childs_dict.append(self.childs[c].toJSON())
+            childs_dict[c] = self.childs[c].toJSON()
         output["C"] = childs_dict
         return output 
 
