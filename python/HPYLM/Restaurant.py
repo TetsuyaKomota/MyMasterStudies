@@ -198,14 +198,6 @@ class Restaurant:
         
         for c in self.childs:
             self.childs[c].toPrint(t+1)
-    # --------------------------------------------------------------------------------------
-    # 以下仮置きメソッド．順次実装
-
-    # 料理を引数に，親店からその料理のテーブル新設を要求する
-    # 親店にもない場合は再帰的に要求する
-        # w : str : 料理
-    def orderNewWord(self, w):
-        print("hogehoge")
 
     # 料理を引数に，その料理のおかれているテーブルの数を返す
     # 現段階ではt_uw = 1 なので0 or 1 を返す
@@ -218,35 +210,10 @@ class Restaurant:
                 output = output + 1
         return output
 
-    # テーブルのID を引数に，そのテーブルに座る客の数を返す
-        # tableId : int : テーブルID (配列のインデックス)
-        # return  : int : そのテーブルに座る客の数
-    def getNumofCustomersofTable(self, tableId):
-        return 0
-
-    # 料理を引数に，その料理を食べる客の数を返す
-    # 現段階では t_uw = 1 を仮定してるので，適切にテーブルを選べば上と同じ値になる
-        # w      : str : 料理
-        # return : int : その料理を提供してるテーブルに座る客の数の合計
-    def getNumofCustomersofWord(self, w):
-        output = 0
-        for i in range(len(self.tables)):
-            if self.tables[i] == w:
-                for c in self.customers:
-                    if c == i:
-                        output = output + 1
-        return output
-
-    # 料理を引数に，この店（=文脈）でその料理（=単語）を観測する確率を返す
-        # w      : str   : 料理（単語）
-        # return : float : その単語がこの文脈で出現する確率
-    def calcProbabilityforThis(self, w):
-        return 0.0
-
     # 単語を引数に，その店（文脈）および親店での確率を評価して返す
         # w : str  : 料理
     # テスト成功確認次第仮置きじゃなくす
-    def calcProbability(self, w):
+    def calcProbabilityofForrowedU(self, w):
         # -------------------------------------------
         # 指定した文脈にあたる店まで移動する
         # -------------------------------------------
@@ -269,10 +236,37 @@ class Restaurant:
         if self.parent is None:
             Pdash = 1.0/len(set(self.tables))
         else:
-            Pdash = self.parent.calcProbability(w)
+            Pdash = self.parent.calcProbabilityofForrowedU(w)
         # -------------------------------------------
         # 確率を計算する
         term1 =  (1.0*(c_uw - d*t_uw)) / (theta + c_u)
         term2 = ((1.0*(theta + d*t_u)) / (theta + c_u)) * Pdash
         return term1 + term2
 
+    # テーブルのID を引数に，そのテーブルに座る客の数を返す
+        # tableId : int : テーブルID (配列のインデックス)
+        # return  : int : そのテーブルに座る客の数
+    def getNumofCustomersofTable(self, tableId):
+        output = 0
+        for c in self.customers:
+            if c == tableId:
+                output = output + 1
+        return output
+
+    # 料理を引数に，その料理を食べる客の数を返す
+    # 現段階では t_uw = 1 を仮定してるので，適切にテーブルを選べば上と同じ値になる
+        # w      : str : 料理
+        # return : int : その料理を提供してるテーブルに座る客の数の合計
+    def getNumofCustomersofWord(self, w):
+        output = 0
+        for i in range(len(self.tables)):
+            if self.tables[i] == w:
+                output = output + self.getNumofCustomersofTable(i)
+        return output
+
+    # --------------------------------------------------------------------------------------
+    # 以下仮置きメソッド．順次実装
+
+    # 一文を引数に，その文章の生成確率を返す
+    def calcProbability(self, sentence):
+        return 0.0

@@ -111,7 +111,7 @@ class TestGetChildofForrowedU(unittest.TestCase):
         self.assertEqual(expected, result)
 
     # 確率計算のテスト
-    def test_calcProbability(self):
+    def test_calcProbabilityofForrowedU(self):
 
         # 根店を生成
         rest = Restaurant.Restaurant(None, [])
@@ -143,11 +143,11 @@ class TestGetChildofForrowedU(unittest.TestCase):
         w3 = "いい"
         w4 = "おっぺけぺ～"
         w5 = "だいだげき！"
-        p1 = (rest.getChildofForrowedU(u).calcProbability(w1))
-        p2 = (rest.getChildofForrowedU(u).calcProbability(w2))
-        p3 = (rest.getChildofForrowedU(u).calcProbability(w3))
-        p4 = (rest.getChildofForrowedU(u).calcProbability(w4))
-        p5 = (rest.getChildofForrowedU(u).calcProbability(w5))
+        p1 = (rest.getChildofForrowedU(u).calcProbabilityofForrowedU(w1))
+        p2 = (rest.getChildofForrowedU(u).calcProbabilityofForrowedU(w2))
+        p3 = (rest.getChildofForrowedU(u).calcProbabilityofForrowedU(w3))
+        p4 = (rest.getChildofForrowedU(u).calcProbabilityofForrowedU(w4))
+        p5 = (rest.getChildofForrowedU(u).calcProbabilityofForrowedU(w5))
 
         """
         print(rest.getChildofForrowedU(u).getU())
@@ -159,6 +159,64 @@ class TestGetChildofForrowedU(unittest.TestCase):
         """
 
         self.assertTrue((p1>p2) and (p2>p3) and (p3>p4) and (p4==p5))
+
+    # 確率計算のテスト.数値指定版
+    def test_calcProbabilityofForrowedU_hard(self):
+
+        # 根店を生成
+        rest = Restaurant.Restaurant(None, [])
+        # 文脈を適当に挿入
+
+        u1 = ["生きてる", "こと", "が", "つらい", "なら"]
+        u2 = ["いっそ", "小さく", "死ね", "ば", "いい"]
+        u3 = ["生きてる", "こと", "が", "つらい", "なら"]
+        u4 = ["喚き", "散らして", "泣け", "ば", "いい"]
+        u5 = ["生きてる", "こと", "が", "つらい", "なら"]
+        u6 = ["悲しみ", "を", "とくと", "見る", "が", "いい"]
+        u7 = ["生きてる", "こと", "が", "つらい", "ならば"]
+        u8 = ["くたばる", "喜び", "とっておけ"]
+        
+        rest.addCustomerfromSentence(u1)
+        rest.addCustomerfromSentence(u2)
+        rest.addCustomerfromSentence(u3)
+        rest.addCustomerfromSentence(u4)
+        rest.addCustomerfromSentence(u5)
+        rest.addCustomerfromSentence(u6)
+        rest.addCustomerfromSentence(u7)
+        rest.addCustomerfromSentence(u8)
+
+        # rest.toPrint()
+
+        u = ["生きてる", "こと", "が", "つらい"]
+        w1 = "なら"
+        w2 = "ならば"
+        w3 = "いい"
+        w4 = "おっぺけぺ～"
+        w5 = "だいだげき！"
+        p1 = (rest.getChildofForrowedU(u).calcProbabilityofForrowedU(w1))
+        p2 = (rest.getChildofForrowedU(u).calcProbabilityofForrowedU(w2))
+        p3 = (rest.getChildofForrowedU(u).calcProbabilityofForrowedU(w3))
+        p4 = (rest.getChildofForrowedU(u).calcProbabilityofForrowedU(w4))
+        p5 = (rest.getChildofForrowedU(u).calcProbabilityofForrowedU(w5))
+
+        
+        t1 = (p1 == 0.29297422954417)
+        t2 = (p2 == 0.15011708668702714)
+        t3 = (p3 == 0.04050244972864021)
+        t4 = (p4 == 0.015967311912252386)
+        t5 = (p5 == 0.015967311912252386)
+
+        """
+        print(t1)
+        print(t2)
+        print(t3)
+        print(t4)
+        print(t5)
+        """
+
+        self.assertTrue(t1 and t2 and t3 and t4 and t5)
+
+
 
 
 if __name__ == "__main__":
