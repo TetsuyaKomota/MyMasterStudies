@@ -100,16 +100,12 @@ class Restaurant:
             if rec == False:
                 print("[Restaurant]addCustomerfromSentence:error")
                 return False
-        # 最も深い文脈である場合，料理に対応するテーブルに客を配置する
-        if len(self.getU()) + 1 >= len(U):
-            self.addCustomeratWord(U[-1])
-        # もし u が要素一つのみの配列ならそこで終了
-        if len(U) == 1:
-            return True
         # U から「自分の文脈 + 料理」を除いた部分が「さらに深いngram」
         # なので，次の文脈を取得する
         # 文脈 + 料理 の長さが与えられた文章以上ならそれが最も深い文脈
+        # 最も深い文脈である場合，料理に対応するテーブルに客を配置する
         if len(self.getU()) + 1 >= len(U):
+            self.addCustomeratWord(U[-1])
             return True
         # 1個目の -1 は調整用，2個目は料理分を表す
         nextU = U[-1-1-len(self.getU())]
@@ -266,9 +262,6 @@ class Restaurant:
                 output = output + self.getNumofCustomersofTable(i)
         return output
 
-    # --------------------------------------------------------------------------------------
-    # 以下仮置きメソッド．順次実装
-
     # 一文を引数に，その文章の生成確率を返す
     # そのまま計算するとかなり確率が小さくなってしまう気がするが，とりあえずそのまま計算する
     def calcProbability(self, sentence):
@@ -281,10 +274,51 @@ class Restaurant:
             # 計算対象の単語と文脈を更新
             tempUandW.append(sentence[len(tempUandW)])
             # 計算を行う文脈の店を取得する
-            # TODO ここで店が存在しないとエラーになってしまうが，「初めて見た文脈」というのもありなはず
-            # TODO つまり最初に作ってた「getChildofForrowedU で子店新設できる」というのが正しかったので修正する
             chi = self.getChildofForrowedU(tempUandW[:-1])
             # 確率を反映
             output = output * chi.calcProbabilityofForrowedU(tempUandW[-1])
             
         return output
+
+    # --------------------------------------------------------------------
+    # 以下仮置きメソッド．順次実装
+
+    # 文章を引数に，その文章で追加された客を除去する
+    # TODO まだ addCustomesfromSentence をコピペしただけ
+    def eliminateCustomersfromSentence(self, u):
+        # もし u が配列ならそのまま使う
+        if isinstance(u, list):
+            U = u
+        # もし u が文字列なら，要素一つの配列に変える
+        elif isinstance(u, str) == True:
+            U = []
+            U.append(u)
+        # 文字列でも配列でもないときは間違いなのでエラー終了
+        else:
+            print("[Restaurant]addCustomerfromSentence:invalid inputs")
+            return False
+
+        # 一つの文章から，開始位置によって多数の文脈を取得できる
+        # 根店の場合のみ，多数の開始位置に対応する再帰を行う
+        if self.parent is None and len(U) >= 2:
+            rec = self.addCustomerfromSentence(U[:-1])
+            if rec == False:
+                print("[Restaurant]addCustomerfromSentence:error")
+                return False
+        # U から「自分の文脈 + 料理」を除いた部分が「さらに深いngram」
+        # なので，次の文脈を取得する
+        # 文脈 + 料理 の長さが与えられた文章以上ならそれが最も深い文脈
+        # 最も深い文脈である場合，料理に対応するテーブルに客を配置する
+        if len(self.getU()) + 1 >= len(U):
+            self.addCustomeratWord(U[-1])
+            return True
+        # 1個目の -1 は調整分，2個目は料理分を表す
+        nextU = U[-1-1-len(self.getU())]
+        # 対応する子店が存在しない場合，子店を生成する
+        if nextU not in self.childs.keys():
+            self.childs[nextU] = Restaurant(self,[nextU]+self.getU())
+        # 子店に対して再帰的に関数を呼ぶ
+        # self.addCustomeratWord(nextU)
+        return self.childs[nextU].addCustomerfromSentence(U)
+
+
