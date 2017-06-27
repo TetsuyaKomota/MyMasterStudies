@@ -110,6 +110,46 @@ class TestGetChildofForrowedU(unittest.TestCase):
         expected = [13, 3, 1, 1, 1]
         self.assertEqual(expected, result)
 
+    # 文章からの客削除が適切に行えているかのテスト
+    def test_isCollectEliminate(self):
+
+        # なぜか思考ごとに結果が変わるという場合があったので
+        # 100回くらい試行して全部 OK の場合のみ OK とする
+        flag = True
+        for _ in range(100):
+                # 根店を生成
+                rest = Restaurant.Restaurant(None, [])
+                # 文脈を適当に挿入
+                
+                u1 = ["きしむ", "ベッド", "の", "上で"]
+                u2 = ["優しさ", "を", "持ち寄り"]
+                rest.addCustomerfromSentence(u1)
+                rest.addCustomerfromSentence(u2)
+                before = rest.toJSON()
+
+                # print("BEFORE ADDING u3")
+                # rest.toPrint()
+                
+                
+                u3 = ["きつく", "身体", "抱きしめあえば"]
+                rest.addCustomerfromSentence(u3)
+                # print("AFTER  ADDING u3")
+                # rest.toPrint()
+                
+                rest.eliminateCustomerfromSentence(u3)
+                after = rest.toJSON()
+                
+                # print("AFTER  ELIMINATING u3")
+                # rest.toPrint()
+                flag = flag and (before == after)
+                if before != after:
+                    print("after is different before:")
+                    print("before:" + str(before))
+                    print("after :" + str(after))
+                    break
+
+        self.assertTrue(flag)
+
     # 確率計算のテスト
     def test_calcProbabilityofForrowedU(self):
 

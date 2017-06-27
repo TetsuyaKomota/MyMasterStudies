@@ -75,17 +75,32 @@ class Restaurant:
         # 選択したテーブルの客を適当に探してきて削除
         for i in range(len(self.customers)):
             if self.customers[i] == tableId:
-               self.customers.pop(i)
+                self.customers.pop(i)
+                break
         # 削除後のそのテーブルの客数を確認
         # ゼロ人ならそのテーブルを削除
         if self.getNumofCustomersofTable(tableId) == 0:
+            w = self.tables[tableId]
+            self.tables.pop(tableId)
+        # テーブルを削除したなら，親店の対応する代理客を削除する
+            if self.parent is not None:
+                self.parent.eliminateCustomeratWord(w)
         # テーブルを削除したなら，全客に対して以下を行う
-            for c in self.customers:
+            for i in range(len(self.customers)):
         #   テーブル番号が削除したテーブル以上の客のインデックスを1減らす
-                if c > tableId:
-                    c = c - 1
-        self.customers.append(tableId)
-        
+                if self.customers[i] > tableId:
+                    self.customers[i] = self.customers[i] - 1
+        # 客が一人もいなくなった場合，親店にこの店の削除を要求する
+            if len(self.customers) == 0 and self.parent is not None:
+                self.parent.eliminateChild(self.getU()[0])
+    # 相対文脈を引数に，子店を削除する
+    # 客がなくなった子店側からの要求のために使用する 
+        # u : str : 相対文脈．通常はすぐ下の子店からのみ要求を受けるはず
+    def eliminateChild(self, u):
+        if u in self.childs.keys():
+            del self.childs[u]
+        else:
+            print("[Restaurant]eliminateChild:no child has context " + str(u))
 
     # 料理を引数に，その料理のおかれたテーブルのいずれかに客を一人追加する
     # 現段階では料理一種につきテーブル一つなので成立する
@@ -106,6 +121,18 @@ class Restaurant:
                 self.parent.addCustomeratWord(w)
         self.addCustomeratTable(newId)
 
+    # 料理を引数に，その料理のおかれたテーブルのいずれかの客を一人削除する
+    # 現段階では料理一種につきテーブル一つなので成立する
+        # w : str : 料理
+    def eliminateCustomeratWord(self, w):
+        for i in range(len(self.tables)):
+            if self.tables[i] == w:
+                self.eliminateCustomeratTable(i)
+                return
+        # 指定した料理のテーブルが存在しない場合，何もしない
+        print("[Restaurant]eliminateCustomeratWord:no tables serving " \
+         + str(w) + " in context " + str(self.getU()))   
+ 
     # 引数に与えた料理を提供するテーブルを新設する
         # w      : str : 料理
         # return : int : 新設されたテーブルの番号
@@ -234,6 +261,17 @@ class Restaurant:
         for c in self.childs:
             self.childs[c].toPrint(t+1)
 
+    # デバッグ用．疑似 json 出力
+    def toJSON(self):
+        output = {}
+        output["U"] = self.getU()
+        output["T"] = self.tables
+        childs_dict = []
+        for c in self.childs:
+            childs_dict.append(self.childs[c].toJSON())
+        output["C"] = childs_dict
+        return output 
+
     # 料理を引数に，その料理のおかれているテーブルの数を返す
     # 現段階ではt_uw = 1 なので0 or 1 を返す
         # w      : str : 料理
@@ -322,7 +360,7 @@ class Restaurant:
 
     # 文章を引数に，その文章で追加された客を除去する
     # TODO まだ addCustomesfromSentence をコピペしただけ
-    def eliminateCustomersfromSentence(self, u):
+    def eliminateCustomerfromSentence(self, u):
         # もし u が配列ならそのまま使う
         if isinstance(u, list):
             U = u
@@ -332,22 +370,22 @@ class Restaurant:
             U.append(u)
         # 文字列でも配列でもないときは間違いなのでエラー終了
         else:
-            print("[Restaurant]addCustomerfromSentence:invalid inputs")
+            print("[Restaurant]eliminateCustomerfromSentence:invalid inputs")
             return False
 
         # 一つの文章から，開始位置によって多数の文脈を取得できる
         # 根店の場合のみ，多数の開始位置に対応する再帰を行う
         if self.parent is None and len(U) >= 2:
-            rec = self.addCustomerfromSentence(U[:-1])
+            rec = self.eliminateCustomerfromSentence(U[:-1])
             if rec == False:
-                print("[Restaurant]addCustomerfromSentence:error")
+                print("[Restaurant]elminateCustomerfromSentence:error")
                 return False
         # U から「自分の文脈 + 料理」を除いた部分が「さらに深いngram」
         # なので，次の文脈を取得する
         # 文脈 + 料理 の長さが与えられた文章以上ならそれが最も深い文脈
         # 最も深い文脈である場合，料理に対応するテーブルに客を配置する
         if len(self.getU()) + 1 >= len(U):
-            self.addCustomeratWord(U[-1])
+            self.eliminateCustomeratWord(U[-1])
             return True
         # 1個目の -1 は調整分，2個目は料理分を表す
         nextU = U[-1-1-len(self.getU())]
@@ -355,7 +393,6 @@ class Restaurant:
         if nextU not in self.childs.keys():
             self.childs[nextU] = Restaurant(self,[nextU]+self.getU())
         # 子店に対して再帰的に関数を呼ぶ
-        # self.addCustomeratWord(nextU)
-        return self.childs[nextU].addCustomerfromSentence(U)
+        return self.childs[nextU].eliminateCustomerfromSentence(U)
 
 
