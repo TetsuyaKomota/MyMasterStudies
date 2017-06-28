@@ -449,7 +449,7 @@ class Restaurant:
             # 求めた確率をもとにサンプリング
             p_b = self.calcProbability(newU)
             p_a = self.calcProbability(newU_changed)
-            if random.random() > p_a / (p_a + p_b):
+            if random.random() < p_a / (p_a + p_b):
                 newU = newU_changed
         # 全境界候補にサンプリングを適用し，完成した文章をモデルに代入
         print("[Restaurant]sampling: sampled -> " + str(newU))
