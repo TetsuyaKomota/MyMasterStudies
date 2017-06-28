@@ -1,5 +1,8 @@
 #-*- coding:utf-8 -*-
 
+import copy
+import random
+
 # HPYLM において各ノードにあたる「店」クラス
 
 # ====================================================
@@ -356,7 +359,6 @@ class Restaurant:
         return output
 
     # 文章を引数に，その文章で追加された客を除去する
-    # TODO まだ addCustomesfromSentence をコピペしただけ
     def eliminateCustomerfromSentence(self, u):
         # もし u が配列ならそのまま使う
         if isinstance(u, list):
@@ -429,3 +431,28 @@ class Restaurant:
         if flag == False and temp2 != "":
             output.append(temp2)
         return output
+
+    # 文章を引数に，境界状態をサンプリングする
+        # u : list : 文章．
+        # すでにモデルに反映されていることを前提とする(eliminate するため)
+    def sampling(self, u):
+        # u をモデルから eliminate
+        self.eliminateCustomerfromSentence(u)
+        # 以下を，u の境界候補全体で繰り返す
+        newU = copy.deepcopy(u)
+        length = 0
+        for w in u:
+            length = length + len(w)
+        for idx in range(length):
+            # 境界部分を変更するほうとしないほうで確率計算
+            newU_changed = self.changeBoundary(newU, idx)
+            # 求めた確率をもとにサンプリング
+            p_b = self.calcProbability(newU)
+            p_a = self.calcProbability(newU_changed)
+            if random.random() > p_a / (p_a + p_b):
+                newU = newU_changed
+        # 全境界候補にサンプリングを適用し，完成した文章をモデルに代入
+        print("[Restaurant]sampling: sampled -> " + str(newU))
+        self.addCustomerfromSentence(newU)
+        # 終了
+        return 

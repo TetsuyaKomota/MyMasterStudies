@@ -277,13 +277,13 @@ class TestGetChildofForrowedU(unittest.TestCase):
         rest.addCustomerfromSentence(u5)
 
         # 確率計算
-        print(rest.calcProbability(u1))
-        print(rest.calcProbability(u5))
-        print(rest.calcProbability(u6))
+        # print(rest.calcProbability(u1))
+        # print(rest.calcProbability(u5))
+        # print(rest.calcProbability(u6))
 
         self.assertTrue(True)
 
-    # サンプリングのテスト
+    # 境界状態変更のテスト
     def test_changeBoundary(self):
 
  
@@ -317,6 +317,33 @@ class TestGetChildofForrowedU(unittest.TestCase):
 
         self.assertTrue(flag)
 
+    # サンプリングのテスト
+    def test_sampling(self):
+        # 根店を生成
+        rest = Restaurant.Restaurant(None, [])
+        # 文脈を適当に挿入
+        u1 = ["生きてる", "こと", "が", "つらい", "なら"]
+        u2 = ["生きてる", "こと", "が", "つらい", "なら"]
+        u3 = ["生きてる", "こと", "が", "つらい", "なら"]
+        u4 = ["生きてる", "こと", "が", "つらい", "なら"]
+        u5 = ["いっそ", "小さく", "死ね", "ば", "いい"]
+        u6 = ["喚き", "散らして", "泣け", "ば", "いい"]
+        
+        rest.addCustomerfromSentence(u1)
+        rest.addCustomerfromSentence(u2)
+        rest.addCustomerfromSentence(u3)
+        rest.addCustomerfromSentence(u4)
+        rest.addCustomerfromSentence(u5)
+
+        # 確率計算
+        print(rest.calcProbability(u1))
+        print(rest.calcProbability(u5))
+        print(rest.calcProbability(u6))
+
+        # サンプリング
+        rest.sampling(u1)
+
+        self.assertTrue(True)
 
 
 
