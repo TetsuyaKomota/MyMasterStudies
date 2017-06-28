@@ -355,9 +355,6 @@ class Restaurant:
             
         return output
 
-    # --------------------------------------------------------------------
-    # 以下仮置きメソッド．順次実装
-
     # 文章を引数に，その文章で追加された客を除去する
     # TODO まだ addCustomesfromSentence をコピペしただけ
     def eliminateCustomerfromSentence(self, u):
@@ -395,4 +392,40 @@ class Restaurant:
         # 子店に対して再帰的に関数を呼ぶ
         return self.childs[nextU].eliminateCustomerfromSentence(U)
 
+    # --------------------------------------------------------------------
+    # 以下仮置きメソッド．順次実装
 
+
+    # 文章と番号を引数に，指定した番号の場所の境界状態を入れ替える
+    # 境界なら連結し，境界でないなら分割する
+    def changeBoundary(self, u, idx):
+        output = []
+        temp = 0
+        temp2 = ""
+        flag = False
+        for w in u:
+            # 文字数を取得し，累積する
+            temp = temp + len(w)
+            # 境界操作後は残りの単語を取得するだけ
+            if flag == True:
+                output.append(w)
+            elif temp2 != "":
+                output.append(temp2 + w)
+                flag = True
+            # 指定文字数に到達していない場合，境界操作はまだ
+            elif temp < idx+1:
+                output.append(w)
+            # 指定文字数と等しくなった場合，その次の境界を消す
+            elif temp == idx+1:
+                temp2 = w
+            # 指定文字数を上回った場合，境界を作り分割する
+            elif temp > idx+1:
+                b = idx - (temp - len(w)) + 1
+                output.append(w[:b])
+                output.append(w[b:])
+                flag = True
+        # 連結用の単語が待機 and flag == False なら
+        # 終端を連結しようとしているため，改めて append 
+        if flag == False and temp2 != "":
+            output.append(temp2)
+        return output

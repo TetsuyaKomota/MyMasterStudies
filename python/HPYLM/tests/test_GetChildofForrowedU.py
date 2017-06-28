@@ -283,5 +283,44 @@ class TestGetChildofForrowedU(unittest.TestCase):
 
         self.assertTrue(True)
 
+    # サンプリングのテスト
+    def test_changeBoundary(self):
+
+ 
+        # 根店を生成
+        rest = Restaurant.Restaurant(None, [])
+        # 文章を適当に作成
+        u1 = ["生きてる", "こと", "が", "つらい", "なら"]
+
+        # for i in range(15):
+        #     print(rest.changeBoundary(u1, i))
+
+        flag = True     
+        result = rest.changeBoundary(u1, 0)
+        expected = ["生", "きてる", "こと", "が", "つらい", "なら"]
+        flag = flag and (result == expected)
+        result = rest.changeBoundary(u1, 3)
+        expected = ["生きてること", "が", "つらい", "なら"]
+        flag = flag and (result == expected)
+        result = rest.changeBoundary(u1, 5)
+        expected = ["生きてる", "ことが", "つらい", "なら"]
+        flag = flag and (result == expected)
+        result = rest.changeBoundary(u1, 6)
+        expected = ["生きてる", "こと", "がつらい", "なら"]
+        flag = flag and (result == expected)
+        result = rest.changeBoundary(u1, 11)
+        expected = ["生きてる", "こと", "が", "つらい", "なら"]
+        flag = flag and (result == expected)
+        result = rest.changeBoundary(u1, 100)
+        expected = ["生きてる", "こと", "が", "つらい", "なら"]
+        flag = flag and (result == expected)
+
+        self.assertTrue(flag)
+
+
+
+
+
+
 if __name__ == "__main__":
     unittest.main()
