@@ -40,7 +40,7 @@ class Restaurant:
     def getTheta(self):
     # PY過程における割引率．上とともに本来はlen(u) によって決まる関数だが，
     # とりあえず簡単のために定数化
-        return 10
+        return 0.5
 
     # 割引係数 d のゲッター
     def getD(self):
@@ -213,33 +213,6 @@ class Restaurant:
             if nextU not in self.childs.keys():
                 self.childs[nextU] = Restaurant(self,[nextU]+self.getU()) 
             return self.childs[nextU].getChildofForrowedU(U)
-    """
-    # （相対的な）文脈を引数に，子店を取得，ない場合は生成するメソッド
-    def old_getChildofForrowedU(self, u):
-        # もし u が空配列なら，自分を返す
-        if isinstance(u, list) == True and len(u) == 0:
-            return self
-        # 一つの文章から，開始位置によって多数の文脈を取得できる
-        # 根店の場合のみ，多数の開始位置に対応する再帰を行う
-        if self.parent is None:
-            self.getChildofForrowedU(u[1:])
-        # もし u が配列ならそのまま使う
-        if isinstance(u, list):
-            U = u
-        # もし u が文字列なら，要素一つの配列に変える
-        elif isinstance(u, str) == True:
-            U = []
-            U.append(u)
-        # 文字列でも配列でもないときは間違いなのでエラー終了
-        else:
-            print("[Restaurant]getChildofForrowedU:invalid inputs")
-            return None
-        # もしU[0] を文脈とする子店がないなら，新規に作成する
-        if U[0] not in self.childs.keys():
-            self.childs[U[0]] = Restaurant(self, self.getU() + [U[0]])
-        # 子供に対して再帰的に関数を呼ぶ
-        return self.childs[U[0]].getChildofForrowedU(U[1:])
-    """
     # デバッグ用．ステータス表示
     def toPrint(self, t=0):
         tab = ""
@@ -482,10 +455,10 @@ class Restaurant:
             for i in range(len(currentSentences)):
                 currentSentences[i] = self.sampling(currentSentences[i])
             # 定期的に途中状態を表示してみる
-            # if idx % 20 == 0:
-            #    print("[Restaurant]executeParsing:currentSentences:")
-            #    for s in currentSentences:
-            #        print(s)
+            if idx % 5000 == 0:
+               print("[Restaurant]executeParsing:currentSentences:")
+               for s in currentSentences:
+                   print(s)
         # 最終結果を表示する
         print("[Restaurant]executeParsing:currentSentences:")
         for s in currentSentences:
