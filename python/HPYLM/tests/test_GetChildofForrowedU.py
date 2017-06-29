@@ -380,7 +380,7 @@ class TestGetChildofForrowedU(unittest.TestCase):
         u.append(["生きてることがつらいなら"])
         u.append(["くたばる喜びとっておけ"])
 
-        rest.executeParsing(u, 100000)
+        rest.executeParsing(u, 10000)
 
 if __name__ == "__main__":
     unittest.main()

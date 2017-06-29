@@ -7,6 +7,12 @@ import random
 
 # ====================================================
 # 定数
+
+# θ の |u| に関する比例定数
+paramTheta = 1.0
+# d の |u| に関する比例定数
+paramD     = 1.0
+
 class Restaurant:
 
     # u         : 文脈（根店からの絶対文脈）．店のインデックスと考えてもよい
@@ -38,15 +44,18 @@ class Restaurant:
     # 強度θのゲッター
     # PY過程における未知数の強度. ディリクレ過程における α
     def getTheta(self):
-    # PY過程における割引率．上とともに本来はlen(u) によって決まる関数だが，
-    # とりあえず簡単のために定数化
-        return 0.5
+        # PY過程における割引率．上とともに本来はlen(u) によって決まる関数だが，
+        # とりあえず簡単のために定数化
+        # return 0.5
+        return paramTheta * (len(self.getU()) + 1.0)
 
     # 割引係数 d のゲッター
     def getD(self):
-    # t_uw (店u で料理w のおいてあるテーブルの数=親店から取得した回数)はとりあえず1固定
-    # つまりこれはPY ではなくIKN
-       return 0.5
+        # t_uw (店u で料理w のおいてあるテーブルの数=親店から取得した回数)はとりあえず1固定
+        # つまりこれはPY ではなくIKN
+        # return 0.5
+        return (paramD*len(self.getU())) / (len(self.getU())+1.0)
+
 
     # テーブルのID を引数に，そのテーブルに客を一人追加する
         # tableId : int : テーブルのID(配列のインデックス)
