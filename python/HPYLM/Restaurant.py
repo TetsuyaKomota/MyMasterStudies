@@ -455,7 +455,7 @@ class Restaurant:
                 currentSentences[i] = self.sampling(currentSentences[i])
             # 定期的に途中状態を表示してみる
             if idx % 5000 == 0:
-                print("[Restrant]executeParsing:iteration:"+str(iteration))
+               print("[Restrant]executeParsing:iteration:"+str(iteration))
                print("[Restaurant]executeParsing:currentSentences:")
                for s in currentSentences:
                    print(s)
