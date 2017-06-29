@@ -306,11 +306,11 @@ class Restaurant:
         theta = self.getTheta()
         d     = self.getD()
             # 親店での確率
-            # 根店の場合はその店自体の全料理数の逆数(全料理等確率)
+            # 根店の場合は基底測度から取得
             # 根店には全料理が存在するはず
         Pdash = 0
         if self.parent is None:
-            Pdash = 1.0/len(set(self.tables))
+            Pdash = self.calcProbabilityofBaseMeasure(w)
         else:
             Pdash = self.parent.calcProbabilityofForrowedU(w)
         # -------------------------------------------
@@ -318,6 +318,13 @@ class Restaurant:
         term1 =  (1.0*(c_uw - d*t_uw)) / (theta + c_u)
         term2 = ((1.0*(theta + d*t_u)) / (theta + c_u)) * Pdash
         return term1 + term2
+
+    # 単語を引数に，基底測度から確率を評価して返す
+    # 根店限定のメソッド
+        # w : str : 料理
+    def calcProbabilityofBaseMeasure(self, w):
+        output = 1.0/len(set(self.tables))
+        return output
 
     # テーブルのID を引数に，そのテーブルに座る客の数を返す
         # tableId : int : テーブルID (配列のインデックス)
@@ -394,10 +401,6 @@ class Restaurant:
         # 子店に対して再帰的に関数を呼ぶ
         return self.childs[nextU].eliminateCustomerfromSentence(U)
 
-    # --------------------------------------------------------------------
-    # 以下仮置きメソッド．順次実装
-
-
     # 文章と番号を引数に，指定した番号の場所の境界状態を入れ替える
     # 境界なら連結し，境界でないなら分割する
     def changeBoundary(self, u, idx):
@@ -452,7 +455,38 @@ class Restaurant:
             if random.random() < p_a / (p_a + p_b):
                 newU = newU_changed
         # 全境界候補にサンプリングを適用し，完成した文章をモデルに代入
-        print("[Restaurant]sampling: sampled -> " + str(newU))
+        # print("[Restaurant]sampling: sampled -> " + str(newU))
         self.addCustomerfromSentence(newU)
         # 終了
-        return 
+        return newU 
+
+    # --------------------------------------------------------------------
+    # 以下仮置きメソッド．順次実装
+
+
+    # 文章の組（配列）を引数に，繰り返し学習して形態素解析の結果を返す
+        # sentences : list(list) : 文章(単語の配列)の配列
+        # iteration : int        : 再帰回数
+    def executeParsing(self, sentences, iteration):
+        # 根店以外で呼び出された場合は無効
+        if self.parent is not None:
+            return None
+        currentSentences = copy.deepcopy(sentences)
+        # 最初に，文章全てをモデルに代入する
+        for s in currentSentences:
+            self.addCustomerfromSentence(s)
+        for idx in range(iteration):
+            # print("[Restrant]executeParsing:iteration:"+str(iteration))
+            # 順番に代入しなおす(ギブスサンプリング)
+            for i in range(len(currentSentences)):
+                currentSentences[i] = self.sampling(currentSentences[i])
+            # 定期的に途中状態を表示してみる
+            # if idx % 20 == 0:
+            #    print("[Restaurant]executeParsing:currentSentences:")
+            #    for s in currentSentences:
+            #        print(s)
+        # 最終結果を表示する
+        print("[Restaurant]executeParsing:currentSentences:")
+        for s in currentSentences:
+            print(s)
+ 

@@ -201,7 +201,7 @@ class TestGetChildofForrowedU(unittest.TestCase):
         self.assertTrue((p1>p2) and (p2>p3) and (p3>p4) and (p4==p5))
 
     # 確率計算のテスト.数値指定版
-    def test_calcProbabilityofForrowedU_hard(self):
+    def _test_calcProbabilityofForrowedU_hard(self):
 
         # 根店を生成
         rest = Restaurant.Restaurant(None, [])
@@ -346,8 +346,41 @@ class TestGetChildofForrowedU(unittest.TestCase):
         self.assertTrue(True)
 
 
+    # 形態素解析のテスト
+    def test_executeParsing(self):
+        # 根店を生成
+        rest = Restaurant.Restaurant(None, [])
+        # 文脈を適当に挿入
+        u = []
+        u.append(["生きてることがつらいなら"])
+        u.append(["いっそ小さく死ねばいい"])
+        u.append(["恋人と親は悲しむが"])
+        u.append(["三日とたてば元通り"])
+        u.append(["気が付きゃみんな年取って"])
+        u.append(["おんなじところに行くのだから"])
+        u.append(["生きてることがつらいなら"])
+        u.append(["喚き散らしてなけばいい"])
+        u.append(["そのうち夜は明けちゃって"])
+        u.append(["疲れて眠りにつくだろう"])
+        u.append(["夜に泣くのは赤ん坊"])
+        u.append(["だけって決まりはないんだし"])
+        u.append(["生きてることがつらいなら"])
+        u.append(["悲しみをとくと見るがいい"])
+        u.append(["悲しみはいつか一片の"])
+        u.append(["お花みたいに咲くという"])
+        u.append(["そっと伸ばした両の手で"])
+        u.append(["摘み取るんじゃなく守るといい"])
+        u.append(["何にもないところから何にもないところへと"])
+        u.append(["なんにもなかったかのように"])
+        u.append(["めぐる命だから"])
+        u.append(["生きてることがつらいなら"])
+        u.append(["嫌になるまで生きるがいい"])
+        u.append(["歴史は小さなブランコで"])
+        u.append(["宇宙は小さな水飲み場"])
+        u.append(["生きてることがつらいなら"])
+        u.append(["くたばる喜びとっておけ"])
 
-
+        rest.executeParsing(u, 10000)
 
 if __name__ == "__main__":
     unittest.main()
