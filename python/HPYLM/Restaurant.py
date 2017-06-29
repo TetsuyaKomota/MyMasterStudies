@@ -286,13 +286,31 @@ class Restaurant:
                 output = output + 1
         return output
 
+    # テーブルのID を引数に，そのテーブルに座る客の数を返す
+        # tableId : int : テーブルID (配列のインデックス)
+        # return  : int : そのテーブルに座る客の数
+    def getNumofCustomersofTable(self, tableId):
+        output = 0
+        for c in self.customers:
+            if c == tableId:
+                output = output + 1
+        return output
+
+    # 料理を引数に，その料理を食べる客の数を返す
+    # 現段階では t_uw = 1 を仮定してるので，適切にテーブルを選べば上と同じ値になる
+        # w      : str : 料理
+        # return : int : その料理を提供してるテーブルに座る客の数の合計
+    def getNumofCustomersofWord(self, w):
+        output = 0
+        for i in range(len(self.tables)):
+            if self.tables[i] == w:
+                output = output + self.getNumofCustomersofTable(i)
+        return output
+
     # 単語を引数に，その店（文脈）および親店での確率を評価して返す
         # w : str  : 料理
     # テスト成功確認次第仮置きじゃなくす
     def calcProbabilityofForrowedU(self, w):
-        # -------------------------------------------
-        # 指定した文脈にあたる店まで移動する
-        # -------------------------------------------
         # 計算に必要な値を用意する
             # この店の文脈 u で料理 w が生成された回数
         c_uw = self.getNumofCustomersofWord(w)
@@ -323,28 +341,11 @@ class Restaurant:
     # 根店限定のメソッド
         # w : str : 料理
     def calcProbabilityofBaseMeasure(self, w):
-        output = 1.0/len(set(self.tables))
-        return output
-
-    # テーブルのID を引数に，そのテーブルに座る客の数を返す
-        # tableId : int : テーブルID (配列のインデックス)
-        # return  : int : そのテーブルに座る客の数
-    def getNumofCustomersofTable(self, tableId):
-        output = 0
-        for c in self.customers:
-            if c == tableId:
-                output = output + 1
-        return output
-
-    # 料理を引数に，その料理を食べる客の数を返す
-    # 現段階では t_uw = 1 を仮定してるので，適切にテーブルを選べば上と同じ値になる
-        # w      : str : 料理
-        # return : int : その料理を提供してるテーブルに座る客の数の合計
-    def getNumofCustomersofWord(self, w):
-        output = 0
-        for i in range(len(self.tables)):
-            if self.tables[i] == w:
-                output = output + self.getNumofCustomersofTable(i)
+        # 各単語等確率
+        # output = 1.0/len(set(self.tables))
+        # 長い単語ほど低確率
+        a = 10.0
+        output = (a)/(len(w) + a)
         return output
 
     # 一文を引数に，その文章の生成確率を返す
@@ -489,4 +490,21 @@ class Restaurant:
         print("[Restaurant]executeParsing:currentSentences:")
         for s in currentSentences:
             print(s)
- 
+
+if __name__ == "__main__" :
+    rest = Restaurant(None, [])
+
+    # u = ["生きてることがつらいなら"]
+    # rest.addCustomerfromSentence(u)
+    u = ["生きてる", "ことがつらいなら"]
+    rest.addCustomerfromSentence(u)
+    u = ["生きてる", "ことが", "つらいなら"]
+    rest.addCustomerfromSentence(u)
+    u = ["生きて", "る", "ことが", "つらいなら"]
+    rest.addCustomerfromSentence(u)
+    print(rest.calcProbability(["生きてることがつらいなら"]))
+    print(rest.calcProbability(["生きてる", "ことがつらいなら"]))
+    print(rest.calcProbability(["生きてることが", "つらいなら"]))
+    print(rest.calcProbability(["生きてる", "ことが", "つらいなら"]))
+    print(rest.calcProbability(["生きてる", "ことが", "つらい", "なら"]))
+    print(rest.calcProbability(["生き", "て", "る", "ことが", "つらい", "なら"]))
