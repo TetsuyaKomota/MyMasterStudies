@@ -12,6 +12,8 @@ import random
 paramTheta = 1.0
 # d の |u| に関する比例定数
 paramD     = 1.0
+# 基底測度の係数
+paramA = 0.01
 
 class Restaurant:
 
@@ -326,7 +328,7 @@ class Restaurant:
         # 各単語等確率
         # output = 1.0/len(set(self.tables))
         # 長い単語ほど低確率
-        a = 1.0
+        a = paramA
         output = (a)/(len(w) + a)
         return output
 
