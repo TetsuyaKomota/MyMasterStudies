@@ -2,6 +2,7 @@
 
 import copy
 import random
+import numpy as np
 
 # HPYLM において各ノードにあたる「店」クラス
 
@@ -13,8 +14,7 @@ paramTheta = 1.0
 # d の |u| に関する比例定数
 paramD     = 1.0
 # 基底測度の係数
-paramA = 0.01
-
+paramA = 2
 class Restaurant:
 
     # u         : 文脈（根店からの絶対文脈）．店のインデックスと考えてもよい
@@ -329,7 +329,8 @@ class Restaurant:
         # output = 1.0/len(set(self.tables))
         # 長い単語ほど低確率
         a = paramA
-        output = (a)/(len(w) + a)
+        # output = (a)/(len(w) + a)
+        output = np.exp(-len(w) * a)
         return output
 
     # 一文を引数に，その文章の生成確率を返す
