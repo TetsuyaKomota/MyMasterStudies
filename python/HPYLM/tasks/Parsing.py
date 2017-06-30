@@ -11,11 +11,22 @@ u = []
 with open("tasks/inputSentences.txt", "r") as f:
     line = f.readline()
     while(line != ""):
-        u.append(line[:-1])
+        u.append([line[:-1]])
         line = f.readline()
 
 print("input sentences:")
 for s in u:
-    print(s)
+    print(s[0])
 
-rest.executeParsing(u, 100000)
+result = rest.executeParsing(u, 10000)
+
+print("parsing results:")
+with open("tasks/result.txt", "w") as f:
+    for r in result:
+        line = ""
+        for w in r:
+            line = line + w + ", "
+        line = line + "\n"
+        print(line)
+        f.write(line)
+

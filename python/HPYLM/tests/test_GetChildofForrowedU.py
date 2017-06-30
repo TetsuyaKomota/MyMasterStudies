@@ -347,7 +347,8 @@ class TestGetChildofForrowedU(unittest.TestCase):
 
 
     # 形態素解析のテスト
-    def test_executeParsing(self):
+    # TODO これはテストコードでやることじゃない．消す
+    def _test_executeParsing(self):
         # 根店を生成
         rest = Restaurant.Restaurant(None, [])
         # 文脈を適当に挿入
