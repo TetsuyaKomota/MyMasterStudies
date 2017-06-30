@@ -4,5 +4,7 @@ __init__.py
 *.swp
 nohup.out
 
+*/results
+
 inputSentences.txt
 result.txt

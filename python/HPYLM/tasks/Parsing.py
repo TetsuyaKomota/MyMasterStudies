@@ -18,7 +18,7 @@ print("input sentences:")
 for s in u:
     print(s[0])
 
-result = rest.executeParsing(u, 10000)
+result = rest.executeParsing(u, 100000)
 
 print("parsing results:")
 with open("tasks/result.txt", "w") as f:
