@@ -326,7 +326,7 @@ class Restaurant:
         # 各単語等確率
         # output = 1.0/len(set(self.tables))
         # 長い単語ほど低確率
-        a = 10.0
+        a = 1.0
         output = (a)/(len(w) + a)
         return output
 
