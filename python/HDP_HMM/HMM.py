@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Jan 18 13:56:15 2017
-
-@author: komot
-"""
 
 import numpy as np
 import random
@@ -15,48 +10,15 @@ import scipy.stats as ss
 import copy
 import matplotlib.pyplot as plt
 
+import MakeData
 
-# ====================================================================================
-# データを適当に作る
+"""
+2017/ 7/1
+通常の HMM を用いて符号化を行う実験用のコード
+学習に使う時系列データは MakeData.py で生成
+"""
 
-def testfunc_circle(x):
-    scale = 200
-    return [scale * np.sin(x), scale * np.cos(x)]
-
-def testfunc_cubic(x):
-    a = 1
-    b = -10
-    c = -1
-    d = 1
-    
-    return [x, a*x*x*x + b*x*x + c*x + d]
-
-def testfunc_sigmoid(x):
-    scale = 200
-    range = 50
-    return [x, scale*(1 - 1/(1+np.exp(-(x-300)/range)))]
-
-
-def makeData(func, size, start, end, noize):
-    output = []
-    
-    x = start
-    delta = (end - start)/size
-    
-    pdf = ss.norm(scale = noize)    
-    
-    for i in range(size):
-        
-        temp = func(x)
-        
-        for j in range(len(temp)):
-            ep = pdf.rvs()
-            temp[j] = temp[j] + ep
-        output.append(copy.deepcopy(temp))
-        x = x + delta
-               
-    return output
-# ====================================================================================
+# ==================================================================
 # 結果測定用のメソッド
     
     # 比較用のランダムなヒストグラムを生成する
@@ -103,17 +65,12 @@ def generate_random_hist (inputList, numofSample):
     return output
 
 
-# ====================================================================================
+# ==================================================================
 # テスト関数
 
     # とりあえず試してみるだけの奴．
 def experiment_0():
-    datas = []
-    datas.extend(makeData(testfunc_circle, 100, 0, 2*np.pi, 10))
-    datas.extend(makeData(testfunc_sigmoid, 100, 0, 600, 10))
-    datas.extend(makeData(testfunc_sigmoid, 100, 600, 0, 10))
-    datas.extend(makeData(testfunc_circle, 100, 0, 2*np.pi, 10))
-    # datas.extend(makeData(testfunc_cubic, 100, 0, 2*np.pi, 0.1))
+    datas = MakeData.make1()
 
     for _ in range(10):
         # datas.extend(makeData(testfunc_circle, 100, 0, 2*np.pi, 10))
@@ -129,7 +86,7 @@ def experiment_0():
     
     model = hmm.GaussianHMM(n_components=10, covariance_type="full")    
     
-    model.fit(datas[0:400])
+    model.fit(datas)
     
     '''
     # 学習結果を表示
@@ -143,17 +100,8 @@ def experiment_0():
     print(model.transmat_)    
     '''
 
-    """
-    # 推定.実際の変わり目である100番目,101番目にカッコを付ける
-    pre = model.predict(datas[0:200])
-    print(pre[0:100])
-    print("(", end="")
-    print(pre[100:102], end="")
-    print(")")
-    print(pre[102:])
-    """
     # 推定．連続する同状態はカットして，繊維の様子だけ取り出す
-    pre = model.predict(datas[0:400])
+    pre = model.predict(datas)
     result = []
     for p in pre:
         if len(result) == 0 or p != result[-1]:
@@ -162,12 +110,8 @@ def experiment_0():
    
     # makeData し直して推定した場合の状態遷移列を比較したい
     for _ in range(1000):
-        datas = []
-        datas.extend(makeData(testfunc_circle, 100, 0, 2*np.pi, 10))
-        datas.extend(makeData(testfunc_sigmoid, 100, 0, 600, 10))
-        # datas.extend(makeData(testfunc_sigmoid, 100, 600, 0, 10))
-        # datas.extend(makeData(testfunc_circle, 100, 0, 2*np.pi, 10))
-        pre = model.predict(datas[0:200])
+        datas = MakeData.make1_half()
+        pre = model.predict(datas)
         result_2 = []
         for p in pre:
             if len(result_2) == 0 or p != result_2[-1]:
@@ -178,15 +122,6 @@ def experiment_0():
             print(result_2)
             break
     
- 
-    '''
-    # 学習したモデルからサンプリングしてみる
-    for _ in range(10):
-        sampleX, sampleZ = model.sample(200)
-        sample = np.array(sampleX).T
-        plt.plot(sample[0], sample[1])
-    plt.show()
-    '''   
 
     # 符号化後の境界と本当の境界との距離をヒストグラムで表示する関数
 def experiment_1(n_components, dataLength, div):
