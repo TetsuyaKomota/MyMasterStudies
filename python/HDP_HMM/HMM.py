@@ -16,13 +16,25 @@ import MakeData
 
     # とりあえず試してみるだけの奴．
 def experiment_0(detail=False):
-    datas = MakeData.make1()
+
+    # datas = MakeData.make2()
+
+    dataList = []
+    dataList.append(MakeData.make1())
+    dataList.append(MakeData.make2())
+
+    lengths = []
+    for d in dataList:
+        lengths.append(len(d))
+
+    datas = np.concatenate(dataList)
 
     MakeData.showData(datas, detail)
 
     model = hmm.GaussianHMM(n_components=10, covariance_type="full")    
     
-    model.fit(datas)
+    # model.fit(datas)
+    model.fit(datas, lengths)
     
     # 学習結果を表示
     if detail == True:
@@ -36,16 +48,17 @@ def experiment_0(detail=False):
         print(model.transmat_)    
 
     # 推定．連続する同状態はカットして，遷移の様子だけ取り出す
-    pre = model.predict(datas)
-    result = []
-    for p in pre:
-        if len(result) == 0 or p != result[-1]:
-            result.append(p) 
-    print(result)
+    for d in dataList:
+        pre = model.predict(d)
+        result = []
+        for p in pre:
+            if len(result) == 0 or p != result[-1]:
+                result.append(p) 
+        print(result)
    
     # makeData し直して推定した場合の状態遷移列を比較したい
     for _ in range(1000):
-        datas = MakeData.make1_half()
+        datas = MakeData.make2_half()
         pre = model.predict(datas)
         result_2 = []
         for p in pre:

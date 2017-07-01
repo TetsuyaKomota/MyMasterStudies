@@ -29,6 +29,14 @@ def testfunc_cubic(x):
     
     return [x, a*x*x*x + b*x*x + c*x + d]
 
+def testfunc_cos(x):
+    scale = 200
+    return [scale * x, scale * np.cos(x)]
+
+def testfunc_sin(x):
+    scale = 200
+    return [scale * np.sin(x), scale * x]
+
 def testfunc_sigmoid(x):
     scale = 200
     range = 50
@@ -49,7 +57,7 @@ def make1(noize=10):
     datas.extend(makeData(testfunc_circle, 100, 0, 2*np.pi, noize))
     # return datas
     # 速度に変換してみよう
-    return getVelocityList(datas)
+    # return getVelocityList(datas)
     # TMA で平滑化してみよう
     # return getTMAList(datas)
     # TMA で平滑化した状態で速度列をとってみよう
@@ -64,11 +72,42 @@ def make1_half(noize=10):
     datas.extend(makeData(testfunc_sigmoid, 100, 0, 600, noize))
     # return datas
     # 速度に変換してみよう
-    return getVelocityList(datas)
+    # return getVelocityList(datas)
     # TMA で平滑化してみよう
     # return getTMAList(datas)
     # TMA で平滑化した状態で速度列をとってみよう
-    # return getVelocityList(getTMAList(datas))
+    return getVelocityList(getTMAList(datas))
+
+
+# 上方向に順 sin → 下方向に順sin 
+# 各100ステップで 200ステップデータ
+def make2(noize=10):
+    datas = []
+    datas.extend(makeData(testfunc_sin, 100, 0, 2*np.pi, noize))
+    later = makeData(testfunc_sin, 100, 2*np.pi, 0, noize)
+    for i in range(len(later)):
+        later[i][0] = -later[i][0]
+    datas.extend(later)
+    # return datas
+    # 速度に変換してみよう
+    # return getVelocityList(datas)
+    # TMA で平滑化してみよう
+    # return getTMAList(datas)
+    # TMA で平滑化した状態で速度列をとってみよう
+    return getVelocityList(getTMAList(datas))
+
+# 上方向に順 sin
+# 100ステップデータ
+def make2_half(noize=10):
+    datas = []
+    datas.extend(makeData(testfunc_sin, 100, 0, 2*np.pi, noize))
+    # return datas
+    # 速度に変換してみよう
+    # return getVelocityList(datas)
+    # TMA で平滑化してみよう
+    # return getTMAList(datas)
+    # TMA で平滑化した状態で速度列をとってみよう
+    return getVelocityList(getTMAList(datas))
 
 
 
