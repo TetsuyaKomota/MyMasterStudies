@@ -111,6 +111,8 @@ def experiment_0():
     datas = []
     datas.extend(makeData(testfunc_circle, 100, 0, 2*np.pi, 10))
     datas.extend(makeData(testfunc_sigmoid, 100, 0, 600, 10))
+    datas.extend(makeData(testfunc_sigmoid, 100, 600, 0, 10))
+    datas.extend(makeData(testfunc_circle, 100, 0, 2*np.pi, 10))
     # datas.extend(makeData(testfunc_cubic, 100, 0, 2*np.pi, 0.1))
 
     for _ in range(10):
@@ -125,9 +127,9 @@ def experiment_0():
         plt.plot(invdata[0], invdata[1])
     plt.show()
     
-    model = hmm.GaussianHMM(n_components=30, covariance_type="full")    
+    model = hmm.GaussianHMM(n_components=10, covariance_type="full")    
     
-    model.fit(datas[0:200])
+    model.fit(datas[0:400])
     
     '''
     # 学習結果を表示
@@ -141,6 +143,7 @@ def experiment_0():
     print(model.transmat_)    
     '''
 
+    """
     # 推定.実際の変わり目である100番目,101番目にカッコを付ける
     pre = model.predict(datas[0:200])
     print(pre[0:100])
@@ -148,6 +151,34 @@ def experiment_0():
     print(pre[100:102], end="")
     print(")")
     print(pre[102:])
+    """
+    # 推定．連続する同状態はカットして，繊維の様子だけ取り出す
+    pre = model.predict(datas[0:400])
+    result = []
+    for p in pre:
+        if len(result) == 0 or p != result[-1]:
+            result.append(p) 
+    print(result)
+   
+    # makeData し直して推定した場合の状態遷移列を比較したい
+    for _ in range(1000):
+        datas = []
+        datas.extend(makeData(testfunc_circle, 100, 0, 2*np.pi, 10))
+        datas.extend(makeData(testfunc_sigmoid, 100, 0, 600, 10))
+        # datas.extend(makeData(testfunc_sigmoid, 100, 600, 0, 10))
+        # datas.extend(makeData(testfunc_circle, 100, 0, 2*np.pi, 10))
+        pre = model.predict(datas[0:200])
+        result_2 = []
+        for p in pre:
+            if len(result_2) == 0 or p != result_2[-1]:
+                result_2.append(p) 
+        # print(result)
+        if result != result_2:
+            print("Different")
+            print(result_2)
+            break
+    
+ 
     '''
     # 学習したモデルからサンプリングしてみる
     for _ in range(10):
@@ -231,6 +262,6 @@ def experiment_1(n_components, dataLength, div):
 if __name__ == "__main__":
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        # experiment_0()
-        experiment_1(30, 200, 100)
+        experiment_0()
+        # experiment_1(30, 200, 100)
         # generate_random_hist([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4], 1000)
