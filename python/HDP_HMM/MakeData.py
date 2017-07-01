@@ -59,6 +59,8 @@ def make1_half():
     return datas
 
 # =====================================================================
+# 機能系メソッド
+# いじらない
 
 # 引数に与えられた関数で start から end まで等間隔で size 個のデータを
 # 分散 noize のガウス誤差を付与して獲得する
@@ -81,4 +83,15 @@ def makeData(func, size, start, end, noize):
         x = x + delta
                
     return output
+
+# 取得したデータを可視化
+def showData(datas, detail=False):
+    # 転置
+    invdata = np.array(datas).T
+    if detail == True:
+        print(datas)
+        print(invdata)
+    plt.plot(invdata[0], invdata[1])
+    plt.show()
+ 
 # =====================================================================
