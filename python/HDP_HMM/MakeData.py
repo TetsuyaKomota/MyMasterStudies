@@ -41,7 +41,7 @@ def testfunc_sigmoid(x):
 # 右回り円運動 → 右下がり順方向シグモイド
 # →右下がり逆方向シグモイド → 右回り円運動
 # 各 100 ステップで 400ステップデータ
-def make1(noize=0.1):
+def make1(noize=10):
     datas = []
     datas.extend(makeData(testfunc_circle, 100, 0, 2*np.pi, noize))
     datas.extend(makeData(testfunc_sigmoid, 100, 0, 600, noize))
@@ -50,17 +50,27 @@ def make1(noize=0.1):
     # return datas
     # 速度に変換してみよう
     return getVelocityList(datas)
+    # TMA で平滑化してみよう
+    # return getTMAList(datas)
+    # TMA で平滑化した状態で速度列をとってみよう
+    return getVelocityList(getTMAList(datas))
 
 # 右回り円運動 → 右下がり順方向シグモイド
 # 各 100 ステップで 200ステップデータ
 # つまり make1 の前半のみ
-def make1_half(noize=0.1):
+def make1_half(noize=10):
     datas = []
     datas.extend(makeData(testfunc_circle, 100, 0, 2*np.pi, noize))
     datas.extend(makeData(testfunc_sigmoid, 100, 0, 600, noize))
     # return datas
     # 速度に変換してみよう
     return getVelocityList(datas)
+    # TMA で平滑化してみよう
+    # return getTMAList(datas)
+    # TMA で平滑化した状態で速度列をとってみよう
+    # return getVelocityList(getTMAList(datas))
+
+
 
 # =====================================================================
 # 機能系メソッド
@@ -108,4 +118,48 @@ def getVelocityList(datas, timeDelta=0.01):
     # 長さを datas と合わせる
     output.append(output[-1])
     return output
+
+# 取得したデータを単純移動平均で平滑化
+# 前後 length の平均をとるので，範囲は 2*length
+# 両端のデータはそれぞれ片側の平均しか取れない(取らない)
+def getSMAList(datas, length=10):
+    output = []
+    # バッファ．こいつに足したり引いたりする
+    buf = np.zeros(len(datas[0]))
+    # バッファに保持されているデータの数
+    count = 0
+    # まず右側の平均を取得する
+    for l in range(length+1): # 自分を含めるために +1
+        if len(datas) > l:
+            count = count + 1
+            buf = buf + np.array(datas[l])
+        else:
+            break
+    # 移動平均を計算する
+    for idx in range(len(datas)):
+        # データを取得する
+        output.append(buf/count)
+        # 移動する
+        # 現在のデータは次のデータの左側となるので，加える
+        # count = count + 1
+        # buf = buf + datas[idx]
+        # 左側のデータ数が既にlength 個あるなら，移動する際に一つ取り除く
+        if idx >= length:
+            count = count - 1
+            buf = buf - np.array(datas[idx-length])
+        # 右側のデータ数が length 以上ある場合は buf に加える
+        # idx+length までは含まれているから，その次ということで +1
+        if idx+length+1 < len(datas):
+            count = count + 1
+            buf = buf + np.array(datas[idx+length+1])
+    return output 
+
+# sy得したデータを三角移動平均で平滑化
+def getTMAList(datas, length=10):
+    output = []
+    half_length = math.ceil((length+1)/2)
+    output = getSMAList(getSMAList(datas, half_length), half_length)
+    return output
+
+
 # =====================================================================

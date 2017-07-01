@@ -7,10 +7,42 @@ import random
 単純な関数の形のデータ + 一様誤差 or 外れ値 という形の場合
 
 '''
+def getSMA(datas, length, isHM):
+    output = []
+    # バッファ．こいつに足したり引いたりする
+    buf = 0.0
+    # バッファに保持されているデータの数
+    count = 0
+    # まず右側の平均を取得する
+    for l in range(length+1): # 自分を含めるために +1
+        if len(datas) > l:
+            count = count + 1
+            buf = buf + datas[l]
+        else:
+            break
+    # 移動平均を計算する
+    for idx in range(len(datas)):
+        # データを取得する
+        output.append(buf/count)
+        # 移動する
+        # 現在のデータは次のデータの左側となるので，加える
+        # count = count + 1
+        # buf = buf + datas[idx]
+        # 左側のデータ数が既にlength 個あるなら，移動する際に一つ取り除く
+        if idx >= length:
+            count = count - 1
+            buf = buf - datas[idx-length]
+        # 右側のデータ数が length 以上ある場合は buf に加える
+        # idx+length までは含まれているから，その次ということで +1
+        if idx+length+1 < len(datas):
+            count = count + 1
+            buf = buf + datas[idx+length+1]
+    return output 
+#
 
 
 
-def getSMA(data, n, isHM):
+def _getSMA(data, n, isHM):
 	output = []
 
 	buf = 0
@@ -86,32 +118,38 @@ if __name__ == "__main__":
 	
 	sldata = getSMA(data, l, False)
 	sLdata = getSMA(data, L, False)
-	wldata = getWMA(data, l, False)
-	wLdata = getWMA(data, L, False)
-	eldata = getEMA(data, l, False)
-	eLdata = getEMA(data, L, False)
+	osldata = _getSMA(data, l, False)
+	osLdata = _getSMA(data, L, False)
+	# wldata = getWMA(data, l, False)
+	# wLdata = getWMA(data, L, False)
+	# eldata = getEMA(data, l, False)
+	# eLdata = getEMA(data, L, False)
 	tldata = getTMA(data, l, False)
 	tLdata = getTMA(data, L, False)
 
 	print("data :" , data)
 	print("sldata:" , sldata)
 	print("sLdata:" , sLdata)
-	print("wldata:" , wldata)
-	print("wLdata:" , wLdata)
-	print("eldata:" , eldata)
-	print("eLdata:" , eLdata)
-	print("tldata:" , tldata)
-	print("tLdata:" , tLdata)
+	print("osldata:" , osldata)
+	print("osLdata:" , osLdata)
+	# print("wldata:" , wldata)
+	# print("wLdata:" , wLdata)
+	# print("eldata:" , eldata)
+	# print("eLdata:" , eLdata)
+	# print("tldata:" , tldata)
+	# print("tLdata:" , tLdata)
 	
 	plt.plot(range(numofData), data, label="original")
-	plt.plot(range(l-1, numofData), sldata, label="SMA_smallRange")
-	plt.plot(range(L-1, numofData), sLdata, label="SMA_largeRange")
-	plt.plot(range(l-1, numofData), wldata, label="WMA_smallRange")
-	plt.plot(range(L-1, numofData), wLdata, label="WMA_largeRange")
-	plt.plot(range(l-1, numofData), eldata, label="EMA_smallRange")
-	plt.plot(range(L-1, numofData), eLdata, label="EMA_largeRange")
-	plt.plot(range(l-1, numofData), tldata, label="TMA_smallRange")
-	plt.plot(range(L-1, numofData), tLdata, label="TMA_largeRange")
+	plt.plot(range(numofData), sldata, label="SMA_smallRange")
+	plt.plot(range(numofData), sLdata, label="SMA_largeRange")
+	plt.plot(range(l-1, numofData), osldata, label="oldSMA_smallRange")
+	plt.plot(range(L-1, numofData), osLdata, label="oldSMA_largeRange")
+	# plt.plot(range(l-1, numofData), wldata, label="WMA_smallRange")
+	# plt.plot(range(L-1, numofData), wLdata, label="WMA_largeRange")
+	# plt.plot(range(l-1, numofData), eldata, label="EMA_smallRange")
+	# plt.plot(range(L-1, numofData), eLdata, label="EMA_largeRange")
+	plt.plot(range(numofData), tldata, label="TMA_smallRange")
+	plt.plot(range(numofData), tLdata, label="TMA_largeRange")
 	plt.legend(loc="upper left")
 	plt.show()
 
