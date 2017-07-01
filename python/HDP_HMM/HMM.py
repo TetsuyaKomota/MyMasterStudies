@@ -60,4 +60,4 @@ def experiment_0(detail=False):
 if __name__ == "__main__":
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        experiment_0()
+        experiment_0(True)

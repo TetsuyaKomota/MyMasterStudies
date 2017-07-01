@@ -41,22 +41,26 @@ def testfunc_sigmoid(x):
 # 右回り円運動 → 右下がり順方向シグモイド
 # →右下がり逆方向シグモイド → 右回り円運動
 # 各 100 ステップで 400ステップデータ
-def make1():
+def make1(noize=0.1):
     datas = []
-    datas.extend(makeData(testfunc_circle, 100, 0, 2*np.pi, 10))
-    datas.extend(makeData(testfunc_sigmoid, 100, 0, 600, 10))
-    datas.extend(makeData(testfunc_sigmoid, 100, 600, 0, 10))
-    datas.extend(makeData(testfunc_circle, 100, 0, 2*np.pi, 10))
-    return datas
+    datas.extend(makeData(testfunc_circle, 100, 0, 2*np.pi, noize))
+    datas.extend(makeData(testfunc_sigmoid, 100, 0, 600, noize))
+    datas.extend(makeData(testfunc_sigmoid, 100, 600, 0, noize))
+    datas.extend(makeData(testfunc_circle, 100, 0, 2*np.pi, noize))
+    # return datas
+    # 速度に変換してみよう
+    return getVelocityList(datas)
 
 # 右回り円運動 → 右下がり順方向シグモイド
 # 各 100 ステップで 200ステップデータ
 # つまり make1 の前半のみ
-def make1_half():
+def make1_half(noize=0.1):
     datas = []
-    datas.extend(makeData(testfunc_circle, 100, 0, 2*np.pi, 10))
-    datas.extend(makeData(testfunc_sigmoid, 100, 0, 600, 10))
-    return datas
+    datas.extend(makeData(testfunc_circle, 100, 0, 2*np.pi, noize))
+    datas.extend(makeData(testfunc_sigmoid, 100, 0, 600, noize))
+    # return datas
+    # 速度に変換してみよう
+    return getVelocityList(datas)
 
 # =====================================================================
 # 機能系メソッド
@@ -93,5 +97,15 @@ def showData(datas, detail=False):
         print(invdata)
     plt.plot(invdata[0], invdata[1])
     plt.show()
- 
+
+# 取得したデータを速度列に変換
+def getVelocityList(datas, timeDelta=0.01):
+    output = []
+    prev = np.array(datas[0])
+    for d in datas[1:]:
+        output.append((np.array(d)-prev)/timeDelta)
+        prev = d
+    # 長さを datas と合わせる
+    output.append(output[-1])
+    return output
 # =====================================================================
