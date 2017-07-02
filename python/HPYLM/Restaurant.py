@@ -3,6 +3,7 @@
 import copy
 import random
 import numpy as np
+import dill
 
 # HPYLM において各ノードにあたる「店」クラス
 
@@ -478,9 +479,24 @@ class Restaurant:
             print(s)
         return currentSentences
 
+    # 数字をアルファベットに変換
+    # 数字の列じゃダメだったのに今気づいた
+    def translate(self, number):
+        idx = number
+        if number >= 26:
+            idx = idx + 6
+        return (chr(ord("A")+idx))
+
+    # アルファベットを数字に変換
+    def retranslate(self, alphabet):
+        output = ord(alphabet) - ord("A")
+        if output >= 26:
+            output = output - 6
+        return output
+
 if __name__ == "__main__" :
     rest = Restaurant(None, [])
-
+    """
     # u = ["生きてることがつらいなら"]
     # rest.addCustomerfromSentence(u)
     u = ["生きてる", "ことがつらいなら"]
@@ -495,3 +511,20 @@ if __name__ == "__main__" :
     print(rest.calcProbability(["生きてる", "ことが", "つらいなら"]))
     print(rest.calcProbability(["生きてる", "ことが", "つらい", "なら"]))
     print(rest.calcProbability(["生き", "て", "る", "ことが", "つらい", "なら"]))
+    """
+    with open("tmp/HMM_results.dill", "rb") as f:
+        datas = dill.load(f)
+    u = []
+    for m in datas:
+        for d in datas[m]:
+            print(d)
+            line = ""
+            for s in d:
+                line = line + rest.translate(s)
+            u.append(line)
+    print(u)
+    for d in u:
+        line = ""
+        for c in d:
+            line = line + str(rest.retranslate(c)) + ","
+        print(line)
