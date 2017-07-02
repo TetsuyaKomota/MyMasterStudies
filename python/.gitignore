@@ -1,6 +1,4 @@
-*/__init__.py
 *.pyc
-__init__.py
 *.swp
 nohup.out
 
