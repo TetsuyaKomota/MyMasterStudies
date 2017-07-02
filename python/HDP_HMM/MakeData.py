@@ -34,8 +34,12 @@ def testfunc_cos(x):
     return [scale * x, scale * np.cos(x)]
 
 def testfunc_sin(x):
-    scale = 200
+    scale = 100
     return [scale * np.sin(x), scale * x]
+
+def testfunc_invsin(x):
+    scale = 100
+    return [scale * np.sin(x), scale * x * (-1)] 
 
 def testfunc_sigmoid(x):
     scale = 200
@@ -43,8 +47,16 @@ def testfunc_sigmoid(x):
     return [x, scale*(1 - 1/(1+np.exp(-(x-300)/rang)))]
 
 def testfunc_inve(x):
-    scale = 200
+    scale = 500
     return [x, scale * (1 - np.exp(-1 * x/10))]
+
+def testfunc_x(x):
+    scale = 20
+    return [scale * x, 0]
+
+def testfunc_y(x):
+    scale = 20
+    return [0, scale * x]
 
 # =====================================================================
 # func を組み合わせてあらかじめ作ったプリセットデータ生成メソッド
@@ -53,9 +65,9 @@ def testfunc_inve(x):
 # 右回り円運動 → 右下がり順方向シグモイド
 # →右下がり逆方向シグモイド → 右回り円運動
 # 各 100 ステップで 400ステップデータ
-def make1(noize=10):
+def make1(noize=10, init=[0, 0]):
     datas = []
-    datas.extend(makeData(testfunc_circle, 100, 0, 2*np.pi, noize))
+    datas.extend(makeData(testfunc_circle, 100,0,2*np.pi,noize,init=init))
     datas.extend(makeData(testfunc_sigmoid, 100, 0, 600, noize))
     datas.extend(makeData(testfunc_sigmoid, 100, 600, 0, noize))
     datas.extend(makeData(testfunc_circle, 100, 0, 2*np.pi, noize))
@@ -70,9 +82,9 @@ def make1(noize=10):
 # 右回り円運動 → 右下がり順方向シグモイド
 # 各 100 ステップで 200ステップデータ
 # つまり make1 の前半のみ
-def make1_half(noize=10):
+def make1_half(noize=10, init=[0, 0]):
     datas = []
-    datas.extend(makeData(testfunc_circle, 100, 0, 2*np.pi, noize))
+    datas.extend(makeData(testfunc_circle,100,0,2*np.pi, noize, init=init))
     datas.extend(makeData(testfunc_sigmoid, 100, 0, 600, noize))
     # return datas
     # 速度に変換してみよう
@@ -86,13 +98,10 @@ def make1_half(noize=10):
 # 上方向に順 sin → 下方向に順sin 
 # つまり八文字
 # 各100ステップで 200ステップデータ
-def make2(noize=10):
+def make2(noize=10, init=[0, 0]):
     datas = []
-    datas.extend(makeData(testfunc_sin, 100, 0, 2*np.pi, noize))
-    later = makeData(testfunc_sin, 100, 2*np.pi, 0, noize)
-    for i in range(len(later)):
-        later[i][0] = -later[i][0]
-    datas.extend(later)
+    datas.extend(makeData(testfunc_sin,100,0,2*np.pi,noize,init=init))
+    datas.extend(makeData(testfunc_invsin,100,0,2*np.pi,noize,init=datas[-1]))
     # return datas
     # 速度に変換してみよう
     # return getVelocityList(datas)
@@ -103,9 +112,9 @@ def make2(noize=10):
 
 # 上方向に順 sin
 # 100ステップデータ
-def make2_half(noize=10):
+def make2_half(noize=10, init=[0, 0]):
     datas = []
-    datas.extend(makeData(testfunc_sin, 100, 0, 2*np.pi, noize))
+    datas.extend(makeData(testfunc_sin, 100, 0, 2*np.pi, noize, init=init))
     # return datas
     # 速度に変換してみよう
     # return getVelocityList(datas)
@@ -116,10 +125,13 @@ def make2_half(noize=10):
 
 # 適当な高さまで漸近 → 返ってくる
 # 各 100 ステップで　200 ステップデータ
-def make3(noize=10):
+def make3(noize=10, init=[0, 0]):
     datas = []
-    datas.extend(makeData(testfunc_inve, 100, 0, 100, noize))
-    datas.extend(makeData(testfunc_inve, 100, 100, 0, noize))
+    datas.extend(makeData(testfunc_inve, 100, 0, 500, noize, init=init))
+    invdata = []
+    for i in range(len(datas)):
+        invdata.append(datas[-i-1])
+    datas.extend(invdata)
     # return datas
     # 速度に変換してみよう
     # return getVelocityList(datas)
@@ -130,9 +142,9 @@ def make3(noize=10):
 
 # 適当な高さまで漸近
 # 各 100  ステップデータ
-def make3_half(noize=10):
+def make3_half(noize=10, init=[0, 0]):
     datas = []
-    datas.extend(makeData(testfunc_inve, 100, 0, 100, noize))
+    datas.extend(makeData(testfunc_inve, 100, 0, 500, noize, init=init))
     # return datas
     # 速度に変換してみよう
     # return getVelocityList(datas)
@@ -141,7 +153,24 @@ def make3_half(noize=10):
     # TMA で平滑化した状態で速度列をとってみよう
     return getVelocityList(getTMAList(datas))
 
-   
+# S字っぽいの書いて戻ってくる
+def make4(noize=10, init=[0, 0]) : 
+    datas = []
+    datas.extend(makeData(testfunc_x, 100, 0, -10, noize, init=init))
+    datas.extend(makeData(testfunc_y, 100, 0, 5, noize, init=datas[-1]))
+    datas.extend(makeData(testfunc_x, 100, 0, -10, noize, init=datas[-1]))
+    datas.extend(makeData(testfunc_y, 100, 0, -5, noize, init=datas[-1]))
+    datas.extend(makeData(testfunc_x, 100, 0, 20, noize, init=datas[-1]))
+    # return datas
+    # 速度に変換してみよう
+    # return getVelocityList(datas)
+    # TMA で平滑化してみよう
+    # return getTMAList(datas)
+    # TMA で平滑化した状態で速度列をとってみよう
+    return getVelocityList(getTMAList(datas))
+
+
+ 
 
 # =====================================================================
 # 機能系メソッド
@@ -149,7 +178,7 @@ def make3_half(noize=10):
 
 # 引数に与えられた関数で start から end まで等間隔で size 個のデータを
 # 分散 noize のガウス誤差を付与して獲得する
-def makeData(func, size, start, end, noize):
+def makeData(func, size, start, end, noize, init=[0, 0]):
     output = []
     
     x = start
@@ -164,7 +193,7 @@ def makeData(func, size, start, end, noize):
         for j in range(len(temp)):
             ep = pdf.rvs()
             temp[j] = temp[j] + ep
-        output.append(copy.deepcopy(temp))
+        output.append(np.array(copy.deepcopy(temp))+np.array(init))
         x = x + delta
                
     return output
@@ -225,7 +254,7 @@ def getSMAList(datas, length=10):
             buf = buf + np.array(datas[idx+length+1])
     return output 
 
-# sy得したデータを三角移動平均で平滑化
+# 取得したデータを三角移動平均で平滑化
 def getTMAList(datas, length=10):
     output = []
     half_length = math.ceil((length+1)/2)

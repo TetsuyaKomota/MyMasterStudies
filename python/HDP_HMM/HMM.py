@@ -21,8 +21,9 @@ def experiment_0(detail=False):
 
     dataList = []
     dataList.append(MakeData.make1())
-    dataList.append(MakeData.make2())
-    dataList.append(MakeData.make3())
+    dataList.append(MakeData.make2(init=dataList[-1][-1]))
+    dataList.append(MakeData.make3(init=dataList[-1][-1]))
+    dataList.append(MakeData.make4(init=dataList[-1][-1]))
 
     lengths = []
     for d in dataList:
@@ -32,7 +33,7 @@ def experiment_0(detail=False):
 
     MakeData.showData(datas, detail)
 
-    model = hmm.GaussianHMM(n_components=10, covariance_type="full")    
+    model = hmm.GaussianHMM(n_components=20, covariance_type="full")    
     
     # model.fit(datas)
     model.fit(datas, lengths)
@@ -49,6 +50,27 @@ def experiment_0(detail=False):
         print(model.transmat_)    
 
     # 推定．連続する同状態はカットして，遷移の様子だけ取り出す
+    print("dataList:")
+    pre = model.predict(datas)
+    result = []
+    for p in pre:
+        if len(result) == 0 or p != result[-1]:
+            result.append(p) 
+    print(result)
+
+    # データを取り直す
+    dataList = []
+    dataList.append(MakeData.make1())
+    dataList.append(MakeData.make2(init=dataList[-1][-1]))
+    dataList.append(MakeData.make3(init=dataList[-1][-1]))
+    dataList.append(MakeData.make4(init=dataList[-1][-1]))
+
+    lengths = []
+    for d in dataList:
+        lengths.append(len(d))
+
+    datas = np.concatenate(dataList)
+
     for i, d in enumerate(dataList):
         print("dataList[" + str(i) + "]:")
         pre = model.predict(d)
