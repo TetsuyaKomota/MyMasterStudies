@@ -39,8 +39,12 @@ def testfunc_sin(x):
 
 def testfunc_sigmoid(x):
     scale = 200
-    range = 50
-    return [x, scale*(1 - 1/(1+np.exp(-(x-300)/range)))]
+    rang  = 50
+    return [x, scale*(1 - 1/(1+np.exp(-(x-300)/rang)))]
+
+def testfunc_inve(x):
+    scale = 200
+    return [x, scale * (1 - np.exp(-1 * x/10))]
 
 # =====================================================================
 # func を組み合わせてあらかじめ作ったプリセットデータ生成メソッド
@@ -80,6 +84,7 @@ def make1_half(noize=10):
 
 
 # 上方向に順 sin → 下方向に順sin 
+# つまり八文字
 # 各100ステップで 200ステップデータ
 def make2(noize=10):
     datas = []
@@ -109,7 +114,34 @@ def make2_half(noize=10):
     # TMA で平滑化した状態で速度列をとってみよう
     return getVelocityList(getTMAList(datas))
 
+# 適当な高さまで漸近 → 返ってくる
+# 各 100 ステップで　200 ステップデータ
+def make3(noize=10):
+    datas = []
+    datas.extend(makeData(testfunc_inve, 100, 0, 100, noize))
+    datas.extend(makeData(testfunc_inve, 100, 100, 0, noize))
+    # return datas
+    # 速度に変換してみよう
+    # return getVelocityList(datas)
+    # TMA で平滑化してみよう
+    # return getTMAList(datas)
+    # TMA で平滑化した状態で速度列をとってみよう
+    return getVelocityList(getTMAList(datas))
 
+# 適当な高さまで漸近
+# 各 100  ステップデータ
+def make3_half(noize=10):
+    datas = []
+    datas.extend(makeData(testfunc_inve, 100, 0, 100, noize))
+    # return datas
+    # 速度に変換してみよう
+    # return getVelocityList(datas)
+    # TMA で平滑化してみよう
+    # return getTMAList(datas)
+    # TMA で平滑化した状態で速度列をとってみよう
+    return getVelocityList(getTMAList(datas))
+
+   
 
 # =====================================================================
 # 機能系メソッド

@@ -22,6 +22,7 @@ def experiment_0(detail=False):
     dataList = []
     dataList.append(MakeData.make1())
     dataList.append(MakeData.make2())
+    dataList.append(MakeData.make3())
 
     lengths = []
     for d in dataList:
@@ -48,7 +49,8 @@ def experiment_0(detail=False):
         print(model.transmat_)    
 
     # 推定．連続する同状態はカットして，遷移の様子だけ取り出す
-    for d in dataList:
+    for i, d in enumerate(dataList):
+        print("dataList[" + str(i) + "]:")
         pre = model.predict(d)
         result = []
         for p in pre:
@@ -58,7 +60,8 @@ def experiment_0(detail=False):
    
     # makeData し直して推定した場合の状態遷移列を比較したい
     for _ in range(1000):
-        datas = MakeData.make2_half()
+        # datas = MakeData.make2_half()
+        datas = MakeData.make3_half()
         pre = model.predict(datas)
         result_2 = []
         for p in pre:
