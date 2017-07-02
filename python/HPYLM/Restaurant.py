@@ -496,7 +496,6 @@ class Restaurant:
 
 if __name__ == "__main__" :
     rest = Restaurant(None, [])
-    """
     # u = ["生きてることがつらいなら"]
     # rest.addCustomerfromSentence(u)
     u = ["生きてる", "ことがつらいなら"]
@@ -511,20 +510,4 @@ if __name__ == "__main__" :
     print(rest.calcProbability(["生きてる", "ことが", "つらいなら"]))
     print(rest.calcProbability(["生きてる", "ことが", "つらい", "なら"]))
     print(rest.calcProbability(["生き", "て", "る", "ことが", "つらい", "なら"]))
-    """
-    with open("tmp/HMM_results.dill", "rb") as f:
-        datas = dill.load(f)
-    u = []
-    for m in datas:
-        for d in datas[m]:
-            print(d)
-            line = ""
-            for s in d:
-                line = line + rest.translate(s)
-            u.append(line)
-    print(u)
-    for d in u:
-        line = ""
-        for c in d:
-            line = line + str(rest.retranslate(c)) + ","
-        print(line)
+
