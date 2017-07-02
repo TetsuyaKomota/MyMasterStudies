@@ -2,6 +2,7 @@
 
 import numpy as np
 import warnings
+import dill
 from hmmlearn import hmm
 
 import MakeData
@@ -64,17 +65,12 @@ def experiment_0(detail=False):
             result.append(p) 
     print(result)
 
-    # データを取り直す
-    """
-    dataList = []
-    dataList.append(MakeData.make1())
-    dataList.append(MakeData.make2())
-    dataList.append(MakeData.make3())
-    dataList.append(MakeData.make4())
-    """
+    # 学習したモデルをもとに，推定を行う
+    # dill 出力して，それをHPYLM で参照する
+    results = {}
     for i, m in enumerate(methods):
         print("MakeData.make" + str(i+1) + ":")
-        
+        results_temp = []
         for _ in range(10):
             pre = model.predict(m())
             result = []
@@ -82,7 +78,12 @@ def experiment_0(detail=False):
                 if len(result) == 0 or p != result[-1]:
                     result.append(p) 
             print(result)
-
+            results_temp.append(result)
+        results["make"+str(i+1)] = results_temp
+    with open("tmp/HMM_results.dill", "wb")  as f:
+        dill.dump(results, f)
+        print("Successfully dumping")
+ 
 if __name__ == "__main__":
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
