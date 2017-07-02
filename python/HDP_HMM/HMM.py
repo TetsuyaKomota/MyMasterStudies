@@ -19,11 +19,17 @@ def experiment_0(detail=False):
 
     # datas = MakeData.make2()
 
+    methods = []
+    methods.append(MakeData.make1)
+    methods.append(MakeData.make2)
+    methods.append(MakeData.make3)
+    methods.append(MakeData.make4)
+
     dataList = []
-    dataList.append(MakeData.make1())
-    dataList.append(MakeData.make2(init=dataList[-1][-1]))
-    dataList.append(MakeData.make3(init=dataList[-1][-1]))
-    dataList.append(MakeData.make4(init=dataList[-1][-1]))
+    for m in methods:
+        # とりあえず各軌道2回ずつ取得して学習データに使う
+        for _ in range(2):
+            dataList.append(m())
 
     lengths = []
     for d in dataList:
@@ -33,7 +39,7 @@ def experiment_0(detail=False):
 
     MakeData.showData(datas, detail)
 
-    model = hmm.GaussianHMM(n_components=20, covariance_type="full")    
+    model = hmm.GaussianHMM(n_components=30, covariance_type="full")    
     
     # model.fit(datas)
     model.fit(datas, lengths)
@@ -59,42 +65,24 @@ def experiment_0(detail=False):
     print(result)
 
     # データを取り直す
+    """
     dataList = []
     dataList.append(MakeData.make1())
-    dataList.append(MakeData.make2(init=dataList[-1][-1]))
-    dataList.append(MakeData.make3(init=dataList[-1][-1]))
-    dataList.append(MakeData.make4(init=dataList[-1][-1]))
+    dataList.append(MakeData.make2())
+    dataList.append(MakeData.make3())
+    dataList.append(MakeData.make4())
+    """
+    for i, m in enumerate(methods):
+        print("MakeData.make" + str(i+1) + ":")
+        
+        for _ in range(10):
+            pre = model.predict(m())
+            result = []
+            for p in pre:
+                if len(result) == 0 or p != result[-1]:
+                    result.append(p) 
+            print(result)
 
-    lengths = []
-    for d in dataList:
-        lengths.append(len(d))
-
-    datas = np.concatenate(dataList)
-
-    for i, d in enumerate(dataList):
-        print("dataList[" + str(i) + "]:")
-        pre = model.predict(d)
-        result = []
-        for p in pre:
-            if len(result) == 0 or p != result[-1]:
-                result.append(p) 
-        print(result)
-   
-    # makeData し直して推定した場合の状態遷移列を比較したい
-    for _ in range(1000):
-        # datas = MakeData.make2_half()
-        datas = MakeData.make3_half()
-        pre = model.predict(datas)
-        result_2 = []
-        for p in pre:
-            if len(result_2) == 0 or p != result_2[-1]:
-                result_2.append(p) 
-        # print(result)
-        if result != result_2:
-            print("Different")
-            print(result_2)
-            break
-    
 if __name__ == "__main__":
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
