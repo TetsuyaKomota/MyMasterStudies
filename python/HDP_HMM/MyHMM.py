@@ -28,8 +28,8 @@ class MyHMM:
         methods = []
         methods.append(MakeData.make1)
         methods.append(MakeData.make2)
-        methods.append(MakeData.make3)
-        methods.append(MakeData.make4)
+        # methods.append(MakeData.make3)
+        # methods.append(MakeData.make4)
 
         dataList = []
         for m in methods:
@@ -43,7 +43,7 @@ class MyHMM:
 
         datas = np.concatenate(dataList)
 
-        MakeData.showData(datas, detail)
+        # MakeData.showData(datas, detail)
 
         model = hmm.GaussianHMM(n_components=self.n_components, covariance_type="full")    
         
@@ -62,13 +62,14 @@ class MyHMM:
             print(model.transmat_)    
 
         # 推定．連続する同状態はカットして，遷移の様子だけ取り出す
-        print("dataList:")
         pre = model.predict(datas)
         result = []
         for p in pre:
             if len(result) == 0 or p != result[-1]:
                 result.append(p) 
-        print(result)
+        if detail == True:
+            print("dataList:")
+            print(result)
 
         # 学習したモデルをもとに，推定を行う
         # dill 出力して，それをHPYLM で参照する
@@ -82,7 +83,8 @@ class MyHMM:
                 for p in pre:
                     if len(result) == 0 or p != result[-1]:
                         result.append(p) 
-                print(result)
+                if detail == True:
+                    print(result)
                 results_temp.append(result)
             results["make"+str(i+1)] = results_temp
         with open("tmp/HMM_results.dill", "wb")  as f:
