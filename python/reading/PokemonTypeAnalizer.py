@@ -70,7 +70,8 @@ class TypeModel:
         self.count = self.count + 1
         encoded = ""
         for S in name:
-            s = self.encodeChar(S)
+            # s = self.encodeChar(S)
+            s = S
             encoded = encoded + s
             # s = S
             if s != "NC" and s in self.hist.keys():
@@ -88,8 +89,8 @@ class TypeModel:
     def calcProbability(self, name):
         output = 1
         for S in name:
-            s = self.encodeChar(S)
-            # s = S
+            # s = self.encodeChar(S)
+            s = S
             if s in self.hist.keys():
                 output = output * ((self.hist[s]+ALPHA)/self.getNumofChars())
             else:
