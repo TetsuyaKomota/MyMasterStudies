@@ -2,7 +2,11 @@
 *.swp
 nohup.out
 
-*/results
+.python-version
+
+__init__.py
+
+results/
 
 inputSentences.txt
 result.txt
