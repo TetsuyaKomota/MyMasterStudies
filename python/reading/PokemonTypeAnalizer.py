@@ -205,13 +205,11 @@ if __name__ == "__main__":
                 print(temp + "\n")
                 temp = ""
         print(temp + "\n")
-    """
     # タイプごとに名前を分類できたのでとりあえず保存しておく
     with open("type_names_dict.dill", "wb") as f:
         dill.dump(datas, f)
     with open("type_names_dict.dill", "rb") as f:
         datas = dill.load(f)
-    """
     # 各タイプのモデルを生成してみよう
     phist = PHist()
     phist.fit(datas)
