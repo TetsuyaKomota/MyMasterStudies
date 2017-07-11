@@ -3,10 +3,34 @@ import MeCab
 import dill
 import numpy as np
 
-if __name__ == "__main__":
-    model = word2vec.Word2Vec.load("../../..//w2vModel/sample.model")
 
-    m = MeCab.Tagger()
+class W2V:
+    def __init__(self):
+        self.model = word2vec.Word2Vec.load("../../..//w2vModel/sample.model")
+        self.m = MeCab.Tagger()
+
+    def vectorize(self, sentence):
+        texts = self.m.parse(sentence).split("\n")
+        tempvec = np.zeros(200)
+        for n in texts:
+            tempn = n.split(",")
+            if len(tempn) < 2:
+                break
+            if tempn[0].split("\t")[1] not in ["名詞", "動詞", "形容詞"]:
+                break
+            if tempn[6] != "*":
+                key = tempn[6]
+            else:
+                key = tempn[0].split("\t")[0]
+            try:
+                tempvec = tempvec + self.model[key]
+            except KeyError:
+                print(key + " is not in model")
+        return tempvec 
+
+
+if __name__ == "__main__":
+
     namemap = {}
     with open("pokemon.csv", "r", encoding="utf-8") as f:
         line = f.readline()
@@ -18,25 +42,14 @@ if __name__ == "__main__":
         datas = dill.load(f)
     print(datas)
 
+    w2v = W2V()
+
     vecs = {}
     for t in datas:
         vecs[t] = []
         for i in datas[t]:
-            tempvec = np.zeros(200)
-            texts = m.parse(namemap[i]).split("\n")
-            for n in texts:
-                tempn = n.split(",")
-                if len(tempn) < 2:
-                    break
-                if tempn[6] != "*":
-                    key = tempn[6]
-                else:
-                    key = tempn[0].split("\t")[0]
-                try:
-                    tempvec = tempvec + model[key]
-                except KeyError:
-                    print(key + " is not in model")
-            vecs[t].append(tempvec)
-    print(vecs)
+            print(namemap[i])
+            vecs[t].append(w2v.vectorize(namemap[i]))
+    # print(vecs)
     with open("type_vecs_dict.dill", "wb") as f:
         dill.dump(vecs, f)
