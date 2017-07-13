@@ -1,18 +1,19 @@
 #-*- coding: utf-8 -*-
 
-"""
-とりあえず設定だけ決めていこう
-・空間には物体が4つとハンドの5つ
-・2次元
-・
-"""
 import numpy as np
+import scipy.stats as ss
 
 DIMENSION = 2
+NOIZE_X = 1.0 
+NOIZE_V = 0.1 
+NOIZE_A = 0.1 
 
 class Maker:
     def __init__(self):
         self.timeStep = 0
+        self.pdfX = ss.norm(scale = NOIZE_X)
+        self.pdfV = ss.norm(scale = NOIZE_V)
+        self.pdfA = ss.norm(scale = NOIZE_A)
         self.handX = np.zeros(DIMENSION)
         self.handV = np.zeros(DIMENSION)
         self.handA = np.zeros(DIMENSION)
@@ -78,8 +79,8 @@ class Maker:
         self.handX = self.handX + self.handV
         self.handV = self.handV + self.handA
         for c in self.colorList:
-            self.Xs[c] = self.Xs[c] + self.Vs[c]
-            self.Vs[c] = self.Vs[c] + self.As[c]
+            self.Xs[c] = self.Xs[c] + self.Vs[c] + self.pdfX.rvs()
+            self.Vs[c] = self.Vs[c] + self.As[c] + self.pdfV.rvs()
 
     # デバッグ用．現在の座標状況を取得する
     def debug_show(self):
