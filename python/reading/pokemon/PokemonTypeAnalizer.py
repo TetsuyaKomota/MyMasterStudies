@@ -70,7 +70,7 @@ class TypeModel:
             return "NC"
 
     # 名前を代入してヒストグラムを更新する
-    def inputName(self, name):
+    def inputName(self, name, eliminate=False):
         self.count = self.count + 1
         encoded = ""
         buff = ""
@@ -87,17 +87,25 @@ class TypeModel:
             for l in range(2, NGRAM + 1):
                 if len(buff) > l:
                     buffL = buff[-1*l:]
-                    if buffL in self.hist.keys():
+                    if eliminate == True:
+                        self.hist[buffL] = self.hist[buffL] - 1
+                        if self.hist[buffL] == 0:
+                            del self.hist[buffL]
+                    elif buffL in self.hist.keys():
                         self.hist[buffL] = self.hist[buffL] + 1
                     else:
                         self.hist[buffL] = 1
             if s == "NC":
                 continue
-            if s in self.hist.keys():
+            if eliminate == True:
+                self.hist[s] = self.hist[s] + 1
+                if self.hist[s] == 0:
+                    del self.hist[s]
+            elif s in self.hist.keys():
                 self.hist[s] = self.hist[s] + 1
             else:
                 self.hist[s] = 1
-        print(name + "  \t->\t" + encoded)
+        # print(name + "  \t->\t" + encoded)
 
     # 配列で代入すると全部の名前代入する君
     def inputNameList(self, namelist):
@@ -145,6 +153,13 @@ class PHist:
             self.count = self.count + len(datas[t])
             self.models[t] = TypeModel(t)
             self.models[t].inputNameList(datas[t])
+
+    # 指定したタイプから指定したポケモンの情報を削除する
+    def eliminateName(self, name, types, eliminate=True):
+        for t in types:
+            if t == "なし":
+                continue
+            self.models[t].inputName(name, eliminate)
 
     # 名前を引数にタイプを推定する
     # 引数 theta は閾値．これを下回るとタイプ2は なし になる
@@ -248,13 +263,50 @@ if __name__ == "__main__":
         res.write(str(success_fir + success_sec + success_rev) + "/" + str(count) + "\n")
         res.write("fir:" + str(success_fir) + "  sec:" + str(success_sec) + "\n")
         res.write("rev:" + str(success_rev) + "\n")
-        # 実在しないポケモンのタイプを予想しよう
-        phist.predict("チコリータ")
-        phist.predict("ベイリーフ")
-        phist.predict("メガニウム")
-        phist.predict("ヒノアラシ")
-        phist.predict("マグマラシ")
-        phist.predict("バクフーン")
-        phist.predict("ワニノコ")
-        phist.predict("アリゲイツ")
-        phist.predict("オーダイル")
+    # 実在しないポケモンのタイプを予想しよう
+    phist.predict("チコリータ")
+    phist.predict("ベイリーフ")
+    phist.predict("メガニウム")
+    phist.predict("ヒノアラシ")
+    phist.predict("マグマラシ")
+    phist.predict("バクフーン")
+    phist.predict("ワニノコ")
+    phist.predict("アリゲイツ")
+    phist.predict("オーダイル")
+    # クロスバリデーションで検定してみよう
+    with open("result/resultCV" + str(int(datetime.now().timestamp())) + ".txt", "w", encoding="utf-8") as res:
+        with open("pokemon.csv", "r", encoding="utf-8") as f:
+            line = f.readline().split(",")
+            count = 0
+            success_fir = 0
+            success_sec = 0
+            success_rev = 0
+            while len(line) > 2:
+                expected  = [line[2], line[3]]
+                phist.eliminateName(line[0], expected)
+                predicted = phist.predict(line[0], out=res)["types"]
+                phist.eliminateName(line[0], expected, eliminate=False)
+                count = count + 2
+                if predicted[0] == expected[0]:
+                    success_fir = success_fir + 1
+                if predicted[1] == expected[1]:
+                    success_sec = success_sec + 1
+                # 順番は間違えているけどタイプを正解している個数
+                # 確認のために, どのポケモンのどのタイプだったか出力してみる
+                if predicted[0] == expected[1]:
+                    # print("rev sample:")
+                    # print(line[0] + " : " + str(predicted[0]) + "predicted:0, expected:1")
+                    success_rev = success_rev + 1
+                if predicted[1] == expected[0]:
+                    # print("rev sample:")
+                    # print(line[0] + " : " + str(predicted[1]) + "predicted:1, expected:0")
+                    success_rev = success_rev + 1
+                line = f.readline().split(",")
+        print("result:")
+        print(str(success_fir + success_sec + success_rev) + "/" + str(count))
+        print("fir:" + str(success_fir) + "  sec:" + str(success_sec))
+        print("rev:" + str(success_rev))
+        res.write("result:\n")
+        res.write(str(success_fir + success_sec + success_rev) + "/" + str(count) + "\n")
+        res.write("fir:" + str(success_fir) + "  sec:" + str(success_sec) + "\n")
+        res.write("rev:" + str(success_rev) + "\n")

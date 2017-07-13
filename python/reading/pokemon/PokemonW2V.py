@@ -9,23 +9,27 @@ class W2V:
         self.model = word2vec.Word2Vec.load("../../..//w2vModel/sample.model")
         self.m = MeCab.Tagger()
 
-    def vectorize(self, sentence):
+    def vectorize(self, sentence, detail=False):
         texts = self.m.parse(sentence).split("\n")
         tempvec = np.zeros(200)
+        encoded = ""
         for n in texts:
             tempn = n.split(",")
             if len(tempn) < 2:
                 break
             if tempn[0].split("\t")[1] not in ["名詞", "動詞", "形容詞"]:
-                break
+                continue
             if tempn[6] != "*":
                 key = tempn[6]
             else:
                 key = tempn[0].split("\t")[0]
+            encoded = encoded + key + ","
             try:
                 tempvec = tempvec + self.model[key]
             except KeyError:
                 print(key + " is not in model")
+        if detail==True:
+            print("ENCODED : " + encoded)
         return tempvec 
 
 
@@ -49,7 +53,7 @@ if __name__ == "__main__":
         vecs[t] = []
         for i in datas[t]:
             print(namemap[i])
-            vecs[t].append(w2v.vectorize(namemap[i]))
+            vecs[t].append(w2v.vectorize(namemap[i], detail=True))
     # print(vecs)
     with open("type_vecs_dict.dill", "wb") as f:
         dill.dump(vecs, f)

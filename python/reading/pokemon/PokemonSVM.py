@@ -3,6 +3,9 @@ from sklearn import svm
 import PokemonW2V
 from datetime import datetime
 
+from sklearn import cross_validation
+from sklearn.cross_validation import cross_val_score
+
 with open("type_vecs_dict.dill", "rb") as f:
     loaded = dill.load(f)
 
@@ -45,3 +48,8 @@ with open("result/resultSVM" + str(int(datetime.now().timestamp()))+".txt", "w",
 
     print(str(success) + "/" + str(count))
     f.write(str(success) + "/" + str(count)+"\n")
+
+# leave-1-out で検定してみよう
+scores = cross_validation.cross_val_score(clf, datas, labels, cv=5,)
+print("scores: " + str(scores))
+print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
