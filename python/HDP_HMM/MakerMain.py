@@ -4,9 +4,9 @@ import numpy as np
 import scipy.stats as ss
 
 DIMENSION = 2
-NOIZE_X = 1.0 
-NOIZE_V = 0.1 
-NOIZE_A = 0.1 
+NOIZE_X = 0.1 
+NOIZE_V = 0.0 
+NOIZE_A = 0.0 
 
 class Maker:
     def __init__(self):
@@ -33,54 +33,94 @@ class Maker:
 
     # 色名から座標を取得
     def getXs(self, color):
-        return self.Xs[color]
+        if color == "hand":
+            return self.handX
+        else:
+            return self.Xs[color]
 
     # 色名から座標指定
     def setXs(self, color, xy):
-        self.Xs[color] = np.array(xy)
+        if color == "hand":
+            self.handX = np.array(xy)
+        else:
+            self.Xs[color] = np.array(xy)
         return self
 
     # 色名から座標移動
     def addXs(self, color, xy):
-        self.Xs[color] = self.Xs[color] + np.array(xy)
+        if color == "hand":
+            self.handX = self.handX + np.array(xy)
+        else:
+            self.Xs[color] = self.Xs[color] + np.array(xy)
         return self
 
     # 色名から速度を取得
     def getVs(self, color):
-        return self.Vs[color]
+        if color == "hand":
+            return self.handV
+        else:
+            return self.Vs[color]
 
     # 色名から速度指定
     def setVs(self, color, xy):
-        self.Vs[color] = np.array(xy)
+        if color == "hand":
+            self.handV = np.array(xy)
+        else:
+            self.Vs[color] = np.array(xy)
         return self
 
     # 色名から速度移動
     def addVs(self, color, xy):
-        self.Vs[color] = self.Vs[color] + np.array(xy)
+        if color == "hand":
+            self.handV = self.handV + np.array(xy)
+        else:
+            self.Vs[color] = self.Vs[color] + np.array(xy)
         return self
 
     # 色名から加速度を取得
     def getAs(self, color):
-        return self.As[color]
+        if color == "hand":
+            return self.handA
+        else:
+            return self.As[color]
 
     # 色名から座標指定
     def setAs(self, color, xy):
-        self.As[color] = np.array(xy)
+        if color == "hand":
+            self.handA = np.array(xy)
+        else:
+            self.As[color] = np.array(xy)
         return self
 
     # 色名から座標移動
     def addAs(self, color, xy):
-        self.As[color] = self.As[color] + np.array(xy)
+        if color == "hand":
+            self.handA = self.handA + np.array(xy)
+        else:
+            self.As[color] = self.As[color] + np.array(xy)
         return self
+
+    # ノイズを作る
+    def genNoize(self, unit):
+        output = np.zeros(DIMENSION)
+        if unit == "X":
+            pdf = self.pdfX
+        elif unit == "V":
+            pdf = self.pdfV
+        else:
+            pdf = self.pdfA
+        for d in range(DIMENSION):
+            output[d] = pdf.rvs()
+        return output
 
     # タイムステップ経過させる
     def nextStep(self):
         self.timeStep = self.timeStep + 1
-        self.handX = self.handX + self.handV
-        self.handV = self.handV + self.handA
+        self.handX = self.handX + self.handV + self.genNoize("X")
+        self.handV = self.handV + self.handA + self.genNoize("V")
         for c in self.colorList:
-            self.Xs[c] = self.Xs[c] + self.Vs[c] + self.pdfX.rvs()
-            self.Vs[c] = self.Vs[c] + self.As[c] + self.pdfV.rvs()
+            self.Xs[c] = self.Xs[c] + self.Vs[c] + self.genNoize("X")
+            self.Vs[c] = self.Vs[c] + self.As[c] + self.genNoize("V")
 
     # デバッグ用．現在の座標状況を取得する
     def debug_show(self):
@@ -114,11 +154,11 @@ class Maker:
 
 if __name__ == "__main__":
     maker = Maker()
-    maker.setVs("red", [2.0, 10.0])
-    maker.setAs("red", [0, -1.0])
+    maker.setVs("hand", [2.0, 10.0])
+    maker.setAs("hand", [0, -1.0])
     for _ in range(100):
         maker.nextStep()
         maker.debug_show()
         maker.debug_log()
-        if maker.getXs("red")[1] < 0:
+        if maker.getXs("hand")[1] < 0:
             break 
