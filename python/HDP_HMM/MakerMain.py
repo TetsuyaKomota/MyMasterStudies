@@ -117,6 +117,14 @@ class Maker:
             self.As[color] = self.As[color] + np.array(xy)
         return self
 
+    # 色名，目標地点から，目標地点に減衰しながらまっすぐ向かうように
+    # 速度と加速度を変更
+    # t は到達までのステップ数
+    def gotoGoal(self, color, goal, t):
+        dis = np.array(goal)-self.getXs(color)
+        self.setVs(color, 2*dis/t)
+        self.setAs(color, -2*dis/(t*t))
+
     # 色指定で握る
     def grab(self, color):
         if self.grabbed != "":
@@ -165,6 +173,14 @@ class Maker:
                 self.Vs[c] = self.Vs[c] * REDIS_V
                 if np.linalg.norm(self.Vs[c]) < 0.1 :
                     self.Vs[c] = np.zeros(DIMENSION)
+
+    # 指定した回数タイムステップを進ませてログをとる
+    def execute(self, num):
+        for _ in range(num):
+            self.nextStep()
+            self.debug_show()
+            self.debug_log()
+ 
  
     # デバッグ用．現在の座標状況を取得する
     def debug_show(self):
