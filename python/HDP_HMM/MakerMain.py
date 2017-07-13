@@ -7,10 +7,15 @@ DIMENSION = 2
 NOIZE_X = 0.1 
 NOIZE_V = 0.0 
 NOIZE_A = 0.0 
+# grab の可能範囲
+GRAB_RANGE = 1000000
+# 速度減衰強度
+REDIS_V = 0.9
 
 class Maker:
     def __init__(self):
         self.timeStep = 0
+        self.grabbed = ""
         self.pdfX = ss.norm(scale = NOIZE_X)
         self.pdfV = ss.norm(scale = NOIZE_V)
         self.pdfA = ss.norm(scale = NOIZE_A)
@@ -42,6 +47,8 @@ class Maker:
     def setXs(self, color, xy):
         if color == "hand":
             self.handX = np.array(xy)
+            if self.grabbed != "":
+                self.setXs(self.grabbed, xy)
         else:
             self.Xs[color] = np.array(xy)
         return self
@@ -50,6 +57,8 @@ class Maker:
     def addXs(self, color, xy):
         if color == "hand":
             self.handX = self.handX + np.array(xy)
+            if self.grabbed != "":
+                self.addXs(self.grabbed, xy)
         else:
             self.Xs[color] = self.Xs[color] + np.array(xy)
         return self
@@ -65,6 +74,8 @@ class Maker:
     def setVs(self, color, xy):
         if color == "hand":
             self.handV = np.array(xy)
+            if self.grabbed != "":
+                self.setVs(self.grabbed, xy)
         else:
             self.Vs[color] = np.array(xy)
         return self
@@ -73,6 +84,8 @@ class Maker:
     def addVs(self, color, xy):
         if color == "hand":
             self.handV = self.handV + np.array(xy)
+            if self.grabbed != "":
+                self.addVs(self.grabbed, xy)
         else:
             self.Vs[color] = self.Vs[color] + np.array(xy)
         return self
@@ -84,21 +97,44 @@ class Maker:
         else:
             return self.As[color]
 
-    # 色名から座標指定
+    # 色名から加速度指定
     def setAs(self, color, xy):
         if color == "hand":
             self.handA = np.array(xy)
+            if self.grabbed != "":
+                self.setAs(self.grabbed, xy)
         else:
             self.As[color] = np.array(xy)
         return self
 
-    # 色名から座標移動
+    # 色名から加速度移動
     def addAs(self, color, xy):
         if color == "hand":
             self.handA = self.handA + np.array(xy)
+            if self.grabbed != "":
+                self.addAs(self.grabbed, xy)
         else:
             self.As[color] = self.As[color] + np.array(xy)
         return self
+
+    # 色指定で握る
+    def grab(self, color):
+        if self.grabbed != "":
+            print("hand already grabbed:" + self.grabbed)
+        elif np.linalg.norm(self.getXs("hand")-self.getXs(color)) < GRAB_RANGE:
+            self.grabbed = color
+            self.setVs(color, self.getVs("hand"))
+            self.setAs(color, self.getAs("hand"))
+        else:
+            print("too far")
+
+    # 色指定で離す
+    def release(self):
+        if self.grabbed == "":
+            print("nothing grabbed")
+        else:
+            self.setAs(self.grabbed, np.zeros(DIMENSION))
+            self.grabbed = ""
 
     # ノイズを作る
     def genNoize(self, unit):
@@ -112,16 +148,24 @@ class Maker:
         for d in range(DIMENSION):
             output[d] = pdf.rvs()
         return output
-
+ 
     # タイムステップ経過させる
     def nextStep(self):
         self.timeStep = self.timeStep + 1
         self.handX = self.handX + self.handV + self.genNoize("X")
         self.handV = self.handV + self.handA + self.genNoize("V")
+        if np.linalg.norm(self.handA) < 0.1 :
+            self.handV = self.handV * REDIS_V
+            if np.linalg.norm(self.handV) < 0.1 :
+                self.handV = np.zeros(DIMENSION)
         for c in self.colorList:
             self.Xs[c] = self.Xs[c] + self.Vs[c] + self.genNoize("X")
             self.Vs[c] = self.Vs[c] + self.As[c] + self.genNoize("V")
-
+            if np.linalg.norm(self.As[c]) < 0.1 :
+                self.Vs[c] = self.Vs[c] * REDIS_V
+                if np.linalg.norm(self.Vs[c]) < 0.1 :
+                    self.Vs[c] = np.zeros(DIMENSION)
+ 
     # デバッグ用．現在の座標状況を取得する
     def debug_show(self):
         print("==SHOW== step:" + str(self.timeStep))
@@ -156,9 +200,13 @@ if __name__ == "__main__":
     maker = Maker()
     maker.setVs("hand", [2.0, 10.0])
     maker.setAs("hand", [0, -1.0])
+    maker.setXs("red", [20.0, 53.0])
     for _ in range(100):
         maker.nextStep()
         maker.debug_show()
         maker.debug_log()
         if maker.getXs("hand")[1] < 0:
             break 
+        elif maker.getVs("hand")[1] <=0:
+            maker.setVs("red", maker.getVs("hand"))
+            maker.setAs("red", maker.getAs("hand"))
