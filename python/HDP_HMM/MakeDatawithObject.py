@@ -28,6 +28,7 @@ class Maker:
             self.Xs[c] = np.zeros(DIMENSION)
             self.Vs[c] = np.zeros(DIMENSION)
             self.As[c] = np.zeros(DIMENSION)
+        self.f = open("tmp/log.csv", "a")
 
     # 色名から座標を取得
     def getXs(self, color):
@@ -82,7 +83,7 @@ class Maker:
 
     # デバッグ用．現在の座標状況を取得する
     def debug_show(self):
-        print("==SHOW==")
+        print("==SHOW== step:" + str(self.timeStep))
         status = ""
         status = status + "\t: " + str(self.handX)
         status = status + "\t: " + str(self.handV)
@@ -96,19 +97,27 @@ class Maker:
             status = status + "\t: " + str(self.As[col])
             print(col + status)
 
+    # デバッグ用．ログ出力
+    def debug_log(self):
+        # 出力の順番はステップ数，ハンド，colorList 順のオブジェクト
+        # ハンドとオブジェクトはそれぞれ座標，速度，加速度
+        self.f.write(str(self.timeStep) + ",")
+        self.f.write(str(self.handX[0])+","+str(self.handX[1])+",")
+        self.f.write(str(self.handV[0])+","+str(self.handV[1])+",")
+        self.f.write(str(self.handA[0])+","+str(self.handA[1])+",")
+        for c in self.colorList:
+            self.f.write(str(self.Xs[c][0])+","+str(self.Xs[c][1])+",")
+            self.f.write(str(self.Vs[c][0])+","+str(self.Vs[c][1])+",")
+            self.f.write(str(self.As[c][0])+","+str(self.As[c][1])+",")
+        self.f.write("\n")
+
 if __name__ == "__main__":
     maker = Maker()
-    """
-    # maker.debug_show()
-    maker.setXs("red", [1.0, 2.0])
-    maker.debug_show()
-    maker.addXs("red", [1.0, 1.0])
-    maker.debug_show()
-    """
-    maker.setVs("red", [10.0, 0])
-    maker.setAs("red", [-1.0, 0])
+    maker.setVs("red", [2.0, 10.0])
+    maker.setAs("red", [0, -1.0])
     for _ in range(100):
         maker.nextStep()
         maker.debug_show()
-        if maker.getVs("red")[0] <= 0:
+        maker.debug_log()
+        if maker.getXs("red")[1] < 0:
             break 
