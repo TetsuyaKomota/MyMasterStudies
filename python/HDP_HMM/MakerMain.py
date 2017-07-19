@@ -125,6 +125,22 @@ class Maker:
         self.setVs(color, 2*dis/t)
         self.setAs(color, -2*dis/(t*t))
 
+    # 色名，目標地点から，目標地点に円弧を描いて向かう
+    # 加速度が変化しながら動くので execute 要素を含む
+    def executeCircle(self, color, goal, t):
+        self.setVs(color, [0, 0])
+        self.setAs(color, [0, 0])
+        base = (self.getXs(color) + np.array(goal))/2
+        dis = np.linalg.norm(np.array(goal) - self.getXs(color))/2
+        # dis = dis * (np.pi/t) * (np.pi/t)
+        for d in range(t):
+            diff = [dis*np.cos(np.pi*d/t), dis*np.sin(np.pi*d/t)]
+            self.setXs(color, base+np.array(diff))
+            self.nextStep()
+            self.debug_show()
+            self.debug_log()
+            
+
     # 色指定で握る
     def grab(self, color):
         if self.grabbed != "":
