@@ -34,6 +34,8 @@ for s in u:
 
 result = rest.executeParsing(u, 100000)
 
+"""
+旧バージョン
 print("parsing results:")
 with open("tasks/result.txt", "w") as f:
     for r in result:
@@ -43,4 +45,14 @@ with open("tasks/result.txt", "w") as f:
         line = line + "\n"
         print(line)
         f.write(line)
+"""
+print("parsing results:")
+for r in result:
+    line = ""
+    for w in r:
+        line = line + w + ", "
+    print(line)
 
+with open("tmp/log_MakerMain/dills/HPYLM_results.dill", "wb") as f:
+    dill.dump(result, f)
+    print("Successfully dumping : result")
