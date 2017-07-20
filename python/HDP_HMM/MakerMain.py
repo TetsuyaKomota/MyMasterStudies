@@ -5,7 +5,7 @@ import scipy.stats as ss
 from datetime import datetime
 
 DIMENSION = 2
-NOIZE_X = 0.1 
+NOIZE_X = 100 
 NOIZE_V = 0.0 
 NOIZE_A = 0.0 
 # grab の可能範囲
@@ -35,7 +35,7 @@ class Maker:
             self.Xs[c] = np.zeros(DIMENSION)
             self.Vs[c] = np.zeros(DIMENSION)
             self.As[c] = np.zeros(DIMENSION)
-        self.f = open("../tmp/log_MakerMain/log" + filename + ".csv", "a")
+        self.f = open("tmp/log_MakerMain/log" + filename + ".csv", "a")
 
     # 色名から座標を取得
     def getXs(self, color):
