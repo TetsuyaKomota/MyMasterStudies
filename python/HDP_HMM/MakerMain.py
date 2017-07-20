@@ -2,6 +2,7 @@
 
 import numpy as np
 import scipy.stats as ss
+from datetime import datetime
 
 DIMENSION = 2
 NOIZE_X = 0.1 
@@ -13,7 +14,7 @@ GRAB_RANGE = 1000000
 REDIS_V = 0.9
 
 class Maker:
-    def __init__(self):
+    def __init__(self, filename=str(datetime.now().timestamp())[-5:]):
         self.timeStep = 0
         self.grabbed = ""
         self.pdfX = ss.norm(scale = NOIZE_X)
@@ -34,7 +35,7 @@ class Maker:
             self.Xs[c] = np.zeros(DIMENSION)
             self.Vs[c] = np.zeros(DIMENSION)
             self.As[c] = np.zeros(DIMENSION)
-        self.f = open("tmp/log.csv", "a")
+        self.f = open("tmp/log_MakerMain/log" + filename + ".csv", "a")
 
     # 色名から座標を取得
     def getXs(self, color):
