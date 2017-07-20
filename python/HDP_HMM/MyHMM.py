@@ -163,10 +163,10 @@ class MyHMM:
                 print(result)
             results[fnameList[i]]       = result
             results_naive[fnameList[i]] = result_naive
-        with open("../tmp/log_MakerMain/dills/HMM_results.dill", "wb")  as f:
+        with open("tmp/log_MakerMain/dills/HMM_results.dill", "wb")  as f:
             dill.dump(results, f)
             print("Successfully dumping : results")
-        with open("../tmp/log_MakerMain/dills/HMM_results_naive.dill", "wb")  as f:
+        with open("tmp/log_MakerMain/dills/HMM_results_naive.dill", "wb")  as f:
             dill.dump(results_naive, f)
             print("Successfully dumping : results_naive")
 
