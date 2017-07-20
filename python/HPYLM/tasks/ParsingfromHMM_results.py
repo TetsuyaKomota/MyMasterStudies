@@ -7,7 +7,8 @@ print("Start Parsing Test (from tmp/HMM_results.dill)")
 
 rest = Restaurant.Restaurant(None, [])
 
-with open("../tmp/HMM_results.dill", "rb") as f:
+# with open("tmp/HMM_results.dill", "rb") as f:
+with open("tmp/log_MakerMain/dills/HMM_results.dill", "rb") as f:
     datas = dill.load(f)
 u = []
 for m in datas:
@@ -25,7 +26,7 @@ for s in u:
 result = rest.executeParsing(u, 100000)
 
 print("parsing results:")
-with open("tasks/resultfromHMM_results.txt", "w") as f:
+with open("tasks/result.txt", "w") as f:
     for r in result:
         line = ""
         for w in r:

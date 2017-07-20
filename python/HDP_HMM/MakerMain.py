@@ -35,7 +35,7 @@ class Maker:
             self.Xs[c] = np.zeros(DIMENSION)
             self.Vs[c] = np.zeros(DIMENSION)
             self.As[c] = np.zeros(DIMENSION)
-        self.f = open("tmp/log_MakerMain/log" + filename + ".csv", "a")
+        self.f = open("../tmp/log_MakerMain/log" + filename + ".csv", "a")
 
     # 色名から座標を取得
     def getXs(self, color):
