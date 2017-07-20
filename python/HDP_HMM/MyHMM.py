@@ -100,8 +100,7 @@ class MyHMM:
     # これらは辞書として生成し，同じキーを保ち，ログファイル名と関連付けておく
     def experiment_1(self, detail=False):
 
-        filenames = glob.glob("tmp/log_MakerMain/*")
-        print(filenames)
+        filenames = glob.glob("tmp/log_MakerMain/PostProcessed/*")
         dataList  = []
         fnameList = [] # dill する辞書のキーに使うファイル名
         for fname in filenames:        
@@ -116,9 +115,12 @@ class MyHMM:
                 while(True):
                     # [1:-1] はステップ番号と改行文字を無視する為
                     # line = f.readline().split(",")[1:-1]
-                    line = f.readline().split(",")[1:3]
+                    # line = f.readline().split(",")[1:3]
+                    # 後処理することにしたから\n削除だけでOK
+                    line = f.readline().split(",")[:-1]
                     if len(line) < 2:
                         break
+                    print(line)
                     tempdata.append(np.array([float(x) for x in line]))
                 dataList.append(tempdata)
         # 一旦確認
