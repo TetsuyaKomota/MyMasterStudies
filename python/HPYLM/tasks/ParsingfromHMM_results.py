@@ -11,6 +11,8 @@ rest = Restaurant.Restaurant(None, [])
 with open("tmp/log_MakerMain/dills/HMM_results.dill", "rb") as f:
     datas = dill.load(f)
 u = []
+"""
+旧バージョン．methods で動作作ってた時の奴
 for m in datas:
     for d in datas[m]:
         print(d)
@@ -18,6 +20,13 @@ for m in datas:
         for s in d:
             line = line + rest.translate(s)
         u.append([line])
+"""
+for d in datas:
+    print(datas[d])
+    line = ""
+    for s in datas[d]:
+        line = line + rest.translate(s)
+    u.append([line])
 
 print("input sentences:")
 for s in u:
