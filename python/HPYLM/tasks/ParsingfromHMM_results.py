@@ -32,7 +32,7 @@ print("input sentences:")
 for s in u:
     print(s[0])
 
-result = rest.executeParsing(u, 100000)
+result = rest.executeParsing(u, 1000000)
 
 """
 旧バージョン
