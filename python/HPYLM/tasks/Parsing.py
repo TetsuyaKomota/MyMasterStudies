@@ -8,7 +8,7 @@ rest = Restaurant.Restaurant(None, [])
 
 u = []
 
-with open("tasks/inputSentences.txt", "r") as f:
+with open("HPYLM/tasks/inputSentences.txt", "r") as f:
     line = f.readline()
     while(line != ""):
         u.append([line[:-1]])

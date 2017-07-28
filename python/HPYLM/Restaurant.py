@@ -459,12 +459,19 @@ class Restaurant:
         if self.parent is not None:
             return None
         currentSentences = copy.deepcopy(sentences)
+        # 辞書が代入されることを想定してるので，
+        # リストだった場合は適当な辞書に変更する
+        if isinstance(currentSentences, list) == True:
+            dic = {}
+            for i in range(len(currentSentences)):
+                dic[str(i)] = currentSentences[i]
+            currentSentences = dic
         # 最初に，文章全てをモデルに代入する
         for s in currentSentences:
-            self.addCustomerfromSentence(s)
+            self.addCustomerfromSentence(currentSentences[s])
         for idx in range(iteration):
             # 順番に代入しなおす(ギブスサンプリング)
-            for i in range(len(currentSentences)):
+            for i in currentSentences:
                 currentSentences[i] = self.sampling(currentSentences[i])
             # 定期的に途中状態を表示してみる
             if (idx) % 5000 == 0 and idx != 0:
@@ -472,11 +479,11 @@ class Restaurant:
                 str(idx))
                 print("[Restaurant]executeParsing:currentSentences:")
                 for s in currentSentences:
-                    print(s)
+                    print(s + ":" + str(currentSentences[s]))
         # 最終結果を表示する
         print("[Restaurant]executeParsing:results:")
         for s in currentSentences:
-            print(s)
+            print(s + ":" + str(currentSentences[s]))
         return currentSentences
 
     # 数字をアルファベットに変換
