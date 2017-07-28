@@ -5,7 +5,7 @@ import scipy.stats as ss
 from datetime import datetime
 
 DIMENSION = 2
-NOIZE_X = 100 
+NOIZE_X = 10 
 NOIZE_V = 0.0 
 NOIZE_A = 0.0 
 # grab の可能範囲
