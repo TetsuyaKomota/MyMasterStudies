@@ -20,3 +20,4 @@ C:\Users\komot\Documents\Visual Studio 2015\Projects\GIT\KinectCameraSample\Kine
 C:\Users\komot\Documents\MyMasterStudies\CS\KinectCameraSample\KinectCameraSample\bin\Debug\KinectCameraSample.exe.config
 C:\Users\komot\Documents\MyMasterStudies\CS\KinectCameraSample\KinectCameraSample\obj\Debug\KinectCameraSample.exe
 C:\Users\komot\Documents\MyMasterStudies\CS\KinectCameraSample\KinectCameraSample\obj\Debug\KinectCameraSample.pdb
+C:\Users\komot\MyMasterStudies\CS\KinectCameraSample\KinectCameraSample\bin\Debug\KinectCameraSample.exe.config
