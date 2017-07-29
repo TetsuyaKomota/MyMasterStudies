@@ -127,7 +127,6 @@ if __name__ == "__main__":
     test3(maker, inits)
     exit()
     """
-    """
     for count in range(10):
         inits = {}
         inits["red"]    = [10000 * (random() - 0.5), 10000 * (random() - 0.5)]
@@ -153,3 +152,4 @@ if __name__ == "__main__":
                 maker.debug_show()
                 test3(maker, inits, num = interval)
 
+    """
