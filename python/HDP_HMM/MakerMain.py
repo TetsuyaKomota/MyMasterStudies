@@ -156,10 +156,10 @@ class Maker:
         # 初速の傾きも求める
         vLen = np.sqrt(oldVs[0]*oldVs[0]+oldVs[1]*oldVs[1])
         if vLen != 0:
-            center = np.array(oldXs) - (r/vLen) * np.array([-1*oldVs[1], oldVs[0]])
-            if oldVs[0] != 0 and oldVs[1] >= 0:
+            center = np.array(oldXs) + (r/vLen) * np.array([-1*oldVs[1], oldVs[0]])
+            if oldVs[0] > 0:
                 initTheta = np.arctan(oldVs[1]/oldVs[0])
-            elif oldVs[0] != 0 and oldVs[1] > 0:
+            elif oldVs[0] < 0:
                 initTheta = np.pi + np.arctan(oldVs[1]/oldVs[0])
             else:
                 initTheta = np.pi/2
