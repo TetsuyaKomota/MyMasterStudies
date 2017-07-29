@@ -3,6 +3,7 @@
 import numpy as np
 import scipy.stats as ss
 from datetime import datetime
+import copy
 
 DIMENSION = 2
 NOIZE_X = 10 
@@ -128,7 +129,7 @@ class Maker:
 
     # 色名，目標地点から，目標地点に円弧を描いて向かう
     # 加速度が変化しながら動くので execute 要素を含む
-    def executeCircle(self, color, goal, t):
+    def executeCurve(self, color, goal, t):
         self.setVs(color, [0, 0])
         self.setAs(color, [0, 0])
         base = (self.getXs(color) + np.array(goal))/2
@@ -140,7 +141,42 @@ class Maker:
             self.nextStep()
             self.debug_show()
             self.debug_log()
-            
+           
+    # 色名，半径から，その場で回転させる
+    # 回転した後は元の運動状態に戻す
+    def executeCircle(self, color, t, r=300):
+        # 最初の状態を保存しておく
+        oldXs = copy.deepcopy(self.getXs(color))
+        oldVs = copy.deepcopy(self.getVs(color))
+        oldAs = copy.deepcopy(self.getAs(color))
+        # 速度を止める
+        self.setVs(color, [0, 0])
+        self.setAs(color, [0, 0])
+        # 回転中心を求める
+        # 初速の傾きも求める
+        vLen = np.sqrt(oldVs[0]*oldVs[0]+oldVs[1]*oldVs[1])
+        if vLen != 0:
+            center = np.array(oldXs) - (r/vLen) * np.array([-1*oldVs[1], oldVs[0]])
+            if oldVs[0] != 0 and oldVs[1] >= 0:
+                initTheta = np.arctan(oldVs[1]/oldVs[0])
+            elif oldVs[0] != 0 and oldVs[1] > 0:
+                initTheta = np.pi + np.arctan(oldVs[1]/oldVs[0])
+            else:
+                initTheta = np.pi/2
+        else:
+            center = np.array([oldXs[0], oldXs[1] + r])
+            initTheta = 0
+        delta = 2 * np.pi / t
+        for i in range(t):
+            diff = [r*np.sin(i*delta+initTheta), -1*r*np.cos(i*delta+initTheta)]
+            self.setXs(color, center+np.array(diff))
+            self.nextStep()
+            self.debug_show()
+            self.debug_log()
+        # 最初の速度に戻す
+        self.setXs(color, oldXs)
+        self.setVs(color, oldVs)
+        self.setAs(color, oldAs)
 
     # 色指定で握る
     def grab(self, color):
