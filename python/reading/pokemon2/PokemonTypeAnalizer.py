@@ -238,6 +238,7 @@ if __name__ == "__main__":
         res.write("fir:" + str(success_fir) + "  sec:" + str(success_sec) + "  nop:" + str(success_nop) + "\n")
         res.write("rev:" + str(success_rev) + "\n")
         res.write("has two types:" + str(count_twoType) + "/" + str(count_true_twoType) + "\n")
+    exit()
     # クロスバリデーションで検定してみよう
     with open("result/resultCV" + str(int(datetime.now().timestamp())) + ".txt", "w", encoding="utf-8") as res:
         with open("pokemon_alopez247.csv", "r", encoding="utf-8") as f:
