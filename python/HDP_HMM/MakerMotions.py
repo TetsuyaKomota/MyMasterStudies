@@ -116,17 +116,10 @@ def test3(maker, inits, num=0):
 
 
 if __name__ == "__main__":
-    """
-    inits = {}
-    inits["red"]    = [10000 * (random() - 0.5), 10000 * (random() - 0.5)]
-    inits["blue"]   = [10000 * (random() - 0.5), 10000 * (random() - 0.5)]
-    inits["yellow"] = [10000 * (random() - 0.5), 10000 * (random() - 0.5)]
-    inits["green"]  = [10000 * (random() - 0.5), 10000 * (random() - 0.5)]
     maker = MakerMain.Maker()
     maker.debug_show()
-    test3(maker, inits)
+    test1(maker)
     exit()
-    """
     for count in range(10):
         inits = {}
         inits["red"]    = [10000 * (random() - 0.5), 10000 * (random() - 0.5)]
