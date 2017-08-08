@@ -1,0 +1,16 @@
+10  capital_gain            0.80
+11  capital_loss            0.76
+12  hours_per_week          0.74
+4   education_num           0.717
+All                         0.714
+3   education               0.699
+7   relationship            0.693
+5   marital_status          0.68
+1,6 workclass, occupation   0.67
+0   age                     0.63
+9   sex                     0.53
+2   fnlwgt                  0.41
+8   race                    0.31
+13  native_country          0.28
+
+All(Weighted)    0.70

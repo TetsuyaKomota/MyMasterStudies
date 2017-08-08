@@ -1,0 +1,48 @@
+Recognise Score - w:0
+0.6042944785276073
+Success:197/All:326
+Recognise Score - w:1
+0.6656441717791411
+Success:217/All:326
+Recognise Score - w:2
+0.3803680981595092
+Success:124/All:326
+Recognise Score - w:3
+0.7331288343558282
+Success:239/All:326
+Recognise Score - w:4
+0.696319018404908
+Success:227/All:326
+Recognise Score - w:5
+0.6656441717791411
+Success:217/All:326
+Recognise Score - w:6
+0.6871165644171779
+Success:224/All:326
+Recognise Score - w:7
+0.7116564417177914
+Success:232/All:326
+Recognise Score - w:8
+0.34049079754601225
+Success:111/All:326
+Recognise Score - w:9
+0.44171779141104295
+Success:144/All:326
+Recognise Score - w:10
+0.8128834355828221
+Success:265/All:326
+Recognise Score - w:11
+0.8374233128834356
+Success:273/All:326
+Recognise Score - w:12
+0.647239263803681
+Success:211/All:326
+Recognise Score - w:13
+0.2668711656441718
+Success:87/All:326
+Recognise Score - w:14
+0.7208588957055214
+Success:235/All:326
+Recognise Score - w:15
+0.7147239263803681
+Success:233/All:326
