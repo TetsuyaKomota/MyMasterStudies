@@ -21,7 +21,7 @@ def inputData(filepath):
 # ファイルを書きだす
 def outputData(output, filepath):
     post_path = "tmp/log_MakerMain/PostProcessed/post_"
-    with open(post_path+filepath[-12:], "w") as f:
+    with open(post_path+filepath[-13:], "w") as f:
         for o in output:
             line = ""
             for d in o:
