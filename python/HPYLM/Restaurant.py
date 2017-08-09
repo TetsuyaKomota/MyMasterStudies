@@ -513,7 +513,7 @@ class Restaurant:
         return output
 
     # ブロック化サンプリング
-    def blockedSampling(self, u)
+    def blockedSampling(self, u):
         # u をモデルから eliminate
         self.eliminateCustomerfromSentence(u)
         # u を全連結
@@ -540,7 +540,7 @@ class Restaurant:
                         s = [word3, word2, word1]
                         prob = self.calcProbability(s)
                         sigma = sigma + prob*a[t-k][j][i]
-            a[t][k][j] = sigma
+                    a[t][k][j] = sigma
         # a をもとに分割を取得
         newU = []
         while True:
