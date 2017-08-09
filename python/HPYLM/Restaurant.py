@@ -17,7 +17,7 @@ paramD     = 1.0
 # 基底測度の係数
 paramA = 2
 # 文脈の深さ限界
-TERMINAL = 4
+TERMINAL = 2
 
 class Restaurant:
 
@@ -219,7 +219,8 @@ class Restaurant:
             print("[Restaurant]getChildofForrowedU:invalid inputs")
             return None
         # U が自分の文脈と同じなら自分を返す
-        if U == self.getU():
+        # 文脈が TERMINAL 以上ならそこが終端なので自分を返す
+        if U == self.getU() or len(self.getU()) >= TERMINAL:
             return self
         else:
         # より深い適切な子店を取得する
