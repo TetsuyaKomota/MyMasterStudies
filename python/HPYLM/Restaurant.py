@@ -482,7 +482,8 @@ class Restaurant:
         for idx in range(iteration):
             # 順番に代入しなおす(ギブスサンプリング)
             for i in currentSentences:
-                currentSentences[i] = self.sampling(currentSentences[i])
+                # currentSentences[i] = self.sampling(currentSentences[i])
+                currentSentences[i] = self.blockedSampling(currentSentences[i])
             # 定期的に途中状態を表示してみる
             if (idx) % 5000 == 0 and idx != 0:
                 print("[Restaurant]executeParsing:iteration:"+\
@@ -510,6 +511,59 @@ class Restaurant:
         if output >= 26:
             output = output - 6
         return output
+
+    # ブロック化サンプリング
+    def blockedSampling(self, u)
+        # u をモデルから eliminate
+        self.eliminateCustomerfromSentence(u)
+        # u を全連結
+        conc = ""
+        for w in u:
+            conc = conc + w
+        # u の長さの3次元配列 a を作る
+        a = []
+        for _1 in range(len(conc)):
+            a.append([])
+            for _2 in range(len(conc)):
+                a[-1].append([0 for _3 in range(len(conc))])
+        # a を計算
+        for t in range(len(conc)):
+            if t == 0:
+                a[0][0][0] = 1
+            for k in range(t+1):
+                for j in range(t-k+1):
+                    sigma = 0
+                    for i in range(t-k-j+1):
+                        word1 = conc[t-k+1:t+1]
+                        word2 = conc[t-k-j+1:t-k+1]
+                        word3 = conc[t-k-j-i+1:t-k-j+1]
+                        s = [word3, word2, word1]
+                        prob = self.calcProbability(s)
+                        sigma = sigma + prob*a[t-k][j][i]
+            a[t][k][j] = sigma
+        # a をもとに分割を取得
+        newU = []
+        while True:
+            if len(conc) <= 0:
+                break
+            B = []
+            for k in range(len(conc)):
+                B.append(sum(a[len(conc)-1][k]))
+            rand = sum(B) * random.random()
+            temp = 0
+            select = -1
+            for i, b in enumerate(B):
+                temp = temp + b
+                if temp > rand:
+                    select = i
+                    break
+            newU.append(conc[-1*select:])
+            conc = conc[:-1*select]
+        # 完成した文章をモデルに代入
+        self.addCustomerfromSentence(newU)
+        # 終了
+        return newU 
+
 
 if __name__ == "__main__" :
     rest = Restaurant(None, [])
