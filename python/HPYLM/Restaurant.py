@@ -538,8 +538,9 @@ class Restaurant:
                         word2 = conc[t-k-j+1:t-k+1]
                         word3 = conc[t-k-j-i+1:t-k-j+1]
                         s = [word3, word2, word1]
-                        prob = self.calcProbability(s)
-                        sigma = sigma + prob*a[t-k][j][i]
+                        if a[t-k][j][i] != 0:
+                            prob = self.calcProbability(s)
+                            sigma = sigma + prob*a[t-k][j][i]
                     a[t][k][j] = sigma
         # a をもとに分割を取得
         newU = []
