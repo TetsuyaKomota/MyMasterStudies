@@ -10,6 +10,12 @@ rest = Restaurant.Restaurant(None, [])
 # with open("tmp/HMM_results.dill", "rb") as f:
 with open("tmp/log_MakerMain/dills/HMM_results.dill", "rb") as f:
     datas = dill.load(f)
+    elis = []
+    for d in datas:
+        if "000000" not in d:
+            elis.append(d)
+    for e in elis:
+        del datas[e]
 u = []
 """
 旧バージョン．methods で動作作ってた時の奴
