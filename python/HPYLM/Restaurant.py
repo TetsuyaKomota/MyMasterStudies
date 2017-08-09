@@ -387,6 +387,9 @@ class Restaurant:
         if len(self.getU()) + 1 >= len(U):
             self.eliminateCustomeratWord(U[-1])
             return True
+        # TERMINAL 以上の長さの文脈は無視する
+        if len(self.getU()) >= TERMINAL:
+            return True
         # 1個目の -1 は調整分，2個目は料理分を表す
         nextU = U[-1-1-len(self.getU())]
         # 対応する子店が存在しない場合，子店を生成する
