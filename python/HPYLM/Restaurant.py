@@ -482,10 +482,15 @@ class Restaurant:
             self.addCustomerfromSentence(currentSentences[s])
         for idx in range(iteration):
             # 順番に代入しなおす(ギブスサンプリング)
+            oldSentences = copy.deepcopy(currentSentences)
             for i in currentSentences:
                 # currentSentences[i] = self.sampling(currentSentences[i])
                 currentSentences[i] = self.blockedSampling(currentSentences[i])
             # 定期的に途中状態を表示してみる
+            diff = self.compareParsing(oldSentences, currentSentences)
+            print("[Restaurant]executeParsing:diff-" + str(diff))
+            with open("tmp/Restaurant_executeParsing_diff.txt", "a", encoding="utf-8") as f:
+                f.write(str(diff) + "\n")
             if (idx) % 100 == 0 and idx != 0:
                 print("[Restaurant]executeParsing:iteration:"+\
                 str(idx))
@@ -572,9 +577,47 @@ class Restaurant:
         # 終了
         return newU 
 
+    # 解析を比較する
+    def compareParsing(self, before, after):
+        output = 0
+        # 各文に対して以下を行う
+        # 1. 長く残っている方から最初の単語を取り除く
+        #    同じ長さなら両方から取り除く
+        # 2. 残りの長さの差を output にインクリメント
+        # 3. 残りがなくなるまで繰り返す
+        for k in before.keys():
+            blist = before[k]
+            alist = after[k]
+            bconc = ""
+            for b in blist:
+                bconc = bconc + b
+            aconc = ""
+            for a in alist:
+                aconc = aconc + a
+            while True:
+                if bconc == "" and aconc == "":
+                    break
+                if len(bconc) == len(aconc):
+                    bconc = bconc[len(blist[0]):]
+                    blist = blist[1:]
+                    aconc = aconc[len(alist[0]):]
+                    alist = alist[1:]
+                elif len(bconc) > len(aconc):
+                    bconc = bconc[len(blist[0]):]
+                    blist = blist[1:]
+                elif len(bconc) < len(aconc):
+                    aconc = aconc[len(alist[0]):]
+                    alist = alist[1:]
+                else:
+                    print("何かがおかしいよ")
+                    exit()
+                output = output + np.abs(len(bconc)-len(aconc))
+        return output
+
 
 if __name__ == "__main__" :
     rest = Restaurant(None, [])
+
     # u = ["生きてることがつらいなら"]
     # rest.addCustomerfromSentence(u)
     u = ["生きてる", "ことがつらいなら"]
