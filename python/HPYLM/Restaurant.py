@@ -557,7 +557,7 @@ class Restaurant:
                 if temp > rand:
                     select = i
                     break
-            newU.append(conc[-1*select:])
+            newU = [conc[-1*select:]] + newU
             conc = conc[:-1*select]
         # 完成した文章をモデルに代入
         self.addCustomerfromSentence(newU)
