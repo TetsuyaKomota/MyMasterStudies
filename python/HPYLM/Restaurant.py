@@ -440,6 +440,7 @@ class Restaurant:
         self.eliminateCustomerfromSentence(u)
         # 以下を，u の境界候補全体で繰り返す
         newU = copy.deepcopy(u)
+        print("[Restaurant]sampling:start " + str(newU) + "!!!")
         length = 0
         for w in u:
             length = length + len(w)
@@ -452,8 +453,8 @@ class Restaurant:
             if random.random() < p_a / (p_a + p_b):
                 newU = newU_changed
         # 全境界候補にサンプリングを適用し，完成した文章をモデルに代入
-        # print("[Restaurant]sampling: sampled -> " + str(newU))
         self.addCustomerfromSentence(newU)
+        print("[Restaurant]sampling:get " + str(newU) + "!!!")
         # 終了
         return newU 
 
@@ -485,7 +486,7 @@ class Restaurant:
                 # currentSentences[i] = self.sampling(currentSentences[i])
                 currentSentences[i] = self.blockedSampling(currentSentences[i])
             # 定期的に途中状態を表示してみる
-            if (idx) % 5000 == 0 and idx != 0:
+            if (idx) % 100 == 0 and idx != 0:
                 print("[Restaurant]executeParsing:iteration:"+\
                 str(idx))
                 print("[Restaurant]executeParsing:currentSentences:")
@@ -514,6 +515,7 @@ class Restaurant:
 
     # ブロック化サンプリング
     def blockedSampling(self, u):
+        print("[Restaurant]blockedSampling:start " + str(u) + "!!!")
         # u をモデルから eliminate
         self.eliminateCustomerfromSentence(u)
         # u を全連結
@@ -539,7 +541,11 @@ class Restaurant:
                         word3 = conc[t-k-j-i+1:t-k-j+1]
                         s = [word3, word2, word1]
                         if a[t-k][j][i] != 0:
-                            prob = self.calcProbability(s)
+                            # prob = self.calcProbability(s)
+                            # 計算を行う文脈の店を取得する
+                            chi = self.getChildofForrowedU(s[:-1])
+                            # 確率を反映
+                            prob = chi.calcProbabilityofForrowedU(s[-1])
                             sigma = sigma + prob*a[t-k][j][i]
                     a[t][k][j] = sigma
         # a をもとに分割を取得
@@ -560,6 +566,7 @@ class Restaurant:
                     break
             newU = [conc[-1*select:]] + newU
             conc = conc[:-1*select]
+        print("[Restaurant]blockedSampling:get " + str(newU) + "!!!")
         # 完成した文章をモデルに代入
         self.addCustomerfromSentence(newU)
         # 終了
