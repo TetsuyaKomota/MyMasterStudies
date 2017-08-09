@@ -16,6 +16,9 @@ paramTheta = 1.0
 paramD     = 1.0
 # 基底測度の係数
 paramA = 2
+# 文脈の深さ限界
+TERMINAL = 4
+
 class Restaurant:
 
     # u         : 文脈（根店からの絶対文脈）．店のインデックスと考えてもよい
@@ -189,7 +192,8 @@ class Restaurant:
         # 1個目の -1 は調整用，2個目は料理分を表す
         nextU = U[-1-1-len(self.getU())]
         # 対応する子店が存在しない場合，子店を生成する
-        if nextU not in self.childs.keys():
+        # 文脈長さが TERMINAL の場合，子店は作らない
+        if len(self.getU()) >= TERMINAL and nextU not in self.childs.keys():
             self.childs[nextU] = Restaurant(self,[nextU]+self.getU())
         # 子店に対して再帰的に関数を呼ぶ
         # self.addCustomeratWord(nextU)
