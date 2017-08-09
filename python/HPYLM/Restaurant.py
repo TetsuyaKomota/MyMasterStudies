@@ -182,15 +182,15 @@ class Restaurant:
             if rec == False:
                 print("[Restaurant]addCustomerfromSentence:error")
                 return False
+        # 文脈長さが TERMINAL の場合，その文脈は無視する
+        if len(self.getU()) >= TERMINAL:
+            return True
         # U から「自分の文脈 + 料理」を除いた部分が「さらに深いngram」
         # なので，次の文脈を取得する
         # 文脈 + 料理 の長さが与えられた文章以上ならそれが最も深い文脈
         # 最も深い文脈である場合，料理に対応するテーブルに客を配置する
         if len(self.getU()) + 1 >= len(U):
             self.addCustomeratWord(U[-1])
-            return True
-        # 文脈長さが TERMINAL の場合，その文脈は無視する
-        if len(self.getU()) >= TERMINAL:
             return True
         # 1個目の -1 は調整用，2個目は料理分を表す
         nextU = U[-1-1-len(self.getU())]
@@ -380,15 +380,15 @@ class Restaurant:
             if rec == False:
                 print("[Restaurant]elminateCustomerfromSentence:error")
                 return False
+        # TERMINAL 以上の長さの文脈は無視する
+        if len(self.getU()) >= TERMINAL:
+            return True
         # U から「自分の文脈 + 料理」を除いた部分が「さらに深いngram」
         # なので，次の文脈を取得する
         # 文脈 + 料理 の長さが与えられた文章以上ならそれが最も深い文脈
         # 最も深い文脈である場合，料理に対応するテーブルに客を配置する
         if len(self.getU()) + 1 >= len(U):
             self.eliminateCustomeratWord(U[-1])
-            return True
-        # TERMINAL 以上の長さの文脈は無視する
-        if len(self.getU()) >= TERMINAL:
             return True
         # 1個目の -1 は調整分，2個目は料理分を表す
         nextU = U[-1-1-len(self.getU())]
