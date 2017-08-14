@@ -18,7 +18,7 @@ def execute():
                 elis.append(d)
         for e in elis:
             del datas[e]
-    u = []
+    u = {}
     """
     旧バージョン．methods で動作作ってた時の奴
     for m in datas:
@@ -34,11 +34,11 @@ def execute():
         line = ""
         for s in datas[d]:
             line = line + rest.translate(s)
-        u.append([line])
-
+        # u.append([line])
+        u[d] = [line]
     print("input sentences:")
     for s in u:
-        print(s[0])
+        print(u[s][0])
 
     result = rest.executeParsing(u, 100)
 

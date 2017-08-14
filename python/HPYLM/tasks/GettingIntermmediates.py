@@ -9,7 +9,8 @@ def execute():
         # HPYLM の結果のパス
         RES_PATH_HPYLM     = "tmp/log_MakerMain/dills/HPYLM_results.dill"
         # 縮約前の HMM の符号化結果のパス
-        RES_PATH_HMM_NAIVE = "tmp/log_makerMain/dills/HMM_results_naive.dill"
+        # RES_PATH_HMM_NAIVE = "tmp/log_makerMain/dills/HMM_results_naive.dill"
+        RES_PATH_HMM_NAIVE = "tmp/log_makerMain/dills/SOINN_results_naive.dill"
 
         # それぞれ読み込む
         with open(RES_PATH_HPYLM, "rb") as f:

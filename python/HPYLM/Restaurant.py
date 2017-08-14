@@ -507,17 +507,23 @@ class Restaurant:
     # 数字の列じゃダメだったのに今気づいた
     def translate(self, number):
         idx = number
-        if number >= 52 and number < 62:
-            return str(number-52)
+        if number >= 58:
+            idx = -1*(idx-58)
+        """
         elif number >= 26:
             idx = idx + 6
+        """
         return (chr(ord("A")+idx))
 
     # アルファベットを数字に変換
     def retranslate(self, alphabet):
         output = ord(alphabet) - ord("A")
+        if output < 0:
+            output = output * -1 + 58
+        """
         if output >= 26:
             output = output - 6
+        """
         return output
 
     # ブロック化サンプリング
