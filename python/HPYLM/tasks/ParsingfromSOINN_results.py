@@ -40,7 +40,7 @@ def execute():
     for s in u:
         print(s[0])
 
-    result = rest.executeParsing(u, 10000)
+    result = rest.executeParsing(u, 100)
 
     """
     旧バージョン

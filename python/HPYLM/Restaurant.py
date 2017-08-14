@@ -507,7 +507,9 @@ class Restaurant:
     # 数字の列じゃダメだったのに今気づいた
     def translate(self, number):
         idx = number
-        if number >= 26:
+        if number >= 52 and number < 62:
+            return str(number-52)
+        elif number >= 26:
             idx = idx + 6
         return (chr(ord("A")+idx))
 
