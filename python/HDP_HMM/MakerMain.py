@@ -15,7 +15,7 @@ GRAB_RANGE = 1000000
 REDIS_V = 0.9
 
 class Maker:
-    def __init__(self, filename=str(datetime.now().timestamp())[-5:]):
+    def __init__(self, filename=str(datetime.now().timestamp())[-9:]):
         self.timeStep = 0
         self.grabbed = ""
         self.pdfX = ss.norm(scale = NOIZE_X)

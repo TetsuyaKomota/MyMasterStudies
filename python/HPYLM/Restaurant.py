@@ -484,12 +484,12 @@ class Restaurant:
             # 順番に代入しなおす(ギブスサンプリング)
             oldSentences = copy.deepcopy(currentSentences)
             for i in currentSentences:
-                # currentSentences[i] = self.sampling(currentSentences[i])
-                currentSentences[i] = self.blockedSampling(currentSentences[i])
+                currentSentences[i] = self.sampling(currentSentences[i])
+                # currentSentences[i] = self.blockedSampling(currentSentences[i])
             # 定期的に途中状態を表示してみる
             diff = self.compareParsing(oldSentences, currentSentences)
             print("[Restaurant]executeParsing:diff-" + str(diff))
-            with open("tmp/Restaurant_executeParsing_diff.txt", "a", encoding="utf-8") as f:
+            with open("tmp/Restaurant_executeParsing_diff_nonblock.txt", "a", encoding="utf-8") as f:
                 f.write(str(diff) + "\n")
             if (idx) % 100 == 0 and idx != 0:
                 print("[Restaurant]executeParsing:iteration:"+\
@@ -617,6 +617,16 @@ class Restaurant:
 
 if __name__ == "__main__" :
     rest = Restaurant(None, [])
+
+    data = {}
+    data["1"] = ["applegrapeorangebananapeach"]
+    data["2"] = ["peachorangebananaapplegrape"]
+    data["3"] = ["grapebananaorangeapplepeach"]
+    data["4"] = ["bananaappleorangepeachgrape"]
+    data["5"] = ["orangepeachbananaapplegrape"]
+
+    rest.executeParsing(data, 10000)
+    exit()
 
     # u = ["生きてることがつらいなら"]
     # rest.addCustomerfromSentence(u)
