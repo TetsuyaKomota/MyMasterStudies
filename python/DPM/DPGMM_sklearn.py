@@ -1,23 +1,23 @@
 #-*- coding: utf-8 -*-
 
 from sklearn import mixture
-import scipy.io
 import dill
 import matplotlib.pyplot as plt
+import dill
 
 model = mixture.BayesianGaussianMixture(n_components = 10, n_init=150, weight_concentration_prior=0.1)
-# model = mixture.DPGMM(n_components = 3, n_init=100)
-print("OK")
 
-data = scipy.io.loadmat("Inputdata.mat")["Inputsample"]
+# data = scipy.io.loadmat("Inputdata.mat")["Inputsample"]
+with open("tmp/log_MakerMain/dills/test_pov.dill", "rb") as f:
+    data = dill.load(f)
 
 model.fit(data)
-print("OKOK!!")
 pre = model.predict(data)
 print(set(pre))
 print(pre)
 print(model.get_params())
 
+"""
 with open("tmp/output.txt", "w", encoding="utf-8") as f:
     print("Labels:")
     print(pre)
@@ -42,7 +42,7 @@ with open("tmp/output.txt", "w", encoding="utf-8") as f:
     f.write("Covariances:\n")
     f.write(str(model.covariances_))
     f.write("\n")
-
+"""
 
 # プロット
 ci = 0

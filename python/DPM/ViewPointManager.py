@@ -2,6 +2,7 @@
 
 import ViewPointEncoder as encoder
 import glob
+import dill
 
 # Encoder 使って色々するやつ
 
@@ -9,7 +10,7 @@ import glob
 def getStateswithViewPoint(filepathList, baseList, refList):
     output = []
     for fname in filepathList:
-        with open(fname, "rb", encoding="utf-8") as f:
+        with open(fname, "r", encoding="utf-8") as f:
             while True:
                 line = f.readline()
                 if line == "":
@@ -23,3 +24,5 @@ if __name__ == "__main__":
     filepaths = glob.glob("tmp/log_MakerMain/GettingIntermediated/*")
     datas = getStateswithViewPoint(filepaths, ["hand"], [])
     print(datas)
+    with open("tmp/log_MakerMain/dills/test_pov.dill", "wb") as f:
+        dill.dump(datas, f)
