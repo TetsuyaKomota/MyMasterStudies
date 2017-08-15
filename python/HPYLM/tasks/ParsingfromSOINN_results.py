@@ -19,16 +19,6 @@ def execute():
         for e in elis:
             del datas[e]
     u = {}
-    """
-    旧バージョン．methods で動作作ってた時の奴
-    for m in datas:
-        for d in datas[m]:
-            print(d)
-            line = ""
-            for s in d:
-                line = line + rest.translate(s)
-            u.append([line])
-    """
     for d in datas:
         print(datas[d])
         line = ""
@@ -40,20 +30,8 @@ def execute():
     for s in u:
         print(u[s][0])
 
-    result = rest.executeParsing(u, 100)
+    result = rest.executeParsing(u, 10000)
 
-    """
-    旧バージョン
-    print("parsing results:")
-    with open("tasks/result.txt", "w") as f:
-        for r in result:
-            line = ""
-            for w in r:
-                line = line + w + ", "
-            line = line + "\n"
-            print(line)
-            f.write(line)
-    """
     print("parsing results:")
     for r in result:
         line = ""

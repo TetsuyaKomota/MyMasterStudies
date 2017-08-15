@@ -7,7 +7,7 @@ def execute():
     step = 5
 
     # soinn = SOINN(step * 2, 99999999999999999, 99999999999999999)
-    soinn = SOINN(step * 2, 10000, 10000, n_iter=1, noise_var=0, detail=True)
+    soinn = SOINN(step * 2, 1000000, 1000000, n_iter=1, noise_var=0, detail=True)
 
     X = []
 
@@ -56,7 +56,7 @@ def execute():
                     x.append(t[0])
                     x.append(t[1])
                 Z.append(x)
-        output[fname[-16:-4]] = soinn.classifier(Z)
+        output[fname[-18:-4]] = soinn.classifier(Z)
 
     # 学習したモデルをもとに，推定を行う
     # dill 出力して，それをHPYLM で参照する

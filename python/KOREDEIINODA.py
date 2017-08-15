@@ -37,6 +37,7 @@ import HDP_HMM.EncodewithSOINN as soinn
 
 print("++++------ : Encoding with SOINN")
 soinn.execute()
+
 import HPYLM.tasks.ParsingfromSOINN_results as hpylm
 
 print("++++++---- : Parsing with HPYLM")
