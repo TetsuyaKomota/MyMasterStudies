@@ -15,4 +15,4 @@ DF=15
 SCALE=np.matrix([[0.1, 0], [0, 0.1]])
 
 # DPM の繰り返しにおける 非更新回数限界
-MAX_ITER_NON = 100
+MAX_ITER_NON = 50

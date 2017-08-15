@@ -21,6 +21,7 @@ Created on Wed Dec 28 13:59:17 2016
 
 import MyStatics as st
 import scipy.stats as ss
+import scipy.io
 import numpy as np
 from random import random
 import GMMv2 as gmm
@@ -239,7 +240,7 @@ class DPM:
             #
         #
         # デバッグ用．サンプリング結果を表示する
-        self.debug_show(167)
+        # self.debug_show(167)
                     
     # 学習の Mステップ
     # Sステップによってサンプリングしたクラスラベルをもとにパラメータを更新する
@@ -280,12 +281,18 @@ class DPM:
         # print(self.data)
         print("labels : ",end="")
         print(self.labels)
-        print("params : ",end="")
-        print(self.params)
+        print("params : ")
+        for p in self.params:
+            print("Cluster:"+str(p))
+            print("coef   :"+str(self.crp.getProbability(p)))
+            print("myu    :"+str(self.params[p][0]))
+            print("sigma  :")
+            print(self.params[p][1])
 
 if __name__ == "__main__":
     print("Welcome to DPM_test")
     # クラスタリングを行うデータを生成
+    """
     c = 3
     means = [[0, 0], [-10, -10], [5, 10]]
     sigmas = [[[1, 0], [0, 1]], [[1, 0.5], [0.5, 1]], [[1, 0], [0, 2]]]
@@ -293,18 +300,36 @@ if __name__ == "__main__":
     size = 1000
 
     data = gmm.getData(c, means, sigmas, rates, size)
+    """
+    data = scipy.io.loadmat("Inputdata.mat")["Inputsample"]
     print(data)
+    # exit()
 
     # DPM を生成
     dpm = DPM()
     # パターンを登録
     dpm.input(data)
     # 学習開始
+    n_iter = 0
     while(dpm.stop_flag == False):
+        n_iter = n_iter + 1
+        print("ITERATION : " + str(n_iter))
         dpm.stepS()
         dpm.stepM()
         dpm.stepV()
+        dpm.debug_show(317)
     # 学習結果を表示
     print("ほげほげ")
-    
+    with open("results4Woung.txt", "w", encoding="utf-8") as f:
+        f.write("labels:\n")
+        f.write(str(dpm.labels)+"\n") 
+        f.write("params:\n")
+        for p in dpm.params:
+            f.write("Cluster:"+str(p)+"\n")
+            f.write("coef   :"+str(dpm.crp.getProbability(p))+"\n")
+            f.write("myu    :"+str(dpm.params[p][0])+"\n")
+            f.write("sigma  :"+"\n")
+            f.write(str(dpm.params[p][1])+"\n")
+
+       
     
