@@ -15,11 +15,11 @@ def encodeState(line):
         print("[ViewPointEncoder]encodeState:invalid input")
         return None
     output = {}
-    output["step"]   = int(temp[0])
-    output["hand"]   = np.array([float(i) for i in temp[1:3]])
-    output["red"]    = np.array([float(i) for i in temp[7:9]])
-    output["blue"]   = np.array([float(i) for i in temp[13:15]])
-    output["green"]  = np.array([float(i) for i in temp[19:21]])
+    output["step"  ] = int(temp[0])
+    output["hand"  ] = np.array([float(i) for i in temp[1:3]])
+    output["red"   ] = np.array([float(i) for i in temp[7:9]])
+    output["blue"  ] = np.array([float(i) for i in temp[13:15]])
+    output["green" ] = np.array([float(i) for i in temp[19:21]])
     output["yellow"] = np.array([float(i) for i in temp[25:27]])
     return output
 

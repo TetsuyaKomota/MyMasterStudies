@@ -20,6 +20,13 @@ def getStateswithViewPoint(filepathList, baseList, refList):
                 data   = encoder.serialize(astate)
                 output.append(data)
     return output
+
+# 状態集合(エンコード，観点変換済み)の前後の組から，ガウス分布を学習する
+def getDistribution(stateList):
+    
+
+
+
 if __name__ == "__main__":
     filepaths = glob.glob("tmp/log_MakerMain/GettingIntermediated/*")
     datas = getStateswithViewPoint(filepaths, ["hand"], [])
