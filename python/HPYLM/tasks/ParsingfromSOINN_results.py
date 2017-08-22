@@ -2,6 +2,9 @@
 
 import Restaurant
 import dill
+import sys, io
+
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 
 def execute():
