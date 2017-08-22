@@ -627,13 +627,21 @@ if __name__ == "__main__" :
     rest = Restaurant(None, [])
 
     data = {}
+    """
     data["1"] = ["applegrapeorangebananapeach"]
     data["2"] = ["peachorangebananaapplegrape"]
     data["3"] = ["grapebananaorangeapplepeach"]
     data["4"] = ["bananaappleorangepeachgrape"]
     data["5"] = ["orangepeachbananaapplegrape"]
+    """
+    data["1"] = ["りんごぶどうみかんばななもも"]
+    data["2"] = ["ももみかんばななりんごぶどう"]
+    data["3"] = ["ぶどうばななみかんりんごもも"]
+    data["4"] = ["ばななりんごみかんももぶどう"]
+    data["5"] = ["みかんももばななりんごぶどう"]
 
-    rest.executeParsing(data, 10000)
+    with open("tmp/Restaurant_result.dill", "wb") as f:
+        dill.dump(rest.executeParsing(data, 100), f)
     exit()
 
     # u = ["生きてることがつらいなら"]
