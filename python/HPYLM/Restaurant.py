@@ -507,9 +507,9 @@ class Restaurant:
     # 数字の列じゃダメだったのに今気づいた
     def translate(self, number):
         idx = number
+        """
         if number >= 58:
             idx = -1*(idx-58)
-        """
         elif number >= 26:
             idx = idx + 6
         """
