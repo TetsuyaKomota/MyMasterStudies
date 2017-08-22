@@ -6,6 +6,7 @@ import HDP_HMM.MakerMotions as makerMotions
 import HDP_HMM.MakerMain as makerMain
 
 """
+"""
 print("---------- : Making datas")
 inits = {}
 inits["red"]    = [10000 * (random() - 0.5), 10000 * (random() - 0.5)]
@@ -36,7 +37,6 @@ import HDP_HMM.EncodewithSOINN as soinn
 
 print("++++------ : Encoding with SOINN")
 soinn.execute()
-"""
 
 import HPYLM.tasks.ParsingfromSOINN_results as hpylm
 
