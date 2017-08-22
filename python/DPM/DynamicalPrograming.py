@@ -68,7 +68,29 @@
 #       2. に戻る
 #   8. B <- A, A<-Anew して 1. に戻る
 
-import ViewPointManager
-import ViewPointEncoder
+import ViewPointManager as manager
+import ViewPointEncoder as encoder
+import glob
 
 output = []
+B = []
+A = []
+ignore_A = []
+ignore_X = []
+X = ""
+# データをロードする
+# 観点,基準点を指定しなければ，そのままエンコードしてくれる
+filepaths = glob.glob("tmp/log_MakerMain/GettingIntermediated/*")
+datas = manager.getStatewithViewPoint(filepaths, [], [])
+#   0. 全データの状態0, 1 をそれぞれB, A とする
+#       X を一つ目のデータとする
+for d in datas:
+    if X == "":
+        X = d
+    B.append(datas[d][0])
+    A.append(datas[d][1])
+#   1. Aが最終状態t なら，そのデータをこれ以降無視する
+for d in datas:
+    if datas[d][-1] in A:
+        ignore_A.append(d)
+
