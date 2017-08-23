@@ -15,7 +15,7 @@ paramTheta = 1.0
 # d の |u| に関する比例定数
 paramD     = 1.0
 # 基底測度の係数
-paramA = 2
+paramA = 5
 # 文脈の深さ限界
 TERMINAL = 2
 

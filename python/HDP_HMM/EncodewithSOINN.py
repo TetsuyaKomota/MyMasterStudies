@@ -4,7 +4,7 @@ import dill
 
 
 def execute():
-    step = 5
+    step = 3
 
     # soinn = SOINN(step * 2, 99999999999999999, 99999999999999999)
     soinn = SOINN(step * 2, 1000000, 1000000, n_iter=1, noise_var=0, detail=True)
