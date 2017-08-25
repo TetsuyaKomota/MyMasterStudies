@@ -33,28 +33,38 @@ for p in filepaths:
     post.outputData(output, p)
 
 """
-step = 5
-soinnN = 5000
-soinnE = 5000
-paramA = 5
+step = 1
+soinnN = 1250
+soinnE = 1250
+paramA = -1
 
-import HDP_HMM.EncodewithSOINN as soinn
+# SOINN のパラメータは 2500, 5000, 10000, 20000, 40000 で試す
+for ne in range(5)
+        soinnN *= 2
+        soinnE *= 2
+        # step は 3, 5, 7, 9, で試す
+        for s in range(4):
+                step += 2
+                import HDP_HMM.EncodewithSOINN as soinn
 
-print("++++------ : Encoding with SOINN")
-soinn.execute(step = step, soinnN = soinnN, soinnE = soinnE)
+                print("++++------ : Encoding with SOINN")
+                soinn.execute(step = step, soinnN = soinnN, soinnE = soinnE)
 
-import HPYLM.tasks.ParsingfromSOINN_results as hpylm
+                import HPYLM.tasks.ParsingfromSOINN_results as hpylm
+                
+                # paramA は 1, 3, 5, 7, 9 で試す
+                for p in range(5):
+                        paramA += 2
+                        print("++++++---- : Parsing with HPYLM")
+                        hpylm.execute(paramA = paramA)
 
-print("++++++---- : Parsing with HPYLM")
-hpylm.execute(paramA = paramA)
+                        import HPYLM.tasks.GettingIntermmediates as inter
 
-import HPYLM.tasks.GettingIntermmediates as inter
+                        print("++++++++-- : Getting intermmediates")
+                        dirName = str(step) + "-"
+                        dirName += str(soinnN) + "-"
+                        dirName += str(soinnE) + "-"
+                        dirName += str(paramA)
+                        inter.execute(dirName)
 
-print("++++++++-- : Getting intermmediates")
-dirName = str(step) + "-"
-dirName += str(soinnN) + "-"
-dirName += str(soinnE) + "-"
-dirName += str(paramA)
-inter.execute(dirName)
-
-print("++++++++++ : Finished")
+                        print("++++++++++ : Finished")
