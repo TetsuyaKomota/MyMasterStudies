@@ -33,19 +33,28 @@ for p in filepaths:
     post.outputData(output, p)
 
 """
+step = 5
+soinnN = 5000
+soinnE = 5000
+paramA = 5
+
 import HDP_HMM.EncodewithSOINN as soinn
 
 print("++++------ : Encoding with SOINN")
-soinn.execute()
+soinn.execute(step = step, soinnN = soinnN, soinnE = soinnE)
 
 import HPYLM.tasks.ParsingfromSOINN_results as hpylm
 
 print("++++++---- : Parsing with HPYLM")
-hpylm.execute()
+hpylm.execute(paramA = paramA)
 
 import HPYLM.tasks.GettingIntermmediates as inter
 
 print("++++++++-- : Getting intermmediates")
-inter.execute()
+dirName = str(step) + "-"
+dirName += str(soinnN) + "-"
+dirName += str(soinnE) + "-"
+dirName += str(paramA)
+inter.execute(dirName)
 
 print("++++++++++ : Finished")

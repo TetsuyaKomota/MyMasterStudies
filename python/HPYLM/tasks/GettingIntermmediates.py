@@ -2,10 +2,11 @@
 
 import dill
 import Restaurant
+import os
 
 # HPYLM_results.dill と ENC_results_naive.dill から，
 # 単語境界のステップ数を取得する
-def execute():
+def execute(dirName = "gomi"):
         # HPYLM の結果のパス
         RES_PATH_HPYLM     = "tmp/log_MakerMain/dills/HPYLM_results.dill"
         # 縮約前の ENC(HMM or SOINN) の符号化結果のパス
@@ -58,11 +59,15 @@ def execute():
             dill.dump(output, f)
 
         # log ファイルから境界ステップの情報だけを切り出した log データを作成
+        # 引数で指定されたディレクトリがないなら作成
+        root = "tmp/log_MakerMain/GettingIntermediated/"
+        if not os.path.exists(root+dirName):
+            os.mkdir(root + dirName)
         for d in output:
             tempD = "log"+d[5:]
             with open("tmp/log_MakerMain/" + tempD + ".csv", "r") as f:
                 tempD = "inter"+d[5:]
-                with open("tmp/log_MakerMain/GettingIntermediated/" + tempD + ".csv", "w") as g:
+                with open(root + dirName + "/" + tempD + ".csv", "w") as g:
                     for s in output[d]:
                         while True:
                             line = f.readline().split("\n")[0]

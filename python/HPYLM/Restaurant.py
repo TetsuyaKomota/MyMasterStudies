@@ -14,8 +14,6 @@ import dill
 paramTheta = 1.0
 # d の |u| に関する比例定数
 paramD     = 1.0
-# 基底測度の係数
-paramA = 5
 # 文脈の深さ限界
 TERMINAL = 2
 
@@ -26,8 +24,10 @@ class Restaurant:
     # childs    : 子店のオブジェクトの辞書．キーを文脈の最後の単語（相対文脈）とする
     # tables    : テーブルの配列,料理（そのテーブルが提供する料理）を要素とする
     # customers : 客の配列, テーブル番号（その客が座っているテーブルのテーブル配列上のインデックス）を要素とする
-    def __init__(self, parent, u):
+    # paramA    : 基底測度の係数
+    def __init__(self, parent, u, paramA = 5):
         self.parent = parent
+        self.paramA = paramA
         self.u = u
         self.tables    = []
         self.customers = []
@@ -336,7 +336,7 @@ class Restaurant:
         # 各単語等確率
         # output = 1.0/len(set(self.tables))
         # 長い単語ほど低確率
-        a = paramA
+        a = self.paramA
         # output = (a)/(len(w) + a)
         output = np.exp(-len(w) * a)
         return output

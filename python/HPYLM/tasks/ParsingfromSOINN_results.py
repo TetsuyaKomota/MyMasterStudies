@@ -7,10 +7,10 @@ import sys, io
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 
-def execute():
+def execute(paramA = 5):
     print("Start Parsing Test (from tmp/SOINN_results.dill)")
 
-    rest = Restaurant.Restaurant(None, [])
+    rest = Restaurant.Restaurant(None, [], paramA = paramA)
 
     # with open("tmp/HMM_results.dill", "rb") as f:
     with open("tmp/log_MakerMain/dills/SOINN_results.dill", "rb") as f:
