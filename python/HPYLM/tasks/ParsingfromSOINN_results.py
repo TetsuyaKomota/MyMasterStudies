@@ -27,6 +27,8 @@ def execute(paramA = 5):
         line = ""
         for s in datas[d]:
             line = line + rest.translate(s)
+        # 終端文字を加える
+        line = line + "~"
         # u.append([line])
         u[d] = [line]
     print("input sentences:")
@@ -35,10 +37,15 @@ def execute(paramA = 5):
 
     result = rest.executeParsing(u, 10000)
 
+    # results のすべての文の最後の単語に終端文字がついているはずなので
+    # このタイミングで除去しておく
+    for r in result:
+        result[r][-1] = result[r][-1][:-1]
+
     print("parsing results:")
     for r in result:
         line = ""
-        for w in r:
+        for w in result[r]:
             line = line + w + ", "
         print(line)
 

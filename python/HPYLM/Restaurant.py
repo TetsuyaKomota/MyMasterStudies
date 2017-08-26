@@ -444,7 +444,12 @@ class Restaurant:
         length = 0
         for w in u:
             length = length + len(w)
-        for idx in range(length):
+        # 以下の idx の回し方だと，常に手前の分割から評価してしまう
+        # for idx in range(length):
+        # 代わりに，境界部分を乱択で全通り網羅するように変更
+        idxList = list(range(length))
+        random.shuffle(idxList)
+        for idx in idxList:
             # 境界部分を変更するほうとしないほうで確率計算
             newU_changed = self.changeBoundary(newU, idx)
             # 求めた確率をもとにサンプリング
@@ -508,16 +513,17 @@ class Restaurant:
     def translate(self, number):
         idx = number
         # 62 ~ 95 は特殊文字っぽいので飛ばす
-        if number >= 62:
-            idx += 34
+        # 61 は「~」だが，これは終端文字に使いたいので飛ばす
+        if number >= 61:
+            idx += 35
         return (chr(ord("A")+idx))
 
     # アルファベットを数字に変換
     def retranslate(self, alphabet):
         output = ord(alphabet) - ord("A")
         # 96 以上なら特殊文字回避のため += 36 されてるはず
-        if output >= 96:
-            output -= 34
+        if output >= 97:
+            output -= 35
         return output
 
     # ブロック化サンプリング
