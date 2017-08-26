@@ -1,15 +1,14 @@
-# from SOINN.SOINN_for_python import SOINN
-import SOINN.SOINN_for_python as SOINN
+from SOINN.SOINN_for_python import SOINN
 import glob
 import dill
 
 
-def execute(step = 3, soinnN = 5000, soinnE = 5000):
+def execute(step = 3, soinnN = 5000, soinnE = 5000, dillpath = ""):
     # step = 3
 
     # soinn = SOINN(step * 2, 99999999999999999, 99999999999999999)
     # soinn = SOINN(step * 2, 1000000, 1000000, n_iter=1, noise_var=0, detail=True)
-    soinn = SOINN.SOINN(step * 2, soinnN, soinnE, n_iter=1, noise_var=0, detail=True)
+    soinn = SOINN(step * 2, soinnN, soinnE, n_iter=1, noise_var=0, detail=True)
 
     X = []
 
@@ -75,10 +74,10 @@ def execute(step = 3, soinnN = 5000, soinnE = 5000):
                 result.append(p)
         results[d]       = result
         results_naive[d] = result_naive
-    with open("tmp/log_MakerMain/dills/SOINN_results.dill", "wb")  as f:
+    with open("tmp/log_MakerMain/dills/SOINN_results" + dillpath + ".dill", "wb")  as f:
         dill.dump(results, f)
         print("Successfully dumping : results")
-    with open("tmp/log_MakerMain/dills/SOINN_results_naive.dill", "wb")  as f:
+    with open("tmp/log_MakerMain/dills/SOINN_results" + dillpath + "_naive.dill", "wb")  as f:
         dill.dump(results_naive, f)
         print("Successfully dumping : results_naive")
 
