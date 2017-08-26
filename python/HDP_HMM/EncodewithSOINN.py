@@ -1,4 +1,5 @@
-from SOINN.SOINN_for_python import SOINN
+# from SOINN.SOINN_for_python import SOINN
+import SOINN.SOINN_for_python as SOINN
 import glob
 import dill
 
@@ -8,7 +9,7 @@ def execute(step = 3, soinnN = 5000, soinnE = 5000):
 
     # soinn = SOINN(step * 2, 99999999999999999, 99999999999999999)
     # soinn = SOINN(step * 2, 1000000, 1000000, n_iter=1, noise_var=0, detail=True)
-    soinn = SOINN(step * 2, soinnN, soinnE, n_iter=1, noise_var=0, detail=True)
+    soinn = SOINN.SOINN(step * 2, soinnN, soinnE, n_iter=1, noise_var=0, detail=True)
 
     X = []
 

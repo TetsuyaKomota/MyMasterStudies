@@ -33,15 +33,14 @@ for p in filepaths:
     post.outputData(output, p)
 
 """
-step = 1
 soinnN = 1250
 soinnE = 1250
-paramA = -1
 
 # SOINN のパラメータは 2500, 5000, 10000, 20000, 40000 で試す
 for ne in range(5):
         soinnN *= 2
         soinnE *= 2
+        step = 1
         # step は 3, 5, 7, 9, で試す
         for s in range(4):
                 step += 2
@@ -52,6 +51,7 @@ for ne in range(5):
 
                 import HPYLM.tasks.ParsingfromSOINN_results as hpylm
                 
+                paramA = -1
                 # paramA は 1, 3, 5, 7, 9 で試す
                 for p in range(5):
                         paramA += 2
