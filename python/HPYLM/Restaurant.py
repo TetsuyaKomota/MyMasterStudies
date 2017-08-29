@@ -10,8 +10,6 @@ import dill
 # ====================================================
 # 定数
 
-# θ の |u| に関する比例定数
-paramTheta = 1.0
 # d の |u| に関する比例定数
 paramD     = 1.0
 # 文脈の深さ限界
@@ -25,7 +23,8 @@ class Restaurant:
     # tables    : テーブルの配列,料理（そのテーブルが提供する料理）を要素とする
     # customers : 客の配列, テーブル番号（その客が座っているテーブルのテーブル配列上のインデックス）を要素とする
     # paramA    : 基底測度の係数
-    def __init__(self, parent, u, paramA = 5):
+    # paramTehta: 基底強度θ の|u| に関する比例定数.大きいほど文脈よりも基底の影響を大きく受ける
+    def __init__(self, parent, u, paramA = 5, paramTheta = 1.0):
         self.parent = parent
         self.paramA = paramA
         self.u = u
@@ -50,16 +49,12 @@ class Restaurant:
     # 強度θのゲッター
     # PY過程における未知数の強度. ディリクレ過程における α
     def getTheta(self):
-        # PY過程における割引率．上とともに本来はlen(u) によって決まる関数だが，
-        # とりあえず簡単のために定数化
-        # return 0.5
         return paramTheta * (len(self.getU()) + 1.0)
 
     # 割引係数 d のゲッター
     def getD(self):
         # t_uw (店u で料理w のおいてあるテーブルの数=親店から取得した回数)はとりあえず1固定
         # つまりこれはPY ではなくIKN
-        # return 0.5
         return (paramD*len(self.getU())) / (len(self.getU())+1.0)
 
 
