@@ -45,7 +45,7 @@ def serialize(state):
 
 # 状態，基準物体，参照点を引数に，変換した状態を返す
 # 複数の場合は重心を参照する
-def translateforViewPoint(state, baseList, refList, smax=1000, scale=20000):
+def transformforViewPoint(state, baseList, refList, smax=1000, scale=20000):
     # とりあえずコピー
     output = copy.deepcopy(state)
     del output["step"]
@@ -87,8 +87,8 @@ if __name__ == "__main__":
     line = line + "0,-3,0,0,0,0,"
     line = line + "0,0,0,0,0,0,"
     b = encodeState(line)
-    # a = translateforViewPoint(b, ["hand"], ["red"])
-    a = translateforViewPoint(b, ["blue"], ["hand"])
+    # a = transformforViewPoint(b, ["hand"], ["red"])
+    a = transformforViewPoint(b, ["blue"], ["hand"])
     print(b)
     print(a)
     de = decodeState(a)

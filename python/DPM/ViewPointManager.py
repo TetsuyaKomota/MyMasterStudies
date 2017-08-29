@@ -4,6 +4,7 @@ import ViewPointEncoder as encoder
 import glob
 import dill
 import numpy as np
+import itertools
 
 # Encoder 使って色々するやつ
 
@@ -18,7 +19,7 @@ def getStateswithViewPoint(filepathList, baseList, refList):
                 if line == "":
                     break
                 bstate = encoder.encodeState(line)
-                astate = encoder.translateforViewPoint(bstate,baseList,refList)
+                astate = encoder.transformforViewPoint(bstate,baseList,refList)
                 data   = encoder.serialize(astate)
                 output[fname].append(data)
     return output
@@ -39,6 +40,19 @@ def getDistribution(stateDict):
         diff += np.linalg.norm(m-mean)
     return [mean, diff]
 
+# 状態集合(未エンコード)の前後の組から，観点を推定する
+#   stateDict = {"before":[前状態], "after":[後状態]}
+def getViewPoint(stateDict):
+    output = []
+    tempmin = 100000
+    objList = ["hand", "red", "blue", "green", "yellow"]
+    # 試すパターンはとりあえず，
+    # baseList 物体3つまで，refList 1つまで
+    for n in range(3 +1):
+        baseList = itertools.combinations(ojbList, n)
+        for b in baseList:
+            for nr in range(1 + 1):
+                
 
 if __name__ == "__main__":
     filepaths = glob.glob("tmp/log_MakerMain/GettingIntermediated/*")
