@@ -27,6 +27,7 @@ class Restaurant:
     def __init__(self, parent, u, paramA = 5, paramTheta = 1.0):
         self.parent = parent
         self.paramA = paramA
+        self.paramTheta = paramTheta
         self.u = u
         self.tables    = []
         self.customers = []
@@ -49,7 +50,7 @@ class Restaurant:
     # 強度θのゲッター
     # PY過程における未知数の強度. ディリクレ過程における α
     def getTheta(self):
-        return paramTheta * (len(self.getU()) + 1.0)
+        return self.paramTheta * (len(self.getU()) + 1.0)
 
     # 割引係数 d のゲッター
     def getD(self):
@@ -619,7 +620,6 @@ class Restaurant:
 
 
 if __name__ == "__main__" :
-    rest = Restaurant(None, [])
 
     data = {}
     """
@@ -635,10 +635,16 @@ if __name__ == "__main__" :
     data["4"] = ["ばななりんごみかんももぶどう"]
     data["5"] = ["みかんももばななりんごぶどう"]
 
-    with open("tmp/Restaurant_result.dill", "wb") as f:
-        dill.dump(rest.executeParsing(data, 100), f)
+    for i in range(10):
+        rest = Restaurant(None, [], paramTheta = i)
+        with open("tmp/Restaurant_result.dill", "wb") as f:
+            dill.dump(rest.executeParsing(data, 100), f)
+        print("paramTheta:"+str(i))
+        import time
+        time.sleep(5)
     exit()
 
+    rest = Restaurant(None, [])
     # u = ["生きてることがつらいなら"]
     # rest.addCustomerfromSentence(u)
     u = ["生きてる", "ことがつらいなら"]
