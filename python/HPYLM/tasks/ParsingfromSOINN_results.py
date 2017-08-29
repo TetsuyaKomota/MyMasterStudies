@@ -7,10 +7,10 @@ import sys, io
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 
-def execute(paramA = 5):
+def execute(paramA = 5, paramTheta = 1.0):
     print("Start Parsing Test (from tmp/SOINN_results.dill)")
 
-    rest = Restaurant.Restaurant(None, [], paramA = paramA)
+    rest = Restaurant.Restaurant(None, [], paramA = paramA, paramTheta = paramTheta)
 
     # with open("tmp/HMM_results.dill", "rb") as f:
     with open("tmp/log_MakerMain/dills/SOINN_results.dill", "rb") as f:
@@ -54,4 +54,4 @@ def execute(paramA = 5):
         print("Successfully dumping : result")
 
 if __name__ == "__main__":
-    execute()
+    execute(paramTheta = 5.0)
