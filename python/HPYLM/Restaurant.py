@@ -438,8 +438,10 @@ class Restaurant:
         newU = copy.deepcopy(u)
         print("[Restaurant]sampling:start " + str(newU) + "!!!")
         length = 0
-        for w in u:
+        # 最後の単語は終端単語なので無視する
+        for w in u[:-1]:
             length = length + len(w)
+        length -= 1
         # 以下の idx の回し方だと，常に手前の分割から評価してしまう
         # for idx in range(length):
         # 代わりに，境界部分を乱択で全通り網羅するように変更
@@ -478,6 +480,11 @@ class Restaurant:
             for i in range(len(currentSentences)):
                 dic[str(i)] = currentSentences[i]
             currentSentences = dic
+        # 各文章に終端単語 '~' をつける
+        # 各文章の最終単語は sampling の際の境界変換時に参照しないので，
+        # 最後まで独立に最終単語であり続ける
+        for s in currentSentences:
+            currentSentences[s].append("~")
         # 最初に，文章全てをモデルに代入する
         for s in currentSentences:
             self.addCustomerfromSentence(currentSentences[s])
@@ -498,6 +505,9 @@ class Restaurant:
                 print("[Restaurant]executeParsing:currentSentences:")
                 for s in currentSentences:
                     print(s + ":" + str(currentSentences[s]))
+        # 各文章から終端単語 '~' を除去する
+        for s in currentSentences:
+            currentSentences[s] = currentSentences[s][:-1]
         # 最終結果を表示する
         print("[Restaurant]executeParsing:results:")
         for s in currentSentences:
