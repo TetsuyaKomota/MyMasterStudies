@@ -63,8 +63,8 @@ if not os.path.exists("tmp/SYUKEISURUNODA_results/"):
 for b in bags:
     plt.hist(bags[b], bins = 250)
     plt.savefig("tmp/SYUKEISURUNODA_results/" + b[:-1] + ".png")
-    plt.figure()
     plt.close()
+    # plt.figure()
 # csv 書き出し
 # print(output)
 outlist = sorted(list(output.keys()))
