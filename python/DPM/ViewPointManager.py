@@ -51,6 +51,7 @@ def getDistribution(stateDict, baseList, refList):
         print("[ViewPointManager]getViewPoint:size is zero")
         return []
     move = []
+    """
     # 観点変換する
     trans = {}
     trans["before"] = []
@@ -58,6 +59,10 @@ def getDistribution(stateDict, baseList, refList):
     for i in range(size):
         trans["before"].append(encoder.transformforViewPoint(stateDict["before"][i], baseList, refList))
         trans["after"].append(encoder.transformforViewPoint(stateDict["after"][i], baseList, refList))
+    """
+    transafter = []
+    for i in range(size):
+        transafter.append(encoder.transformforViewPoint(stateDict["after"][i], baseList, refList))
     # 評価対象は「最も大きく動いている物体」に限定
     # 各物体の「前後で動いた量」の合計を求める
     objList = ["hand", "red", "blue", "green", "yellow"]
@@ -66,13 +71,15 @@ def getDistribution(stateDict, baseList, refList):
         moveDict[o] = 0
     for i in range(size):
         for o in objList:
-            bef = np.array(trans["before"][i][o])
-            aft = np.array(trans["after"][i][o])
+            # bef = np.array(trans["before"][i][o])
+            bef = np.array(stateDict["before"][i][o])
+            # aft = np.array(trans["after"][i][o])
+            aft = np.array(stateDict["after"][i][o])
             moveDict[o] += np.linalg.norm(aft-bef)
     # 寄与率が一定以上になるまで物体を選択する
-    rate = 0.9
+    rate = 0.75
     tempdiff = 0
-    # moveList を降順ソート
+    # moveDict を降順ソート
     moveList = sorted(moveDict.items(), key=itemgetter(1), reverse=True)
     selected = []
     for m in moveList:
@@ -80,14 +87,17 @@ def getDistribution(stateDict, baseList, refList):
         tempdiff += m[1]
         if tempdiff >= sum(moveDict.values()) * rate:
             break
+    # print("moveList:" + str(moveList))
     print("selected:" + str(selected))
     # 選択した物体の最終位置のブレをスコアとして返す
+    # 観点変換はここで使う
     diffDict = {}
     for o in selected:
         diffDict[o] = []
     for i in range(size):
         for s in selected:
-            diffDict[s].append(np.array(trans["after"][i][s]))
+            # diffDict[s].append(np.array(trans["after"][i][s]))
+            diffDict[s].append(np.array(transafter[i][s]))
     meanDict = {}
     for s in selected:
         meanDict[s] = sum(diffDict[s])/size
@@ -95,7 +105,8 @@ def getDistribution(stateDict, baseList, refList):
     diff = 0
     for i in range(size):
         for s in selected:
-            diff += np.linalg.norm(np.array(trans["after"][i][s])-meanDict[s])
+            # diff += np.linalg.norm(np.array(trans["after"][i][s])-meanDict[s])
+            diff += np.linalg.norm(np.array(transafter[i][s])-meanDict[s])
     return [selected, diff]
     """
     for i in range(size):
@@ -121,7 +132,7 @@ def getViewPoint(stateDict):
         print("[ViewPointManager]getViewPoint:different size")
         return []
     output = []
-    tempmin = 100000
+    tempmin = 10000000000000
     objList = ["hand", "red", "blue", "green", "yellow"]
     # 試すパターンはとりあえず，
     # baseList 物体3つまで，refList 1つまで
@@ -177,7 +188,9 @@ if __name__ == "__main__":
     """
     filepaths = glob.glob("tmp/log_MakerMain/*")
     # hand を中心に変換したデータを取得
-    datas = getStateswithViewPoint(filepaths, ["hand"], [])
+    # datas = getStateswithViewPoint(filepaths, ["hand"], [])
+    # データ取得
+    datas = getStateswithViewPoint(filepaths, [], [])
     """
     # 動きを見てみる
     for i, d in enumerate(datas["log000000001.csv"]):
