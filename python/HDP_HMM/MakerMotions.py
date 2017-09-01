@@ -46,15 +46,15 @@ def test2(maker, inits):
     maker.setXs("green" , inits["green"])
 
     # 0.
-    maker.gotoGoal("hand", maker.getXs("red"), 100)
+    maker.gotoGoal("hand", (maker.getXs("hand") + 9*maker.getXs("red"))/10, 100)
     maker.execute(100)
     maker.grab("red")
     # 1.
-    maker.gotoGoal("hand", (maker.getXs("hand") + 9*maker.getXs("yellow"))/10, 100)
+    maker.gotoGoal("hand", (maker.getXs("hand") + 5*maker.getXs("yellow"))/6, 100)
     maker.execute(100)
     maker.release()
     # 2.
-    maker.gotoGoal("hand", maker.getXs("blue"), 100)
+    maker.gotoGoal("hand", (maker.getXs("hand") + 9*maker.getXs("blue"))/10, 100)
     maker.execute(100)
     maker.grab("blue")
     # 3.
