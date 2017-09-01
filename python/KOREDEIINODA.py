@@ -33,6 +33,18 @@ for p in filepaths:
     post.outputData(output, p)
 
 """
+
+"""
+2017/ 9/ 1
+step, soinnN, soinnE, paramA のグリッドサーチ
+結果は GettingIntermediated_20170901, SYUKEISURUNODA_20170901 参照
+step   : 3
+soinnN : 2500
+soinnE : 2500
+paramA : 9
+で最適だった．
+テストの範囲を修正し，paramTheta のループも加えて再度テストを行う
+
 soinnN = 1250
 soinnE = 1250
 
@@ -68,3 +80,44 @@ for ne in range(5):
                         inter.execute(dirName)
 
                         print("++++++++++ : Finished")
+"""
+soinnN = 5000
+soinnE = 5000
+
+# SOINN のパラメータは 2500, 1250, 625 で試す
+for ne in range(3):
+    soinnN /= 2
+    soinnE /= 2
+    step = 1
+    # step は 2, 3, 4 で試す
+    for s in range(3):
+        step += 1
+        import HDP_HMM.EncodewithSOINN as soinn
+
+        print("++++------ : Encoding with SOINN")
+        soinn.execute(step = step, soinnN = soinnN, soinnE = soinnE)
+
+        import HPYLM.tasks.ParsingfromSOINN_results as hpylm
+        
+        paramA = 7
+        # paramA は 9, 11, 13 で試す
+        for p in range(5):
+            paramA += 2
+            # paramTheta は 1, 2, 3, 4, 5 で試す
+            paramTheta = 0
+            for pT in range(5):
+                paramTheta += 1
+                print("++++++---- : Parsing with HPYLM")
+                hpylm.execute(paramA = paramA, paramTheta = paramTheta)
+
+                import HPYLM.tasks.GettingIntermmediates as inter
+
+                print("++++++++-- : Getting intermmediates")
+                dirName = str(step) + "-"
+                dirName += str(soinnN) + "-"
+                dirName += str(soinnE) + "-"
+                dirName += str(paramA) + "-"
+                dirName += str(paramTheta)
+                inter.execute(dirName)
+
+                print("++++++++++ : Finished")
