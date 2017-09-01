@@ -39,7 +39,7 @@ def getStateswithViewPoint(filepathList, baseList, refList):
 #   stateDict = {"before":[前状態], "after":[後状態]}
 #   baseList : 基準点
 #   refList  : 参照点
-def getDistribution(stateDict, baseList, refList):
+def getDistribution(stateDict, baseList, refList, movedObject):
     # データの数を取得しておく
     size = len(stateDict["before"])
     # 前後のデータ数が違えばそこでエラー終了
@@ -63,17 +63,46 @@ def getDistribution(stateDict, baseList, refList):
     transafter = []
     for i in range(size):
         transafter.append(encoder.transformforViewPoint(stateDict["after"][i], baseList, refList))
-    # 評価対象は「最も大きく動いている物体」に限定
-    # 各物体の「前後で動いた量」の合計を求める
+    # 選択した物体の最終位置のブレをスコアとして返す
+    # 観点変換はここで使う
+    diffDict = {}
+    for o in movedObject:
+        diffDict[o] = []
+    for i in range(size):
+        for s in movedObject:
+            # diffDict[s].append(np.array(trans["after"][i][s]))
+            diffDict[s].append(np.array(transafter[i][s]))
+    meanDict = {}
+    for s in movedObject:
+        meanDict[s] = sum(diffDict[s])/size
+    
+    diff = 0
+    for i in range(size):
+        for s in movedObject:
+            # diff += np.linalg.norm(np.array(trans["after"][i][s])-meanDict[s])
+            diff += np.linalg.norm(np.array(transafter[i][s])-meanDict[s])
+    return [movedObject, diff]
+    """
+    for i in range(size):
+        nb = np.array(encoder.serialize(trans["before"][i]))
+        na = np.array(encoder.serialize(trans["after"][i]))
+        move.append(na-nb)
+    mean = sum(move)/len(move)
+    
+    diff = 0
+    for m in move:
+        diff += np.linalg.norm(m-mean)
+    return [mean, diff]
+    """
+# 状態集合の前後の組から，移動物体を推定する
+def getMovedObject(stateDict):
     objList = ["hand", "red", "blue", "green", "yellow"]
     moveDict = {}
     for o in objList:
         moveDict[o] = 0
-    for i in range(size):
+    for i in range(len(stateDict["before"])):
         for o in objList:
-            # bef = np.array(trans["before"][i][o])
             bef = np.array(stateDict["before"][i][o])
-            # aft = np.array(trans["after"][i][o])
             aft = np.array(stateDict["after"][i][o])
             moveDict[o] += np.linalg.norm(aft-bef)
     # 寄与率が一定以上になるまで物体を選択する
@@ -87,40 +116,9 @@ def getDistribution(stateDict, baseList, refList):
         tempdiff += m[1]
         if tempdiff >= sum(moveDict.values()) * rate:
             break
-    # print("moveList:" + str(moveList))
     print("selected:" + str(selected))
-    # 選択した物体の最終位置のブレをスコアとして返す
-    # 観点変換はここで使う
-    diffDict = {}
-    for o in selected:
-        diffDict[o] = []
-    for i in range(size):
-        for s in selected:
-            # diffDict[s].append(np.array(trans["after"][i][s]))
-            diffDict[s].append(np.array(transafter[i][s]))
-    meanDict = {}
-    for s in selected:
-        meanDict[s] = sum(diffDict[s])/size
-    
-    diff = 0
-    for i in range(size):
-        for s in selected:
-            # diff += np.linalg.norm(np.array(trans["after"][i][s])-meanDict[s])
-            diff += np.linalg.norm(np.array(transafter[i][s])-meanDict[s])
-    return [selected, diff]
-    """
-    for i in range(size):
-        nb = np.array(encoder.serialize(trans["before"][i]))
-        na = np.array(encoder.serialize(trans["after"][i]))
-        move.append(na-nb)
-    mean = sum(move)/len(move)
-    
-    diff = 0
-    for m in move:
-        diff += np.linalg.norm(m-mean)
-    return [mean, diff]
-    """
-
+    return selected
+ 
 # 状態集合(未エンコード)の前後の組から，観点を推定する
 #   stateDict = {"before":[前状態], "after":[後状態]}
 #   before, after はインデックスで紐づけられている
@@ -134,14 +132,19 @@ def getViewPoint(stateDict):
     output = []
     tempmin = 10000000000000
     objList = ["hand", "red", "blue", "green", "yellow"]
+
+    # 移動物体を取得する
+    # 移動物体は stateDict が一定な限り一定なはず
+    moved = getMovedObject(stateDict)
+
     # 試すパターンはとりあえず，
     # baseList 物体3つまで，refList 1つまで
     # baseList はゼロ(原点基準)を許さないようにする
-    for nb in range(1, 3 +1):
+    for nb in range(3 +1):
         baseList = itertools.combinations(objList, nb)
         for b in baseList:
-            # TODO 後で消す
-            if "hand" in b:
+            # 移動物体を基準点に含む組み合わせは無視
+            if len(set(moved)&set(b)) != 0:
                 continue
             for nr in range(1 + 1):
                 refList = itertools.combinations(objList, nr)
@@ -150,7 +153,7 @@ def getViewPoint(stateDict):
                     # 基準点と参照点に重複がある場合は飛ばす
                     if len(set(b) & set(r)) != 0:
                         continue
-                    score = getDistribution(stateDict, b, r)
+                    score = getDistribution(stateDict, b, r, moved)
                     if score[1] < tempmin:
                         output = [{"base":b, "ref":r, "score":score[1]}] + output
                         tempmin = score[1]
@@ -210,10 +213,12 @@ if __name__ == "__main__":
     for d in datas:
         stateDict["before"].append(datas[d][0])
         stateDict["after"].append(datas[d][100])
+    """
     for i in range(len(datas)):
         if i%20 == 0:
             show(stateDict["before"][i])
             show(stateDict["after"][i])
+    """
     # 推定
     res = getViewPoint(stateDict)
     print("result:")
