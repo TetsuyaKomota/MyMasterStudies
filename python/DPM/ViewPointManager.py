@@ -136,9 +136,13 @@ def getViewPoint(stateDict):
     objList = ["hand", "red", "blue", "green", "yellow"]
     # 試すパターンはとりあえず，
     # baseList 物体3つまで，refList 1つまで
-    for nb in range(3 +1):
+    # baseList はゼロ(原点基準)を許さないようにする
+    for nb in range(1, 3 +1):
         baseList = itertools.combinations(objList, nb)
         for b in baseList:
+            # TODO 後で消す
+            if "hand" in b:
+                continue
             for nr in range(1 + 1):
                 refList = itertools.combinations(objList, nr)
                 for r in refList:
@@ -206,8 +210,10 @@ if __name__ == "__main__":
     for d in datas:
         stateDict["before"].append(datas[d][0])
         stateDict["after"].append(datas[d][100])
-    show(stateDict["before"][0])
-    show(stateDict["after"][0])
+    for i in range(len(datas)):
+        if i%20 == 0:
+            show(stateDict["before"][i])
+            show(stateDict["after"][i])
     # 推定
     res = getViewPoint(stateDict)
     print("result:")
