@@ -12,7 +12,7 @@ def encodeState(line):
     # temp[-1]は \n のみ
     temp = line.split(",")
     if len(temp) != 32:
-        print("[ViewPointEncoder]encodeState:invalid input")
+        print("[ViewPointEncoder]encodeState:invalid input :"+line)
         return None
     output = {}
     output["step"  ] = int(temp[0])
