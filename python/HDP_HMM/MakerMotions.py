@@ -1,4 +1,4 @@
-import HDP_HMM.MakerMain
+import HDP_HMM.MakerMain as makerMain
 import numpy as np
 from random import random
 
@@ -116,10 +116,12 @@ def test3(maker, inits, num=0):
 
 
 if __name__ == "__main__":
-    maker = MakerMain.Maker()
+    """
+    maker = makerMain.Maker()
     maker.debug_show()
     test1(maker)
     exit()
+    """
     for count in range(10):
         inits = {}
         inits["red"]    = [10000 * (random() - 0.5), 10000 * (random() - 0.5)]
@@ -128,7 +130,7 @@ if __name__ == "__main__":
         inits["green"]  = [10000 * (random() - 0.5), 10000 * (random() - 0.5)]
         for i in range(20):
             filename = "000"+"{0:03d}".format(count)+"{0:03d}".format(i)
-            maker = MakerMain.Maker(filename)
+            maker = makerMain.Maker(filename)
             maker.debug_show()
             test2(maker, inits)
     """
@@ -141,7 +143,7 @@ if __name__ == "__main__":
             inits["green"]  = [10000 * (random() - 0.5), 10000 * (random() - 0.5)]
             for i in range(5):
                 filename = "1"+str(interval)+"0"+"{0:03d}".format(count)+"{0:03d}".format(i)
-                maker = MakerMain.Maker(filename)
+                maker = makerMain.Maker(filename)
                 maker.debug_show()
                 test3(maker, inits, num = interval)
 
