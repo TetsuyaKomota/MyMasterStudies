@@ -7,6 +7,7 @@ import numpy as np
 import itertools
 import matplotlib.pyplot as plt
 import os
+from operator import itemgetter
 
 # Encoder 使って色々するやつ
 
@@ -57,8 +58,47 @@ def getDistribution(stateDict, baseList, refList):
     for i in range(size):
         trans["before"].append(encoder.transformforViewPoint(stateDict["before"][i], baseList, refList))
         trans["after"].append(encoder.transformforViewPoint(stateDict["after"][i], baseList, refList))
-    # 変換した状態で，評価する
-    for i in range(len(trans["before"])):
+    # 評価対象は「最も大きく動いている物体」に限定
+    # 各物体の「前後で動いた量」の合計を求める
+    objList = ["hand", "red", "blue", "green", "yellow"]
+    moveDict = {}
+    for o in objList:
+        moveDict[o] = 0
+    for i in range(size):
+        for o in objList:
+            bef = np.array(trans["before"][i][o])
+            aft = np.array(trans["after"][i][o])
+            moveDict[o] += np.linalg.norm(aft-bef)
+    # 寄与率が一定以上になるまで物体を選択する
+    rate = 0.9
+    tempdiff = 0
+    # moveList を降順ソート
+    moveList = sorted(moveDict.items(), key=itemgetter(1), reverse=True)
+    selected = []
+    for m in moveList:
+        selected.append(m[0])
+        tempdiff += m[1]
+        if tempdiff >= sum(moveDict.values()) * rate:
+            break
+    print("selected:" + str(selected))
+    # 選択した物体の最終位置のブレをスコアとして返す
+    diffDict = {}
+    for o in selected:
+        diffDict[o] = []
+    for i in range(size):
+        for s in selected:
+            diffDict[s].append(np.array(trans["after"][i][s]))
+    meanDict = {}
+    for s in selected:
+        meanDict[s] = sum(diffDict[s])/size
+    
+    diff = 0
+    for i in range(size):
+        for s in selected:
+            diff += np.linalg.norm(np.array(trans["after"][i][s])-meanDict[s])
+    return [selected, diff]
+    """
+    for i in range(size):
         nb = np.array(encoder.serialize(trans["before"][i]))
         na = np.array(encoder.serialize(trans["after"][i]))
         move.append(na-nb)
@@ -68,6 +108,7 @@ def getDistribution(stateDict, baseList, refList):
     for m in move:
         diff += np.linalg.norm(m-mean)
     return [mean, diff]
+    """
 
 # 状態集合(未エンコード)の前後の組から，観点を推定する
 #   stateDict = {"before":[前状態], "after":[後状態]}
@@ -102,7 +143,7 @@ def getViewPoint(stateDict):
 
 # 状態を引数に，描画する
 # 返還前の 軸の向きも一緒に描画する
-def show(state):
+def show(state, title="show"):
     for st in state:
         color = ""
         if st == "hand":
@@ -112,6 +153,7 @@ def show(state):
         else:
             continue
         plt.scatter(state[st][0], state[st][1], c=color, s=120)
+    plt.title(title)
     plt.show()
     return True
 
@@ -136,6 +178,14 @@ if __name__ == "__main__":
     filepaths = glob.glob("tmp/log_MakerMain/*")
     # hand を中心に変換したデータを取得
     datas = getStateswithViewPoint(filepaths, ["hand"], [])
+    """
+    # 動きを見てみる
+    for i, d in enumerate(datas["log000000001.csv"]):
+        if i < 450:
+            continue
+        if i % 1 == 0:
+            show(d, title=str(i))
+    """
     # 0 番と 100 番のデータのみを取り出してみる
     stateDict = {}
     stateDict["before"] = []
@@ -143,7 +193,6 @@ if __name__ == "__main__":
     for d in datas:
         stateDict["before"].append(datas[d][0])
         stateDict["after"].append(datas[d][100])
-    # ちょっと表示してみる
     show(stateDict["before"][0])
     show(stateDict["after"][0])
     # 推定
