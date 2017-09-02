@@ -21,8 +21,6 @@ soinnE = 625
 
 output = []
 
-outfile = open("tmp/SOINNNOCHECKNANODA.txt", "w", encoding="utf-8")
-
 # SOINN のパラメータは 2500, 5000, 10000, 20000, 40000 で試す
 for ne in range(6):
         step = 1
@@ -38,11 +36,11 @@ for ne in range(6):
                         temp += data[d]
                     num = len(set(temp))
                 output.append({"soinn":soinnN, "step":step, "numofClass":num})
-                outfile.write(str(soinnN)+","+str(step)+","+str(num)+"\n")
+                with open("tmp/SOINNNOCHECKNANODA.txt", "a", encoding="utf-8") as f:
+                    f.write(str(soinnN)+","+str(step)+","+str(num)+"\n")
                 print("appended:" + str(output[-1]))
                 step += 2
         soinnN *= 2
         soinnE *= 2
 for o in output:
     print(o)
-outfile.close()
