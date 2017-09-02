@@ -79,6 +79,43 @@ def transformforViewPoint(state, baseList, refList, smax=1000, scale=20000):
     output["timelen"] = (state["step"]/smax)*scale
     return output
 
+# 状態，基準物体，参照点を引数に，逆変換した状態を返す
+# 複数の場合は重心を参照する
+def retransformforViewPoint(state, baseList, refList, smax=1000, scale=20000):
+    # とりあえずコピー
+    output = copy.deepcopy(state)
+    del output["step"]
+    # base, ref を求める
+    base = np.zeros(2)
+    for b in baseList:
+        base = base + state[b]
+    if len(baseList) > 0:
+        base = base / len(baseList)
+    ref = np.zeros(2)
+    for r in refList:
+        ref  = ref  + state[r]
+    if len(refList)  > 0:
+        ref  = ref  / len(refList)
+    # ref をbase 中心に変換する
+    ref = ref - base
+    # 回転角を求める
+    theta = np.arctan(ref[1]/ref[0])
+    if ref[0] < 0:
+        theta = theta + np.pi
+    # 回転行列を作る
+    if len(refList) == 0:
+        rot = np.eye(2)
+    else:
+        rot = np.array([[np.cos(theta), -1*np.sin(theta)], [np.sin(theta), np.cos(theta)]])
+    # 平行移動,回転させる
+    for t in output:
+        output[t] = rot.dot(output[t]) + base
+    # 最後にステップの情報を変換してくっつける
+    output["step"] = state["step"]
+    output["timelen"] = (state["step"]/smax)*scale
+    return output
+
+
 if __name__ == "__main__":
     line = "1,"
     line = line + "1,1,0,0,0,0,"

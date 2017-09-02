@@ -8,8 +8,11 @@ import itertools
 import matplotlib.pyplot as plt
 import os
 from operator import itemgetter
+import copy
 
 # Encoder 使って色々するやつ
+
+objList = ["hand", "red", "blue", "green", "yellow"]
 
 # 指定したファイル群から，指定した観点で状態を取得する
 def getStateswithViewPoint(filepathList, baseList, refList):
@@ -51,15 +54,6 @@ def getDistribution(stateDict, baseList, refList, movedObject):
         print("[ViewPointManager]getViewPoint:size is zero")
         return []
     move = []
-    """
-    # 観点変換する
-    trans = {}
-    trans["before"] = []
-    trans["after"]  = []
-    for i in range(size):
-        trans["before"].append(encoder.transformforViewPoint(stateDict["before"][i], baseList, refList))
-        trans["after"].append(encoder.transformforViewPoint(stateDict["after"][i], baseList, refList))
-    """
     transafter = []
     for i in range(size):
         transafter.append(encoder.transformforViewPoint(stateDict["after"][i], baseList, refList))
@@ -81,22 +75,10 @@ def getDistribution(stateDict, baseList, refList, movedObject):
         for s in movedObject:
             # diff += np.linalg.norm(np.array(trans["after"][i][s])-meanDict[s])
             diff += np.linalg.norm(np.array(transafter[i][s])-meanDict[s])
-    return [movedObject, diff]
-    """
-    for i in range(size):
-        nb = np.array(encoder.serialize(trans["before"][i]))
-        na = np.array(encoder.serialize(trans["after"][i]))
-        move.append(na-nb)
-    mean = sum(move)/len(move)
-    
-    diff = 0
-    for m in move:
-        diff += np.linalg.norm(m-mean)
-    return [mean, diff]
-    """
+    return [meanDict, diff]
+
 # 状態集合の前後の組から，移動物体を推定する
 def getMovedObject(stateDict):
-    objList = ["hand", "red", "blue", "green", "yellow"]
     moveDict = {}
     for o in objList:
         moveDict[o] = 0
@@ -131,7 +113,6 @@ def getViewPoint(stateDict):
         return []
     output = []
     tempmin = 10000000000000
-    objList = ["hand", "red", "blue", "green", "yellow"]
 
     # 移動物体を取得する
     # 移動物体は stateDict が一定な限り一定なはず
@@ -155,9 +136,30 @@ def getViewPoint(stateDict):
                         continue
                     score = getDistribution(stateDict, b, r, moved)
                     if score[1] < tempmin:
-                        output = [{"base":b, "ref":r, "score":score[1]}] + output
+                        better = {}
+                        better["base"]  = b
+                        better["ref"]   = r
+                        better["score"] = score[1]
+                        better["mean"]  = score[0]
+                        output = [better] + output
                         tempmin = score[1]
     return output
+
+# getViewPoint の結果をもとに，自状態を推定する
+# state     : 状態
+# viewPoint : getViewPoint の結果
+def predictwithViewPoint(state, viewPoint):
+    moved  = copy.deepcopy(state)
+    for m in viewPoint[0]["mean"]:
+        moved[m] = viewPoint[0]["mean"][m]
+    moved = encoder.retransformforViewPoint(moved, viewPoint[0]["base"], viewPoint[0]["ref"])
+    output = {}
+    for s in state:
+        if s in viewPoint[0]["mean"]:
+            output[s] = moved[s]
+        else:
+            output[s] = state[s]
+    return output 
 
 # 状態を引数に，描画する
 # 返還前の 軸の向きも一緒に描画する
@@ -166,7 +168,7 @@ def show(state, title="show"):
         color = ""
         if st == "hand":
             color = "black"
-        elif st in ["red", "blue", "green", "yellow"]:
+        elif st in objList:
             color = st
         else:
             continue
@@ -219,8 +221,18 @@ if __name__ == "__main__":
             show(stateDict["before"][i])
             show(stateDict["after"][i])
     """
-    # 推定
+    # 学習
     res = getViewPoint(stateDict)
     print("result:")
     for r in res:
-        print("score:" + str(r["score"]) + "\t\tbase:"+str(r["base"])+"\t\tref:"+str(r["ref"]))
+        line = ""
+        line += "score:" + str(r["score"]) + "\t\t"
+        line += "base:" + str(r["base"]) + "\t\t"
+        line += "ref:" + str(r["ref"]) + "\t\t"
+        line += "mean:" + str(r["mean"]) + "\t\t"
+        print(line)
+    # 推定
+    test = datas["log000000000.csv"][0]
+    show(test, title="before")
+    test = predictwithViewPoint(test, res)
+    show(test, title="after")
