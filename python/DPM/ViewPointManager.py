@@ -178,7 +178,7 @@ def show(state, title="show"):
     return True
 
 # 状態とパスとファイル名を引数に，画像書き出し
-def savefig(state, path="tmp/forslides/", name="fig.png", log=True):
+def savefig(state,path="tmp/forslides",name="fig.png",log=True,inter=False):
     if log == False:
         plt.clf()
     # TODO 後で消す
@@ -192,7 +192,13 @@ def savefig(state, path="tmp/forslides/", name="fig.png", log=True):
             color = st
         else:
             continue
-        plt.scatter(state[st][0], state[st][1], c=color, s=120)
+        scale = 120
+        m     = "o"
+        if inter == True and st == "hand":
+            scale *= 4
+            m      = "*"
+            color  = "gray"
+        plt.scatter(state[st][0], state[st][1], marker=m, c=color, s=scale)
     plt.title("savefig")
     saveas = path
     if saveas[-1] != "/":
