@@ -177,6 +177,34 @@ def show(state, title="show"):
     plt.show()
     return True
 
+# 状態とパスとファイル名を引数に，画像書き出し
+def savefig(state, path="tmp/forslides/", name="fig.png", log=True):
+    if log == False:
+        plt.clf()
+    # TODO 後で消す
+    plt.xlim(-5000, 5000)
+    plt.ylim(-5000, 5000)
+    for st in state:
+        color = ""
+        if st == "hand":
+            color = "black"
+        elif st in objList:
+            color = st
+        else:
+            continue
+        plt.scatter(state[st][0], state[st][1], c=color, s=120)
+    plt.title("savefig")
+    saveas = path
+    if saveas[-1] != "/":
+        saveas += "/"
+    saveas += name
+    plt.savefig(saveas)
+    # plt.close()
+    return True
+
+   
+
+
 if __name__ == "__main__":
     """
     filepaths = glob.glob("tmp/log_MakerMain/GettingIntermediated/3-2500-2500-9/*")
