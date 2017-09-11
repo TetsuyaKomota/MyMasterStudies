@@ -12,7 +12,7 @@ def getAllPair(datas):
     output["after"]  = []
     for d in datas:
         for bIdx in range(0, len(datas[d])):
-            for aIdx in range(bIdx+1, bIdx+2):
+            for aIdx in range(bIdx+1, bIdx+4):
                 if aIdx >= len(datas[d]):
                     continue
                 range(bIdx+1, len(datas[d]))
@@ -67,9 +67,24 @@ def getWorstData(stateDict):
     return output
 
 if __name__ == "__main__":
-    dirpath = "tmp/log_MakerMain/GettingIntermediated/3-2500-2500-9/*"
-    filepaths = glob.glob(dirpath)
+    # dirpath = "tmp/log_MakerMain/GettingIntermediated/3-2500-2500-9/*"
+    # filepaths = glob.glob(dirpath)
+    filepaths = glob.glob("tmp/log_MakerMain/*")
+    # データ取得
     datas = manager.getStateswithViewPoint(filepaths, [], [])
-    stateDict = getAllPair(datas)
+    # 0 番と 100 番のデータのみを取り出してみる
+    stateDict = {}
+    stateDict["before"] = []
+    stateDict["after"]  = []
+    flag = False
+    for d in datas:
+        stateDict["before"].append(datas[d][0])
+        stateDict["after"].append(datas[d][100])
+        # 一個だけ, 200番と 300番のデータを入れてみる
+        if flag == False:
+            stateDict["before"].append(datas[d][200])
+            stateDict["after"].append(datas[d][300])
+            flag = True
     worstData = getWorstData(stateDict)
+    # idx = 1 になってくれると成功 → なった
     print(worstData)
