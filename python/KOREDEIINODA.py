@@ -84,7 +84,13 @@ for ne in range(5):
 soinnN = 5000
 soinnE = 5000
 
+"""
+# 2017/ 9/11
+# SOINN パラメータ，step, paramA の詳細値と，
+# 新たに paramTheta を加えたグリッドサーチ
+# 時間の関係上結局SOINN パラメータの詳細は取れてない
 # SOINN のパラメータは 2500, 1250, 625 で試す
+# 結果は GettingIntermediated_20170911, SYUKEISURUNODA_20170911 参照
 for ne in range(3):
     soinnN /= 2
     soinnE /= 2
@@ -121,3 +127,45 @@ for ne in range(3):
                 inter.execute(dirName)
 
                 print("++++++++++ : Finished")
+"""
+# SOINN のパラメータは 2500, 1250, 625 で試す
+# 結果は GettingIntermediated_20170911, SYUKEISURUNODA_20170911 参照
+for ne in range(3):
+    soinnN /= 2
+    soinnE /= 2
+    step = 2
+    # step は3 で試す
+    for s in range(1):
+        step += 1
+        import HDP_HMM.EncodewithSOINN as soinn
+
+        print("++++------ : Encoding with SOINN")
+        soinn.execute(step = step, soinnN = soinnN, soinnE = soinnE)
+
+        import HPYLM.tasks.ParsingfromSOINN_results as hpylm
+        
+        paramA = 9
+        # paramA は11 で試す
+        for p in range(1):
+            paramA += 2
+            # paramTheta は 1, 2, 3, 4, 5 で試す
+            paramTheta = 0
+            for pT in range(5):
+                # 繰り返しで結果が変わるかもなので，5回ずつ結果を出す
+                paramTheta += 1
+                for n_iter in range(5):
+                    print("++++++---- : Parsing with HPYLM")
+                    hpylm.execute(paramA = paramA, paramTheta = paramTheta)
+
+                    import HPYLM.tasks.GettingIntermmediates as inter
+
+                    print("++++++++-- : Getting intermmediates")
+                    dirName = str(step) + "-"
+                    dirName += str(int(soinnN)) + "-"
+                    dirName += str(int(soinnE)) + "-"
+                    dirName += str(paramA) + "-"
+                    dirName += str(paramTheta) + "-"
+                    dirName += str(n_iter)
+                    inter.execute(dirName)
+
+                    print("++++++++++ : Finished")

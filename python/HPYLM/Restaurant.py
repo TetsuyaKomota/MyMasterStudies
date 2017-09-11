@@ -431,12 +431,13 @@ class Restaurant:
     # 文章を引数に，境界状態をサンプリングする
         # u : list : 文章．
         # すでにモデルに反映されていることを前提とする(eliminate するため)
-    def sampling(self, u):
+    def sampling(self, u, detail = False):
         # u をモデルから eliminate
         self.eliminateCustomerfromSentence(u)
         # 以下を，u の境界候補全体で繰り返す
         newU = copy.deepcopy(u)
-        print("[Restaurant]sampling:start " + str(newU) + "!!!")
+        if detail == True:
+            print("[Restaurant]sampling:start " + str(newU) + "!!!")
         length = 0
         # 最後の単語は終端単語なので無視する
         for w in u[:-1]:
@@ -457,7 +458,8 @@ class Restaurant:
                 newU = newU_changed
         # 全境界候補にサンプリングを適用し，完成した文章をモデルに代入
         self.addCustomerfromSentence(newU)
-        print("[Restaurant]sampling:get " + str(newU) + "!!!")
+        if detail == True:
+            print("[Restaurant]sampling:get " + str(newU) + "!!!")
         # 終了
         return newU 
 
@@ -490,16 +492,15 @@ class Restaurant:
             self.addCustomerfromSentence(currentSentences[s])
         for idx in range(iteration):
             # 順番に代入しなおす(ギブスサンプリング)
+            # 定期的に途中状態を表示してみる
             oldSentences = copy.deepcopy(currentSentences)
             for i in currentSentences:
-                currentSentences[i] = self.sampling(currentSentences[i])
+                currentSentences[i] = self.sampling(currentSentences[i], detail=(idx%100==0))
                 # currentSentences[i] = self.blockedSampling(currentSentences[i])
-            # 定期的に途中状態を表示してみる
             diff = self.compareParsing(oldSentences, currentSentences)
-            print("[Restaurant]executeParsing:diff-" + str(diff))
             with open("tmp/Restaurant_executeParsing_diff_nonblock.txt", "a", encoding="utf-8") as f:
                 f.write(str(diff) + "\n")
-            if (idx) % 100 == 0 and idx != 0:
+            if (idx) % 1000 == 0 and idx != 0:
                 print("[Restaurant]executeParsing:iteration:"+\
                 str(idx))
                 print("[Restaurant]executeParsing:currentSentences:")
@@ -533,8 +534,9 @@ class Restaurant:
         return output
 
     # ブロック化サンプリング
-    def blockedSampling(self, u):
-        print("[Restaurant]blockedSampling:start " + str(u) + "!!!")
+    def blockedSampling(self, u, detail = False):
+        if detail == True:
+            print("[Restaurant]blockedSampling:start " + str(u) + "!!!")
         # u をモデルから eliminate
         self.eliminateCustomerfromSentence(u)
         # u を全連結
@@ -585,7 +587,8 @@ class Restaurant:
                     break
             newU = [conc[-1*select:]] + newU
             conc = conc[:-1*select]
-        print("[Restaurant]blockedSampling:get " + str(newU) + "!!!")
+        if detail==True:
+            print("[Restaurant]blockedSampling:get " + str(newU) + "!!!")
         # 完成した文章をモデルに代入
         self.addCustomerfromSentence(newU)
         # 終了
