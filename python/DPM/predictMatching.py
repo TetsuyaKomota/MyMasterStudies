@@ -5,6 +5,8 @@ import copy
 import numpy as np
 import glob
 
+THRESHOLD = 500
+
 # 途中状態列を引数に，可能な前後組をすべて取得する
 def getAllPair(datas):
     output = {}
@@ -66,12 +68,36 @@ def getWorstData(stateDict):
     output["score"] /= len(stateDict["before"])
     return output
 
+# 状態の前後の組を引数に．マッチングを推定する
+# getWorstData を求め，score が高ければworstIdx のデータをポップし，
+# 低くなったらそれをマッチングとする
+#   stateDict = {"before":[前状態], "after":[後状態]}
+def getMatching(stateDict):
+    f = open("tmp/predictMatching.txt", "w", encoding="utf-8")
+    output = []
+    rest = copy.deepcopy(stateDict)
+    while True:
+        if len(rest["before"]) == 0:
+            break
+        current = copy.deepcopy(rest)
+        rest = {"before":[], "after":[]}
+        while True:
+            result = getWorstData(current)
+            print("result:"+str(result))
+            f.write(str(result)+"\n")
+            if result["score"] < THRESHOLD:
+                break
+            rest["before"].append(current["before"].pop(result["worstIndex"]))
+            rest["after"].append(current["after"].pop(result["worstIndex"]))
+        output.append(current)
+    f.close()
+    return output
+
 if __name__ == "__main__":
-    # dirpath = "tmp/log_MakerMain/GettingIntermediated/3-2500-2500-9/*"
-    # filepaths = glob.glob(dirpath)
     filepaths = glob.glob("tmp/log_MakerMain/*")
     # データ取得
     datas = manager.getStateswithViewPoint(filepaths, [], [])
+    """
     # 0 番と 100 番のデータのみを取り出してみる
     stateDict = {}
     stateDict["before"] = []
@@ -88,3 +114,24 @@ if __name__ == "__main__":
     worstData = getWorstData(stateDict)
     # idx = 1 になってくれると成功 → なった
     print(worstData)
+    """
+    # getMatching のテスト
+    # 0,100 ペアと 200, 300 ペアを取り出す
+    stateDict = {}
+    stateDict["before"] = []
+    stateDict["after"]  = []
+    flag = False
+    count = 0
+    for d in datas:
+        count += 1
+        if count > 50:
+            break
+        stateDict["before"].append(datas[d][0])
+        stateDict["after"].append(datas[d][100])
+        stateDict["before"].append(datas[d][200])
+        stateDict["after"].append(datas[d][300])
+    # マッチングを予測
+    matching = getMatching(stateDict)
+    # 分けられていれば成功
+    print(matching)
+ 
