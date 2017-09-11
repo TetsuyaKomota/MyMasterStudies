@@ -12,7 +12,10 @@ def getAllPair(datas):
     output["after"]  = []
     for d in datas:
         for bIdx in range(0, len(datas[d])):
-            for aIdx in range(bIdx+1, len(datas[d])):
+            for aIdx in range(bIdx+1, bIdx+2):
+                if aIdx >= len(datas[d]):
+                    continue
+                range(bIdx+1, len(datas[d]))
                 output["before"].append(datas[d][bIdx])
                 output["after"].append(datas[d][aIdx])
     return output
@@ -56,6 +59,7 @@ def getWorstData(stateDict):
         # ずれが最大を更新したら記録する
         output["score"] += error
         if error > output["worstScore"]:
+            print("[predictMatching]getWorstData:   updateWorst")
             output["worstIndex"] = i
             output["worstScore"] = error
     # score は平均化
