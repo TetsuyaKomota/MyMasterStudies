@@ -40,8 +40,9 @@ def getStateswithViewPoint(filepathList, baseList, refList):
 # 状態集合の前後の組，基準と参照点から，平均と偏差を求める
 # 偏差はユークリッド距離の平均とのずれの平均とする
 #   stateDict = {"before":[前状態], "after":[後状態]}
-#   baseList : 基準点
-#   refList  : 参照点
+#   baseList    : 基準点
+#   refList     : 参照点
+#   movedObject : 移動した物体，事前にgetMovedObject で推定する
 def getDistribution(stateDict, baseList, refList, movedObject):
     # データの数を取得しておく
     size = len(stateDict["before"])
@@ -56,7 +57,11 @@ def getDistribution(stateDict, baseList, refList, movedObject):
     move = []
     transafter = []
     for i in range(size):
-        transafter.append(encoder.transformforViewPoint(stateDict["after"][i], baseList, refList))
+        transafter.append( \
+            encoder.transformforViewPoint( \
+                stateDict["after"][i], baseList, refList \
+            ) \
+        )
     # 選択した物体の最終位置のブレをスコアとして返す
     # 観点変換はここで使う
     diffDict = {}
@@ -64,7 +69,6 @@ def getDistribution(stateDict, baseList, refList, movedObject):
         diffDict[o] = []
     for i in range(size):
         for s in movedObject:
-            # diffDict[s].append(np.array(trans["after"][i][s]))
             diffDict[s].append(np.array(transafter[i][s]))
     meanDict = {}
     for s in movedObject:
@@ -73,12 +77,11 @@ def getDistribution(stateDict, baseList, refList, movedObject):
     diff = 0
     for i in range(size):
         for s in movedObject:
-            # diff += np.linalg.norm(np.array(trans["after"][i][s])-meanDict[s])
             diff += np.linalg.norm(np.array(transafter[i][s])-meanDict[s])
     return [meanDict, diff]
 
 # 状態集合の前後の組から，移動物体を推定する
-def getMovedObject(stateDict):
+def getMovedObject(stateDict, detail=False):
     moveDict = {}
     for o in objList:
         moveDict[o] = 0
@@ -98,13 +101,14 @@ def getMovedObject(stateDict):
         tempdiff += m[1]
         if tempdiff >= sum(moveDict.values()) * rate:
             break
-    print("selected:" + str(selected))
+    if detail == True:
+        print("selected:" + str(selected))
     return selected
  
 # 状態集合(未エンコード)の前後の組から，観点を推定する
 #   stateDict = {"before":[前状態], "after":[後状態]}
 #   before, after はインデックスで紐づけられている
-def getViewPoint(stateDict):
+def getViewPoint(stateDict, detail=False):
     # データの数を取得しておく
     size = len(stateDict["before"])
     # 前後のデータ数が違えばそこでエラー終了
@@ -130,7 +134,8 @@ def getViewPoint(stateDict):
             for nr in range(1 + 1):
                 refList = itertools.combinations(objList, nr)
                 for r in refList:
-                    print("test => " + str(b) + ":" + str(r))
+                    if detail == True:
+                        print("test => " + str(b) + ":" + str(r))
                     # 基準点と参照点に重複がある場合は飛ばす
                     if len(set(b) & set(r)) != 0:
                         continue
@@ -145,7 +150,7 @@ def getViewPoint(stateDict):
                         tempmin = score[1]
     return output
 
-# getViewPoint の結果をもとに，自状態を推定する
+# getViewPoint の結果をもとに，次の状態を推定する
 # state     : 状態
 # viewPoint : getViewPoint の結果
 def predictwithViewPoint(state, viewPoint):
@@ -213,7 +218,8 @@ def savefig(state,path="tmp/forslides",name="fig.png",log=True,inter=False):
 
 if __name__ == "__main__":
     """
-    filepaths = glob.glob("tmp/log_MakerMain/GettingIntermediated/3-2500-2500-9/*")
+    dirpath = "tmp/log_MakerMain/GettingIntermediated/3-2500-2500-9/*"
+    filepaths = glob.glob(dirpath)
     # hand を中心に変換したデータを取得
     datas = getStateswithViewPoint(filepaths, ["hand"], [])
     for d in datas:
@@ -230,8 +236,6 @@ if __name__ == "__main__":
     getViewPoint(testData)
     """
     filepaths = glob.glob("tmp/log_MakerMain/*")
-    # hand を中心に変換したデータを取得
-    # datas = getStateswithViewPoint(filepaths, ["hand"], [])
     # データ取得
     datas = getStateswithViewPoint(filepaths, [], [])
     """
