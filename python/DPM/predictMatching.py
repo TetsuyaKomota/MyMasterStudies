@@ -4,8 +4,9 @@ import DPM.ViewPointManager as manager
 import copy
 import numpy as np
 import glob
+import dill 
 
-THRESHOLD = 500
+THRESHOLD = 2000
 
 # 途中状態列を引数に，可能な前後組をすべて取得する
 def getAllPair(datas):
@@ -85,7 +86,7 @@ def getMatching(stateDict):
             result = getWorstData(current)
             print("result:"+str(result))
             f.write(str(result)+"\n")
-            if result["score"] < THRESHOLD:
+            if result["score"] < THRESHOLD or len(current["before"]) < 3:
                 break
             rest["before"].append(current["before"].pop(result["worstIndex"]))
             rest["after"].append(current["after"].pop(result["worstIndex"]))
@@ -134,4 +135,5 @@ if __name__ == "__main__":
     matching = getMatching(stateDict)
     # 分けられていれば成功
     print(matching)
- 
+    with open("tmp/log_MakerMain/dills/predictMatching_results.dill", "wb")  as f:
+        dill.dump(matching, f)
