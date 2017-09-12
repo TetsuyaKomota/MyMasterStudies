@@ -48,17 +48,7 @@ def getWorstData(stateDict):
         # 学習した観点でテストデータの推定を行う
         predicted = manager.predictwithViewPoint(tempTest["before"], vp)
         # 推定結果と実際の状態とのずれを計算する
-        error = 0
-        for o in manager.objList:
-            """
-            print("[predictMatching]getWorstData:o")
-            print("[predictMatching]getWorstData:" + str(o))
-            print("[predictMatching]getWorstData:predicted")
-            print("[predictMatching]getWorstData:"+str(predicted))
-            print("[predictMatching]getWorstData:tempTest['after']")
-            print("[predictMatching]getWorstData:"+str(tempTest["after"]))
-            """
-            error += np.linalg.norm(predicted[o]-tempTest["after"][o])
+        error = manager.calcDifference(predicted, tempTest["after"])
         # ずれが最大を更新したら記録する
         output["score"] += error
         if error > output["worstScore"]:

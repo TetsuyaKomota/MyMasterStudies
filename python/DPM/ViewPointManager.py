@@ -182,6 +182,13 @@ def show(state, title="show"):
     plt.show()
     return True
 
+# 状態二つを引数に，差を計算する
+def calcDifference(state1, state2):
+    error = 0
+    for o in objList:
+        error += np.linalg.norm(state1[o]-state2[o])
+    return error 
+
 # 状態とパスとファイル名を引数に，画像書き出し
 def savefig(state,path="tmp/forslides",name="fig.png",log=True,inter=False):
     if log == False:
