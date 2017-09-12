@@ -1,6 +1,6 @@
 #-*- coding: utf-8 -*-
 
-import ViewPointEncoder as encoder
+import DPM.ViewPointEncoder as encoder
 import glob
 import dill
 import numpy as np
@@ -15,11 +15,13 @@ import copy
 objList = ["hand", "red", "blue", "green", "yellow"]
 
 # 指定したファイル群から，指定した観点で状態を取得する
-def getStateswithViewPoint(filepathList, baseList, refList):
+def getStateswithViewPoint(filepathList, baseList, refList, detail=False):
     output = {}
     for fpath in filepathList:
         if fpath[-4:] != ".csv":
-            print(fpath + " : not csv file")
+            if detail==True:
+                text = "[ViewPointManager]getSateswithViewPoint:"
+                print(text + fpath + " is not csv file")
             continue
         # パスをキーにして管理すると面倒なのでファイル名に変更
         filename = os.path.basename(fpath)

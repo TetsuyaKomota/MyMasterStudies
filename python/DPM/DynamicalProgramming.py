@@ -45,7 +45,7 @@ if __name__ == "__main__":
     stateDict = {}
     stateDict["before"] = []
     stateDict["after"]  = []
-    for count, d in enumerate(datas):
+    for count, d in enumerate(sorted(list(datas.keys()))):
         stateDict["before"].append(datas[d][0])
         stateDict["after"].append(datas[d][100])
         if count >= 49:
@@ -59,5 +59,5 @@ if __name__ == "__main__":
     vp = manager.getViewPoint(stateDict)
     # 元データの50 番に対して AdditionalIntermediate を適用する
     testStateList = datas[testname]
-    additional = getAdditionalIntermediate(testStateList,0,vp,detail=True)
+    additional = getAdditionalIntermediate(testStateList,0,vp)
     print(additional["step"])
