@@ -122,15 +122,14 @@ if __name__ == "__main__":
     stateDict["before"] = []
     stateDict["after"]  = []
     flag = False
-    count = 0
-    for d in datas:
-        count += 1
-        if count > 50:
+    for count, d in enumerate(datas):
+        if count >= 50:
             break
         stateDict["before"].append(datas[d][0])
         stateDict["after"].append(datas[d][100])
-        stateDict["before"].append(datas[d][200])
-        stateDict["after"].append(datas[d][300])
+        if True or count%3==0:
+            stateDict["before"].append(datas[d][200])
+            stateDict["after"].append(datas[d][300])
     # マッチングを予測
     matching = getMatching(stateDict)
     # 分けられていれば成功
