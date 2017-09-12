@@ -63,7 +63,7 @@ def getWorstData(stateDict):
 # getWorstData を求め，score が高ければworstIdx のデータをポップし，
 # 低くなったらそれをマッチングとする
 #   stateDict = {"before":[前状態], "after":[後状態]}
-def getMatching(stateDict):
+def getMatchingfromAllPairs(stateDict):
     f = open("tmp/predictMatching.txt", "w", encoding="utf-8")
     output = []
     rest = copy.deepcopy(stateDict)
@@ -113,6 +113,52 @@ def getAdditionalIntermediate(stateList, step, viewPoint, detail=False):
             break
     return output
 
+# 状態列全体と，注目している状態列の前後組から，マッチングを推定し，
+# マッチングと，無視する状態と，保留の状態を返す
+# 動的計画法の1ステップ分
+def DP_sub(stateList, stateDict):
+    output = {}
+    matching = {"before":[], "after":[]}
+    ignored  = {"before":[], "after":[]}
+    pending  = {"before":[], "after":[]}
+    # 閾値以下になるまでworstState を抽出
+    matching = copy.deepcopy(stateDict)
+    while True:
+        result = getWorstData(matching)
+        if result["score"] < THRESHOLD:
+            break
+        elif len(matching) < 3:
+            print("失敗よ！ばか！")
+            exit()
+        pending["before"].append(matching["before"].pop(result["worstIndex"]))
+        pending["after"].append(matching["after"].pop(result["worstIndex"]))
+    # 除去した状態のbefore でgetAdditional
+    vp = manager.getViewPoint(matching)
+    additionals = []
+    for bState in pending["before"]:
+        # TODO TODO TODO TODO TODO TODO TODO 
+        print("ここ，こうしたいけど，stateDict んｐ各データはもともとのファイル名(stateList のキー名)を保持していないため，無理")
+        print("うまい方法を考えて!!!!!")
+        # additional.append(getAdditionalIntermediate(stateList, bState["step"], vp))
+        # TODO TODO TODO TODO TODO TODO TODO 
+    # additional のステップが after のステップよりも手前なら保留データ
+    # additional のステップが after のステップよりも奥なら無視データ
+    for i in range(len(additionals)):
+        if additionals[i]["step"] > pending["after"][i]["step"]:
+            ignored["before"].append(pending["before"][i])
+            ignored["after"].append(pending["after"][i])
+            pending["after"][i] = None
+    temppend = {"before":[], "after":[]}
+    for i in range(len(pending["before"])):
+        if pending["after"][i] is not None:
+            temppend["before"].append(pending["before"][i])
+            temppend["after"].append(pending["after"][i])
+    pending = temppend
+    # 返す
+    output["matching"] = matching
+    output["ignored"]  = ignored
+    output["pending"]  = pending
+    return output
 
 if __name__ == "__main__":
     filepaths = glob.glob("tmp/log_MakerMain/*")
@@ -137,7 +183,7 @@ if __name__ == "__main__":
     print(worstData)
     """
     """
-    # getMatching のテスト
+    # getMatchingfromAllPairs のテスト
     # 0,100 ペアと 200, 300 ペアを取り出す
     stateDict = {}
     stateDict["before"] = []
@@ -152,7 +198,7 @@ if __name__ == "__main__":
             stateDict["before"].append(datas[d][200])
             stateDict["after"].append(datas[d][300])
     # マッチングを予測
-    matching = getMatching(stateDict)
+    matching = getMatchingfromAllPairs(stateDict)
     # 分けられていれば成功
     print(matching)
     with open("tmp/log_MakerMain/dills/predictMatching_results.dill", "wb")  as f:
