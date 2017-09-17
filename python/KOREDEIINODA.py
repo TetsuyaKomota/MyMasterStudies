@@ -151,8 +151,12 @@ for ne in range(3):
             # paramTheta は 1, 2, 3, 4, 5 で試す
             paramTheta = 0
             for pT in range(5):
-                # 繰り返しで結果が変わるかもなので，5回ずつ結果を出す
+                # Windows Update 死ね
+                # もう終わってるところはスキップ
                 paramTheta += 1
+                if pT < 2:
+                    continue
+                # 繰り返しで結果が変わるかもなので，5回ずつ結果を出す
                 for n_iter in range(5):
                     print("++++++---- : Parsing with HPYLM")
                     hpylm.execute(paramA = paramA, paramTheta = paramTheta)
