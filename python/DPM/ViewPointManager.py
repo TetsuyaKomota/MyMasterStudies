@@ -1,6 +1,6 @@
 #-*- coding: utf-8 -*-
 
-import ViewPointEncoder as encoder
+import DPM.ViewPointEncoder as encoder
 import glob
 import dill
 import numpy as np
@@ -15,11 +15,13 @@ import copy
 objList = ["hand", "red", "blue", "green", "yellow"]
 
 # 指定したファイル群から，指定した観点で状態を取得する
-def getStateswithViewPoint(filepathList, baseList, refList):
+def getStateswithViewPoint(filepathList, baseList, refList, detail=False):
     output = {}
     for fpath in filepathList:
         if fpath[-4:] != ".csv":
-            print(fpath + " : not csv file")
+            if detail==True:
+                text = "[ViewPointManager]getSateswithViewPoint:"
+                print(text + fpath + " is not csv file")
             continue
         # パスをキーにして管理すると面倒なのでファイル名に変更
         filename = os.path.basename(fpath)
@@ -182,6 +184,13 @@ def show(state, title="show"):
     plt.show()
     return True
 
+# 状態二つを引数に，差を計算する
+def calcDifference(state1, state2):
+    error = 0
+    for o in objList:
+        error += np.linalg.norm(state1[o]-state2[o])
+    return error 
+
 # 状態とパスとファイル名を引数に，画像書き出し
 def savefig(state,path="tmp/forslides",name="fig.png",log=True,inter=False):
     if log == False:
@@ -213,9 +222,6 @@ def savefig(state,path="tmp/forslides",name="fig.png",log=True,inter=False):
     # plt.close()
     return True
 
-   
-
-
 if __name__ == "__main__":
     """
     dirpath = "tmp/log_MakerMain/GettingIntermediated/3-2500-2500-9/*"
@@ -238,14 +244,6 @@ if __name__ == "__main__":
     filepaths = glob.glob("tmp/log_MakerMain/*")
     # データ取得
     datas = getStateswithViewPoint(filepaths, [], [])
-    """
-    # 動きを見てみる
-    for i, d in enumerate(datas["log000000001.csv"]):
-        if i < 450:
-            continue
-        if i % 1 == 0:
-            show(d, title=str(i))
-    """
     # 0 番と 100 番のデータのみを取り出してみる
     stateDict = {}
     stateDict["before"] = []
@@ -253,12 +251,6 @@ if __name__ == "__main__":
     for d in datas:
         stateDict["before"].append(datas[d][0])
         stateDict["after"].append(datas[d][100])
-    """
-    for i in range(len(datas)):
-        if i%20 == 0:
-            show(stateDict["before"][i])
-            show(stateDict["after"][i])
-    """
     # 学習
     res = getViewPoint(stateDict)
     print("result:")
@@ -274,3 +266,4 @@ if __name__ == "__main__":
     show(test, title="before")
     test = predictwithViewPoint(test, res)
     show(test, title="after")
+

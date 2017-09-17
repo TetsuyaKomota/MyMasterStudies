@@ -4,8 +4,9 @@ import DPM.ViewPointManager as manager
 import copy
 import numpy as np
 import glob
+import dill 
 
-THRESHOLD = 500
+THRESHOLD = 2000
 
 # 途中状態列を引数に，可能な前後組をすべて取得する
 def getAllPair(datas):
@@ -47,17 +48,7 @@ def getWorstData(stateDict):
         # 学習した観点でテストデータの推定を行う
         predicted = manager.predictwithViewPoint(tempTest["before"], vp)
         # 推定結果と実際の状態とのずれを計算する
-        error = 0
-        for o in manager.objList:
-            """
-            print("[predictMatching]getWorstData:o")
-            print("[predictMatching]getWorstData:" + str(o))
-            print("[predictMatching]getWorstData:predicted")
-            print("[predictMatching]getWorstData:"+str(predicted))
-            print("[predictMatching]getWorstData:tempTest['after']")
-            print("[predictMatching]getWorstData:"+str(tempTest["after"]))
-            """
-            error += np.linalg.norm(predicted[o]-tempTest["after"][o])
+        error = manager.calcDifference(predicted, tempTest["after"])
         # ずれが最大を更新したら記録する
         output["score"] += error
         if error > output["worstScore"]:
@@ -72,7 +63,7 @@ def getWorstData(stateDict):
 # getWorstData を求め，score が高ければworstIdx のデータをポップし，
 # 低くなったらそれをマッチングとする
 #   stateDict = {"before":[前状態], "after":[後状態]}
-def getMatching(stateDict):
+def getMatchingfromAllPairs(stateDict):
     f = open("tmp/predictMatching.txt", "w", encoding="utf-8")
     output = []
     rest = copy.deepcopy(stateDict)
@@ -85,12 +76,88 @@ def getMatching(stateDict):
             result = getWorstData(current)
             print("result:"+str(result))
             f.write(str(result)+"\n")
-            if result["score"] < THRESHOLD:
+            if result["score"] < THRESHOLD or len(current["before"]) < 3:
                 break
             rest["before"].append(current["before"].pop(result["worstIndex"]))
             rest["after"].append(current["after"].pop(result["worstIndex"]))
         output.append(current)
     f.close()
+    return output
+
+# 状態列と開始ステップと観点モデルを引数に，
+# 追加で推定される途中状態に最も近い状態を返す
+def getAdditionalIntermediate(stateList, step, viewPoint, detail=False):
+    # 指定したステップ番号のデータを取得する
+    bState = stateList[step]
+    # 取得したデータに対して次の状態を予測する
+    aState = manager.predictwithViewPoint(bState, viewPoint)
+    # 予測した状態に最も近い状態を stateList から推定する
+    output = None
+    tempdiff = 1000000000
+    for state in stateList:
+        if state["step"] <= bState["step"]:
+            continue
+        curError = manager.calcDifference(state, aState)
+        if detail == True:
+            debugLine = "[DynamicalProgramming]getAdditionalIntermediate:"
+            debugLine += "step:" + str(state["step"])
+            debugLine += "\t\terror:" + str(curError) 
+            print(debugLine)
+        # もしtempdiff より小さくなったなら更新する
+        if curError < tempdiff:
+            tempdiff = curError
+            output = state
+        # もし tempdiff + RANGE 以上になったなら，
+        # もうその先で更新の見込みはないとして終了する
+        elif curError >= tempdiff + 1500:
+            break
+    return output
+
+# 状態列全体と，注目している状態列の前後組から，マッチングを推定し，
+# マッチングと，無視する状態と，保留の状態を返す
+# 動的計画法の1ステップ分
+def DP_sub(stateList, stateDict):
+    output = {}
+    matching = {"before":[], "after":[]}
+    ignored  = {"before":[], "after":[]}
+    pending  = {"before":[], "after":[]}
+    # 閾値以下になるまでworstState を抽出
+    matching = copy.deepcopy(stateDict)
+    while True:
+        result = getWorstData(matching)
+        if result["score"] < THRESHOLD:
+            break
+        elif len(matching) < 3:
+            print("失敗よ！ばか！")
+            exit()
+        pending["before"].append(matching["before"].pop(result["worstIndex"]))
+        pending["after"].append(matching["after"].pop(result["worstIndex"]))
+    # 除去した状態のbefore でgetAdditional
+    vp = manager.getViewPoint(matching)
+    additionals = []
+    for bState in pending["before"]:
+        # TODO TODO TODO TODO TODO TODO TODO 
+        print("ここ，こうしたいけど，stateDict んｐ各データはもともとのファイル名(stateList のキー名)を保持していないため，無理")
+        print("うまい方法を考えて!!!!!")
+        # additional.append(getAdditionalIntermediate(stateList, bState["step"], vp))
+        # TODO TODO TODO TODO TODO TODO TODO 
+    # additional のステップが after のステップよりも手前なら保留データ
+    # additional のステップが after のステップよりも奥なら無視データ
+    for i in range(len(additionals)):
+        if additionals[i]["step"] > pending["after"][i]["step"]:
+            ignored["before"].append(pending["before"][i])
+            ignored["after"].append(pending["after"][i])
+            pending["after"][i] = None
+    temppend = {"before":[], "after":[]}
+    for i in range(len(pending["before"])):
+        if pending["after"][i] is not None:
+            temppend["before"].append(pending["before"][i])
+            temppend["after"].append(pending["after"][i])
+    pending = temppend
+    # 返す
+    output["matching"] = matching
+    output["ignored"]  = ignored
+    output["pending"]  = pending
     return output
 
 if __name__ == "__main__":
@@ -115,23 +182,43 @@ if __name__ == "__main__":
     # idx = 1 になってくれると成功 → なった
     print(worstData)
     """
-    # getMatching のテスト
+    """
+    # getMatchingfromAllPairs のテスト
     # 0,100 ペアと 200, 300 ペアを取り出す
     stateDict = {}
     stateDict["before"] = []
     stateDict["after"]  = []
     flag = False
-    count = 0
-    for d in datas:
-        count += 1
-        if count > 50:
+    for count, d in enumerate(datas):
+        if count >= 50:
             break
         stateDict["before"].append(datas[d][0])
         stateDict["after"].append(datas[d][100])
-        stateDict["before"].append(datas[d][200])
-        stateDict["after"].append(datas[d][300])
+        if True or count%3==0:
+            stateDict["before"].append(datas[d][200])
+            stateDict["after"].append(datas[d][300])
     # マッチングを予測
-    matching = getMatching(stateDict)
+    matching = getMatchingfromAllPairs(stateDict)
     # 分けられていれば成功
     print(matching)
- 
+    with open("tmp/log_MakerMain/dills/predictMatching_results.dill", "wb")  as f:
+        dill.dump(matching, f)
+    """
+    stateDict = {}
+    stateDict["before"] = []
+    stateDict["after"]  = []
+    for count, d in enumerate(sorted(list(datas.keys()))):
+        stateDict["before"].append(datas[d][0])
+        stateDict["after"].append(datas[d][100])
+        if count >= 49:
+            testname = d
+    # テストデータを一件だけ取る
+    test = {}
+    test["before"] = stateDict["before"].pop()
+    test["after"]  = stateDict["after"].pop()
+    # 学習する
+    vp = manager.getViewPoint(stateDict)
+    # 元データの50 番に対して AdditionalIntermediate を適用する
+    testStateList = datas[testname]
+    additional = getAdditionalIntermediate(testStateList,0,vp)
+    print(additional["step"])
