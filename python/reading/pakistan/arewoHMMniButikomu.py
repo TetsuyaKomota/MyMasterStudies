@@ -115,4 +115,4 @@ for st in range(10, 21):
 print("bestSTATE:" + str(bestState))
 print("bestSIZE :" + str(bestSize))
 print("bestOK   :" + str(bestOK))
-
+res.close()
