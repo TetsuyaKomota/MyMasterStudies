@@ -6,7 +6,7 @@ import numpy as np
 import glob
 import dill 
 
-THRESHOLD = 500
+THRESHOLD = 1950
 
 # 途中状態列を引数に，可能な前後組をすべて取得する
 def getAllPair(datas):
@@ -60,6 +60,7 @@ def getWorstData(stateDict):
             output["worstScore"] = error
     # score は平均化
     output["score"] /= len(stateDict["before"])
+    print("[predictMatching]getWorstData:score:" + str(output["score"]))
     return output
 
 # 状態の前後の組を引数に．マッチングを推定する
@@ -242,7 +243,7 @@ if __name__ == "__main__":
     
     for count, d in enumerate(sorted(list(datas.keys()))):
         stateDict["before"].append(datas[d][0])
-        stateDict["after"].append(datas[d][100])
+        stateDict["after"].append(datas[d][200])
         stateDict["fname"].append(d)
         if count >= 149:
             break
@@ -252,7 +253,7 @@ if __name__ == "__main__":
             stateDict["fname"].append(d)
         if count >= 144:
             stateDict["before"].append(datas[d][0])
-            stateDict["after"].append(datas[d][20])
+            stateDict["after"].append(datas[d][100])
             stateDict["fname"].append(d)
     # マッチング，無視，保留の取得のテスト取得のテスト
     result = DP_sub(datas, stateDict)
