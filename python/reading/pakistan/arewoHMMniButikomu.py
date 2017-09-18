@@ -111,7 +111,7 @@ for st in range(10, 21):
                 bestSize = si
                 bestOK = ok
         res.close()
-        res = open("tmp/result.csv", "w", encoding="utf-8")
+        res = open("tmp/result.csv", "a", encoding="utf-8")
 print("bestSTATE:" + str(bestState))
 print("bestSIZE :" + str(bestSize))
 print("bestOK   :" + str(bestOK))
