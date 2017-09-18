@@ -6,13 +6,14 @@ import numpy as np
 import glob
 import dill 
 
-THRESHOLD = 2000
+THRESHOLD = 500
 
 # 途中状態列を引数に，可能な前後組をすべて取得する
 def getAllPair(datas):
     output = {}
     output["before"] = []
     output["after"]  = []
+    output["fname"]  = []
     for d in datas:
         for bIdx in range(0, len(datas[d])):
             for aIdx in range(bIdx+1, bIdx+4):
@@ -21,6 +22,7 @@ def getAllPair(datas):
                 range(bIdx+1, len(datas[d]))
                 output["before"].append(datas[d][bIdx])
                 output["after"].append(datas[d][aIdx])
+                output["fname"].append(d)
     return output
 # 状態のペアのリストを引数に，一つ抜き法で学習し，
 # 評価値と最も悪いデータを返す
@@ -43,6 +45,7 @@ def getWorstData(stateDict):
         tempTest = {}
         tempTest["before"] = tempDict["before"].pop(i)
         tempTest["after"]  = tempDict["after"].pop(i)
+        tempTest["fname"]  = tempDict["fname"].pop(i)
         # 学習データで学習を行う
         vp        = manager.getViewPoint(tempDict)
         # 学習した観点でテストデータの推定を行う
@@ -71,7 +74,7 @@ def getMatchingfromAllPairs(stateDict):
         if len(rest["before"]) == 0:
             break
         current = copy.deepcopy(rest)
-        rest = {"before":[], "after":[]}
+        rest = {"before":[], "after":[], "fname":[]}
         while True:
             result = getWorstData(current)
             print("result:"+str(result))
@@ -80,6 +83,7 @@ def getMatchingfromAllPairs(stateDict):
                 break
             rest["before"].append(current["before"].pop(result["worstIndex"]))
             rest["after"].append(current["after"].pop(result["worstIndex"]))
+            rest["fname"].append(current["fname"].pop(result["worstIndex"]))
         output.append(current)
     f.close()
     return output
@@ -116,11 +120,12 @@ def getAdditionalIntermediate(stateList, step, viewPoint, detail=False):
 # 状態列全体と，注目している状態列の前後組から，マッチングを推定し，
 # マッチングと，無視する状態と，保留の状態を返す
 # 動的計画法の1ステップ分
-def DP_sub(stateList, stateDict):
+def DP_sub(datas, stateDict):
     output = {}
-    matching = {"before":[], "after":[]}
-    ignored  = {"before":[], "after":[]}
-    pending  = {"before":[], "after":[]}
+    matching = {"before":[], "after":[], "fname":[]}
+    ignored  = {"before":[], "after":[], "fname":[]}
+    pending  = {"before":[], "after":[], "fname":[]}
+
     # 閾値以下になるまでworstState を抽出
     matching = copy.deepcopy(stateDict)
     while True:
@@ -131,29 +136,31 @@ def DP_sub(stateList, stateDict):
             print("失敗よ！ばか！")
             exit()
         pending["before"].append(matching["before"].pop(result["worstIndex"]))
-        pending["after"].append(matching["after"].pop(result["worstIndex"]))
+        pending["after" ].append(matching["after"].pop(result["worstIndex"]))
+        pending["fname" ].append(matching["fname"].pop(result["worstIndex"]))
+
     # 除去した状態のbefore でgetAdditional
     vp = manager.getViewPoint(matching)
     additionals = []
-    for bState in pending["before"]:
-        # TODO TODO TODO TODO TODO TODO TODO 
-        print("ここ，こうしたいけど，stateDict んｐ各データはもともとのファイル名(stateList のキー名)を保持していないため，無理")
-        print("うまい方法を考えて!!!!!")
-        # additional.append(getAdditionalIntermediate(stateList, bState["step"], vp))
-        # TODO TODO TODO TODO TODO TODO TODO 
+    for i in range(len(pending["before"])):
+        additionals.append(getAdditionalIntermediate(datas[pending["fname"][i]], pending["before"][i]["step"], vp))
+
     # additional のステップが after のステップよりも手前なら保留データ
     # additional のステップが after のステップよりも奥なら無視データ
     for i in range(len(additionals)):
         if additionals[i]["step"] > pending["after"][i]["step"]:
             ignored["before"].append(pending["before"][i])
-            ignored["after"].append(pending["after"][i])
+            ignored["after" ].append(pending["after"][i])
+            ignored["fname" ].append(pending["fname"][i])
             pending["after"][i] = None
-    temppend = {"before":[], "after":[]}
+    temppend = {"before":[], "after":[], "fname":[]}
     for i in range(len(pending["before"])):
         if pending["after"][i] is not None:
             temppend["before"].append(pending["before"][i])
-            temppend["after"].append(pending["after"][i])
+            temppend["after" ].append(pending["after"][i])
+            temppend["fname" ].append(pending["fname"][i])
     pending = temppend
+
     # 返す
     output["matching"] = matching
     output["ignored"]  = ignored
@@ -204,21 +211,50 @@ if __name__ == "__main__":
     with open("tmp/log_MakerMain/dills/predictMatching_results.dill", "wb")  as f:
         dill.dump(matching, f)
     """
+    """
     stateDict = {}
     stateDict["before"] = []
     stateDict["after"]  = []
+    stateDict["fname"]  = []
+    
     for count, d in enumerate(sorted(list(datas.keys()))):
         stateDict["before"].append(datas[d][0])
         stateDict["after"].append(datas[d][100])
+        stateDict["fname"].append(d)
         if count >= 49:
             testname = d
     # テストデータを一件だけ取る
     test = {}
     test["before"] = stateDict["before"].pop()
     test["after"]  = stateDict["after"].pop()
+    test["fname"]  = stateDict["fname"].pop()
     # 学習する
     vp = manager.getViewPoint(stateDict)
     # 元データの50 番に対して AdditionalIntermediate を適用する
     testStateList = datas[testname]
     additional = getAdditionalIntermediate(testStateList,0,vp)
     print(additional["step"])
+    """
+    stateDict = {}
+    stateDict["before"] = []
+    stateDict["after"]  = []
+    stateDict["fname"]  = []
+    
+    for count, d in enumerate(sorted(list(datas.keys()))):
+        stateDict["before"].append(datas[d][0])
+        stateDict["after"].append(datas[d][100])
+        stateDict["fname"].append(d)
+        if count >= 149:
+            break
+        if count >= 139:
+            stateDict["before"].append(datas[d][0])
+            stateDict["after"].append(datas[d][300])
+            stateDict["fname"].append(d)
+        if count >= 144:
+            stateDict["before"].append(datas[d][0])
+            stateDict["after"].append(datas[d][20])
+            stateDict["fname"].append(d)
+    # マッチング，無視，保留の取得のテスト取得のテスト
+    result = DP_sub(datas, stateDict)
+    with open("tmp/log_MakerMain/dills/DP_sub_results.dill", "wb") as f:
+        dill.dump(result, f)
