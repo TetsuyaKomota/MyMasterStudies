@@ -6,7 +6,8 @@ import numpy as np
 import glob
 import dill 
 
-THRESHOLD = 1950
+# THRESHOLD = 1950
+THRESHOLD = 1.7
 
 # 途中状態列を引数に，可能な前後組をすべて取得する
 def getAllPair(datas):
@@ -31,15 +32,17 @@ def getAllPair(datas):
 #       score      : float : 評価値
 #       worstIndex : int   : 最も悪いデータのidx
 #       worstScore : float : 最も悪いデータの評価値
-def getWorstData(stateDict):
-    print("[predictMatching]getWorstData:start")
+def getWorstData(stateDict, detail=False):
+    if detail == True:
+        print("[predictMatching]getWorstData:start")
     output = {}
     output["score"]      = 0
     output["worstIndex"] = -1
     output["worstScore"] = 0
     for i in range(len(stateDict["before"])):
         log = "step " + str(i) + "/" + str(len(stateDict["before"]))
-        print("[predictMatching]getWorstData:" + log)
+        if detail == True:
+            print("[predictMatching]getWorstData:" + log)
         # 学習データをコピーし，テストデータ分をポップ
         tempDict = copy.deepcopy(stateDict)
         tempTest = {}
@@ -55,12 +58,14 @@ def getWorstData(stateDict):
         # ずれが最大を更新したら記録する
         output["score"] += error
         if error > output["worstScore"]:
-            print("[predictMatching]getWorstData:   updateWorst")
+            if detail == True:
+                print("[predictMatching]getWorstData:   updateWorst")
             output["worstIndex"] = i
             output["worstScore"] = error
     # score は平均化
     output["score"] /= len(stateDict["before"])
-    print("[predictMatching]getWorstData:score:" + str(output["score"]))
+    if detail == True:
+        print("[predictMatching]getWorstData:score:" + str(output["score"]))
     return output
 
 # 状態の前後の組を引数に．マッチングを推定する
@@ -80,7 +85,10 @@ def getMatchingfromAllPairs(stateDict):
             result = getWorstData(current)
             print("result:"+str(result))
             f.write(str(result)+"\n")
-            if result["score"] < THRESHOLD or len(current["before"]) < 3:
+            # if result["score"] < THRESHOLD or len(current["before"]) < 3:
+            rate = result["worstScore"]/result["score"]
+            print("rate:"+str(rate))
+            if rate < THRESHOLD or len(current["before"]) < 3:
                 break
             rest["before"].append(current["before"].pop(result["worstIndex"]))
             rest["after"].append(current["after"].pop(result["worstIndex"]))
@@ -131,7 +139,11 @@ def DP_sub(datas, stateDict):
     matching = copy.deepcopy(stateDict)
     while True:
         result = getWorstData(matching)
-        if result["score"] < THRESHOLD:
+        
+        # if result["score"] < THRESHOLD:
+        rate = result["worstScore"]/result["score"]
+        print("[predictMatching]DP_sub:rate:"+str(rate))
+        if rate < THRESHOLD:
             break
         elif len(matching) < 3:
             print("失敗よ！ばか！")
@@ -140,11 +152,14 @@ def DP_sub(datas, stateDict):
         pending["after" ].append(matching["after"].pop(result["worstIndex"]))
         pending["fname" ].append(matching["fname"].pop(result["worstIndex"]))
 
+        print("[predictMatching]DP_sub:pended:"+str(pending["after"][-1]["timelen"]))
+
     # 除去した状態のbefore でgetAdditional
     vp = manager.getViewPoint(matching)
     additionals = []
     for i in range(len(pending["before"])):
         additionals.append(getAdditionalIntermediate(datas[pending["fname"][i]], pending["before"][i]["step"], vp))
+        print("[predictMatching]DP_sub:additionals-(b, a):("+str(pending["before"][i]["step"])+", "+str(additionals[-1]["step"]))
 
     # additional のステップが after のステップよりも手前なら保留データ
     # additional のステップが after のステップよりも奥なら無視データ
@@ -169,7 +184,7 @@ def DP_sub(datas, stateDict):
     return output
 
 if __name__ == "__main__":
-    filepaths = glob.glob("tmp/log_MakerMain/*")
+    filepaths = glob.glob("tmp/forTest_predictMatching/*")
     # データ取得
     datas = manager.getStateswithViewPoint(filepaths, [], [])
     """
