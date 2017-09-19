@@ -122,7 +122,8 @@ def getAdditionalIntermediate(stateList, step, viewPoint, detail=False):
             output = state
         # もし tempdiff + RANGE 以上になったなら，
         # もうその先で更新の見込みはないとして終了する
-        elif curError >= tempdiff + 1500:
+        # elif curError >= tempdiff + 1500:
+        elif curError >= 5*tempdiff:
             break
     return output
 
@@ -159,7 +160,7 @@ def DP_sub(datas, stateDict):
     additionals = []
     for i in range(len(pending["before"])):
         additionals.append(getAdditionalIntermediate(datas[pending["fname"][i]], pending["before"][i]["step"], vp))
-        print("[predictMatching]DP_sub:additionals-(b, a):("+str(pending["before"][i]["step"])+", "+str(additionals[-1]["step"]))
+        print("[predictMatching]DP_sub:additionals-(before, after, additional):("+str(pending["before"][i]["step"])+", "+str(pending["after"][i]["step"])+", "+str(additionals[-1]["step"])+")")
 
     # additional のステップが after のステップよりも手前なら保留データ
     # additional のステップが after のステップよりも奥なら無視データ
