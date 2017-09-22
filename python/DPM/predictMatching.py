@@ -40,8 +40,8 @@ def getWorstData(stateDict, detail=False):
     output["worstIndex"] = -1
     output["worstScore"] = 0
     for i in range(len(stateDict["before"])):
-        log = "step " + str(i) + "/" + str(len(stateDict["before"]))
         if detail == True:
+            log = "step " + str(i) + "/" + str(len(stateDict["before"]))
             print("[predictMatching]getWorstData:" + log)
         # 学習データをコピーし，テストデータ分をポップ
         tempDict = copy.deepcopy(stateDict)
@@ -123,7 +123,7 @@ def getAdditionalIntermediate(stateList, step, viewPoint, detail=False):
         # もし tempdiff + RANGE 以上になったなら，
         # もうその先で更新の見込みはないとして終了する
         # elif curError >= tempdiff + 1500:
-        elif curError >= 50*tempdiff:
+        elif curError >= 5*tempdiff:
             print("TOKEN")
             break
     return output
@@ -161,20 +161,33 @@ def DP_sub(datas, stateDict):
     additionals = []
     for i in range(len(pending["before"])):
         additionals.append(getAdditionalIntermediate(datas[pending["fname"][i]], pending["before"][i]["step"], vp))
-        print("[predictMatching]DP_sub:additionals-(before, after, additional):("+str(pending["before"][i]["step"])+", "+str(pending["after"][i]["step"])+", "+str(additionals[-1]["step"])+")")
+        temptext = "[predictMatching]DP_sub:additionals-(before, after, additional):("
+        temptext += str(pending["before"][i]["step"])+", "
+        temptext += str(pending["after"][i]["step"])+", "
+        temptext += str(additionals[-1]["step"])+")"
+        print(temptext)
 
     # additional のステップが after のステップよりも手前なら保留データ
-    # additional のステップが after のステップよりも奥なら無視データ
     for i in range(len(additionals)):
+        # 無視だろうが保留だろうが，additionals したデータは適切なので
+        # additionals を用いて matching に復帰
+        matching["before"].append(pending["before"][i])
+        matching["after" ].append(additionals[i])
+        matching["fname" ].append(pending["fname"][i])
+        # additional のステップが after のステップよりも奥なら無視データ
         if additionals[i]["step"] > pending["after"][i]["step"]:
             ignored["before"].append(pending["before"][i])
             ignored["after" ].append(pending["after"][i])
             ignored["fname" ].append(pending["fname"][i])
+            # pending[after] を消しておいて，あとで
+            # 「消されてないのは保留データ」というように処理する
             pending["after"][i] = None
     temppend = {"before":[], "after":[], "fname":[]}
     for i in range(len(pending["before"])):
         if pending["after"][i] is not None:
-            temppend["before"].append(pending["before"][i])
+            # temppend["before"].append(pending["before"][i])
+            # pending の前状態は additionals で更新
+            temppend["before"].append(additionals[i])
             temppend["after" ].append(pending["after"][i])
             temppend["fname" ].append(pending["fname"][i])
     pending = temppend
@@ -185,8 +198,65 @@ def DP_sub(datas, stateDict):
     output["pending"]  = pending
     return output
 
+# ディレクトリ名を指定して，ファイル名をキー，境界のidx リストを値とする辞書を作る
+def getInterDict(dirname):
+    output = {}
+    fpaths = glob.glob("tmp/log_MakerMain/GettingIntermediated/"+dirname+"/*")
+    for fpath in fpaths:
+        if os.path.isdir(fpath) == True:
+            continue
+        fname = os.path.basename(fpath)
+        output[fname] = []
+        with open(fpath, "r", encoding="utf-8") as f:
+            while True:
+                line = f.readline()
+                if line == "":
+                    break
+                output[fname].append(int(line.split(",")[0]))
+    return output
+
+# 全データと境界列から，マッチング群を推定して返す
+# interDict : dict : ファイル名をキーに，境界状態のステップ数のリストを持つ辞書
+def DP_main(datas, interDict):
+    output = []
+    rests = copy.deepcopy(interDict)
+    # 最初の stateDict を作る
+    stateDict = {"before":[], "after":[], "fname":[]}
+    for fname in rests:
+        fdata = datas[fname]
+        stateDict["before"].append(fdata[rests[fname].pop(0)])
+        stateDict["after" ].append(fdata[rests[fname].pop(0)])
+        stateDict["fname" ].append(fname)
+    while True:
+        # rests が空なら終了
+        flg = True
+        for fname in rests:
+            if len(rests[fname]) != 0:
+                flg = False
+                break
+        if flg == True:
+            break
+        # stateDict から DP_sub でマッチング，保留，無視を取得
+        results = DP_sub(datas, stateDict)
+        # マッチングを output に append
+        output.append(results["matching"])
+        # 無視の after をrests から消す
+        # → pop してるから，何もしなければ無視することになる
+        # 保留の after を rests に返す
+        for i in range(len(results["pending"])):
+            fname = results["pending"]["fname"][i]
+            rests[fname] = [results["pending"]["after"][i]] + rests[fname]
+        # 次の stateDict を作る
+        stateDict["before"] = results["matching"]["after"]
+        stateDict["after" ] = []
+        stateDict["fname "] = results["matching"]["fname"]
+        for fname in stateDict["fname"]:
+            stateDict["after"].append(rests[fname].pop(0))
+    return output
+
 if __name__ == "__main__":
-    filepaths = glob.glob("tmp/forTest_predictMatching/*")
+    # filepaths = glob.glob("tmp/forTest_predictMatching/*")
+    filepaths = glob.glob("tmp/log_MakerMain/*")
     # データ取得
     datas = manager.getStateswithViewPoint(filepaths, [], [])
     """
@@ -253,6 +323,7 @@ if __name__ == "__main__":
     additional = getAdditionalIntermediate(testStateList,0,vp)
     print(additional["step"])
     """
+    """
     stateDict = {}
     stateDict["before"] = []
     stateDict["after"]  = []
@@ -272,7 +343,10 @@ if __name__ == "__main__":
             stateDict["before"].append(datas[d][0])
             stateDict["after"].append(datas[d][100])
             stateDict["fname"].append(d)
-    # マッチング，無視，保留の取得のテスト取得のテスト
+    # マッチング，無視，保留の取得のテスト
     result = DP_sub(datas, stateDict)
     with open("tmp/log_MakerMain/dills/DP_sub_results.dill", "wb") as f:
         dill.dump(result, f)
+    """
+    with open("tmp/log_MakerMain/dills/DP_main_results.dill", "wb") as f:
+        dill.dump(DP_main(datas, getInterDict("3-2500-2500-11-5-1")))
