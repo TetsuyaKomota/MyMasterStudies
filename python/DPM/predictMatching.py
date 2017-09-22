@@ -123,7 +123,8 @@ def getAdditionalIntermediate(stateList, step, viewPoint, detail=False):
         # もし tempdiff + RANGE 以上になったなら，
         # もうその先で更新の見込みはないとして終了する
         # elif curError >= tempdiff + 1500:
-        elif curError >= 5*tempdiff:
+        elif curError >= 50*tempdiff:
+            print("TOKEN")
             break
     return output
 
@@ -261,13 +262,13 @@ if __name__ == "__main__":
         stateDict["before"].append(datas[d][0])
         stateDict["after"].append(datas[d][200])
         stateDict["fname"].append(d)
-        if count >= 149:
+        if count >= 249:
             break
-        if count >= 139:
+        if count >= 239:
             stateDict["before"].append(datas[d][0])
             stateDict["after"].append(datas[d][300])
             stateDict["fname"].append(d)
-        if count >= 144:
+        if count >= 244:
             stateDict["before"].append(datas[d][0])
             stateDict["after"].append(datas[d][100])
             stateDict["fname"].append(d)
