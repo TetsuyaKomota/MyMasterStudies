@@ -246,21 +246,33 @@ def DP_main(datas, interDict):
         if flg == True:
             break
         # stateDict から DP_sub でマッチング，保留，無視を取得
+        """
+        print("CHECK - rests")
+        for r in rests:
+            print(r)
+            print(rests[r])
+        print("CHECK - stateDict")
+        for s in stateDict:
+            print(s)
+            print(stateDict[s])
+        """
         results = DP_sub(datas, stateDict)
         # マッチングを output に append
         output.append(results["matching"])
         # 無視の after をrests から消す
         # → pop してるから，何もしなければ無視することになる
         # 保留の after を rests に返す
-        for i in range(len(results["pending"])):
+        for i in range(len(results["pending"]["before"])):
             fname = results["pending"]["fname"][i]
-            rests[fname] = [results["pending"]["after"][i]] + rests[fname]
+            rests[fname] = [results["pending"]["after"][i]["step"]] + rests[fname]
         # 次の stateDict を作る
         stateDict["before"] = results["matching"]["after"]
         stateDict["after" ] = []
         stateDict["fname "] = results["matching"]["fname"]
         for fname in stateDict["fname"]:
-            stateDict["after"].append(rests[fname].pop(0))
+            fdata = datas[fname]
+            # print(rests[fname][0])
+            stateDict["after"].append(fdata[rests[fname].pop(0)])
     return output
 
 if __name__ == "__main__":
