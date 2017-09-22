@@ -5,6 +5,8 @@ import copy
 import numpy as np
 import glob
 import dill 
+import os
+import re
 
 # THRESHOLD = 1950
 THRESHOLD = 1.7
@@ -206,6 +208,7 @@ def getInterDict(dirname):
         if os.path.isdir(fpath) == True:
             continue
         fname = os.path.basename(fpath)
+        fname = re.sub("inter", "log", fname)
         output[fname] = []
         with open(fpath, "r", encoding="utf-8") as f:
             while True:
@@ -220,6 +223,12 @@ def getInterDict(dirname):
 def DP_main(datas, interDict):
     output = []
     rests = copy.deepcopy(interDict)
+    # 境界が 0 番, 500番以外にないデータはここで除外する
+    temprests = {}
+    for r in rests:
+        if len(rests[r]) > 2:
+            temprests[r] = rests[r]
+    rests = temprests
     # 最初の stateDict を作る
     stateDict = {"before":[], "after":[], "fname":[]}
     for fname in rests:
