@@ -215,7 +215,9 @@ def getInterDict(dirname):
                 line = f.readline()
                 if line == "":
                     break
-                output[fname].append(int(line.split(",")[0]))
+                # csv ファイルの境界のインデックスは 1~500 になっているので，
+                # 0~499 にするために 1引く
+                output[fname].append(int(line.split(",")[0])-1)
     return output
 
 # 全データと境界列から，マッチング群を推定して返す
@@ -259,19 +261,30 @@ def DP_main(datas, interDict):
         results = DP_sub(datas, stateDict)
         # マッチングを output に append
         output.append(results["matching"])
+        with open("tmp/log_MakerMain/dills/DP_main_temp.dill", "wb") as f:
+            dill.dump(output, f)
         # 無視の after をrests から消す
         # → pop してるから，何もしなければ無視することになる
         # 保留の after を rests に返す
         for i in range(len(results["pending"]["before"])):
             fname = results["pending"]["fname"][i]
-            rests[fname] = [results["pending"]["after"][i]["step"]] + rests[fname]
+            # step は 1 ずれてるので 1 引く
+            rests[fname] = [results["pending"]["after"][i]["step"]-1] + rests[fname]
         # 次の stateDict を作る
         stateDict["before"] = results["matching"]["after"]
         stateDict["after" ] = []
         stateDict["fname "] = results["matching"]["fname"]
         for fname in stateDict["fname"]:
+            # すでに境界状態を使い果たした（本来そうならないでほしいが）fnameを表示して無視
+            if len(rests[fname]) == 0:
+                print("[predictMatching]DP_main:Empty - "+fname)
+                for i in range(len(stateDict["fname"])):
+                    if stateDict["fname"][i] == fname:
+                        stateDict["before"].pop(i)
+                        stateDict["fname"].pop(i)
+                        break
+                continue
             fdata = datas[fname]
-            # print(rests[fname][0])
             stateDict["after"].append(fdata[rests[fname].pop(0)])
     return output
 

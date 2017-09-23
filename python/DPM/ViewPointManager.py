@@ -118,7 +118,7 @@ def getViewPoint(stateDict, detail=False):
         print("[ViewPointManager]getViewPoint:different size")
         return []
     output = []
-    tempmin = 10000000000000
+    tempmin = 123456789
 
     # 移動物体を取得する
     # 移動物体は stateDict が一定な限り一定なはず
@@ -142,7 +142,7 @@ def getViewPoint(stateDict, detail=False):
                     if len(set(b) & set(r)) != 0:
                         continue
                     score = getDistribution(stateDict, b, r, moved)
-                    if score[1] < tempmin:
+                    if tempmin == 123456789 or score[1] < tempmin:
                         better = {}
                         better["base"]  = b
                         better["ref"]   = r
