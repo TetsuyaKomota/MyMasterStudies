@@ -17,6 +17,7 @@ def getAllPair(datas):
     output["before"] = []
     output["after"]  = []
     output["fname"]  = []
+    output["isadd"]  = []
     for d in datas:
         for bIdx in range(0, len(datas[d])):
             for aIdx in range(bIdx+1, bIdx+4):
@@ -26,6 +27,7 @@ def getAllPair(datas):
                 output["before"].append(datas[d][bIdx])
                 output["after"].append(datas[d][aIdx])
                 output["fname"].append(d)
+                output["isadd"].append(False)
     return output
 # 状態のペアのリストを引数に，一つ抜き法で学習し，
 # 評価値と最も悪いデータを返す
@@ -51,6 +53,7 @@ def getWorstData(stateDict, detail=False):
         tempTest["before"] = tempDict["before"].pop(i)
         tempTest["after"]  = tempDict["after"].pop(i)
         tempTest["fname"]  = tempDict["fname"].pop(i)
+        tempTest["isadd"]  = tempDict["isadd"].pop(i)
         # 学習データで学習を行う
         vp        = manager.getViewPoint(tempDict)
         # 学習した観点でテストデータの推定を行う
@@ -82,7 +85,7 @@ def getMatchingfromAllPairs(stateDict):
         if len(rest["before"]) == 0:
             break
         current = copy.deepcopy(rest)
-        rest = {"before":[], "after":[], "fname":[]}
+        rest = {"before":[], "after":[], "fname":[], "isadd":[]}
         while True:
             result = getWorstData(current)
             print("result:"+str(result))
@@ -95,6 +98,7 @@ def getMatchingfromAllPairs(stateDict):
             rest["before"].append(current["before"].pop(result["worstIndex"]))
             rest["after"].append(current["after"].pop(result["worstIndex"]))
             rest["fname"].append(current["fname"].pop(result["worstIndex"]))
+            rest["isadd"].append(current["isadd"].pop(result["worstIndex"]))
         output.append(current)
     f.close()
     return output
@@ -135,9 +139,9 @@ def getAdditionalIntermediate(stateList, step, viewPoint, detail=False):
 # 動的計画法の1ステップ分
 def DP_sub(datas, stateDict):
     output = {}
-    matching = {"before":[], "after":[], "fname":[]}
-    ignored  = {"before":[], "after":[], "fname":[]}
-    pending  = {"before":[], "after":[], "fname":[]}
+    matching = {"before":[], "after":[], "fname":[], "isadd":[]}
+    ignored  = {"before":[], "after":[], "fname":[], "isadd":[]}
+    pending  = {"before":[], "after":[], "fname":[], "isadd":[]}
 
     # 閾値以下になるまでworstState を抽出
     matching = copy.deepcopy(stateDict)
@@ -155,8 +159,9 @@ def DP_sub(datas, stateDict):
         pending["before"].append(matching["before"].pop(result["worstIndex"]))
         pending["after" ].append(matching["after"].pop(result["worstIndex"]))
         pending["fname" ].append(matching["fname"].pop(result["worstIndex"]))
+        pending["isadd" ].append(matching["isadd"].pop(result["worstIndex"]))
 
-        print("[predictMatching]DP_sub:pended:"+str(pending["after"][-1]["timelen"]))
+        print("[predictMatching]DP_sub:pended:"+str(pending["after"][-1]["step"]))
 
     # 除去した状態のbefore でgetAdditional
     vp = manager.getViewPoint(matching)
@@ -176,15 +181,17 @@ def DP_sub(datas, stateDict):
         matching["before"].append(pending["before"][i])
         matching["after" ].append(additionals[i])
         matching["fname" ].append(pending["fname"][i])
+        matching["isadd" ].append(True)
         # additional のステップが after のステップよりも奥なら無視データ
         if additionals[i]["step"] > pending["after"][i]["step"]:
             ignored["before"].append(pending["before"][i])
             ignored["after" ].append(pending["after"][i])
             ignored["fname" ].append(pending["fname"][i])
+            ignored["isadd" ].append(pending["isadd"][i])
             # pending[after] を消しておいて，あとで
             # 「消されてないのは保留データ」というように処理する
             pending["after"][i] = None
-    temppend = {"before":[], "after":[], "fname":[]}
+    temppend = {"before":[], "after":[], "fname":[], "isadd":[]}
     for i in range(len(pending["before"])):
         if pending["after"][i] is not None:
             # temppend["before"].append(pending["before"][i])
@@ -192,6 +199,7 @@ def DP_sub(datas, stateDict):
             temppend["before"].append(additionals[i])
             temppend["after" ].append(pending["after"][i])
             temppend["fname" ].append(pending["fname"][i])
+            temppend["isadd" ].append(True)
     pending = temppend
 
     # 返す
@@ -232,12 +240,13 @@ def DP_main(datas, interDict):
             temprests[r] = rests[r]
     rests = temprests
     # 最初の stateDict を作る
-    stateDict = {"before":[], "after":[], "fname":[]}
+    stateDict = {"before":[], "after":[], "fname":[], "isadd":[]}
     for fname in rests:
         fdata = datas[fname]
         stateDict["before"].append(fdata[rests[fname].pop(0)])
         stateDict["after" ].append(fdata[rests[fname].pop(0)])
         stateDict["fname" ].append(fname)
+        stateDict["isadd" ].append(False)
     while True:
         # rests が空なら終了
         flg = True
@@ -274,6 +283,7 @@ def DP_main(datas, interDict):
         stateDict["before"] = results["matching"]["after"]
         stateDict["after" ] = []
         stateDict["fname "] = results["matching"]["fname"]
+        stateDict["isadd "] = results["matching"]["isadd"]
         for fname in stateDict["fname"]:
             # すでに境界状態を使い果たした（本来そうならないでほしいが）fnameを表示して無視
             if len(rests[fname]) == 0:
