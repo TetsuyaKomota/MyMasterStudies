@@ -39,6 +39,10 @@ def getAllPair(datas):
 def getWorstData(stateDict, detail=False):
     if detail == True:
         print("[predictMatching]getWorstData:start")
+    # TODO 暫定的に「ステップ数の遠いデータにはペナルティ」としよう
+    # 本質的ではないので他の方法を考える
+    bMean = int(sum([b["step"] for b in stateDict["before"]])/len(stateDict["before"]))
+    aMean = int(sum([a["step"] for a in stateDict["after" ]])/len(stateDict["before"]))
     output = {}
     output["score"]      = 0
     output["worstIndex"] = -1
@@ -60,6 +64,10 @@ def getWorstData(stateDict, detail=False):
         predicted = manager.predictwithViewPoint(tempTest["before"], vp)
         # 推定結果と実際の状態とのずれを計算する
         error = manager.calcDifference(predicted, tempTest["after"])
+        # TODO ステップ数のずれを考慮する
+        # TODO 他の方法を考える
+        error += (tempTest["before"]["step"]-bMean) * (tempTest["before"]["step"]-bMean)
+        error += (tempTest["after" ]["step"]-aMean) * (tempTest["after" ]["step"]-aMean)
         # ずれが最大を更新したら記録する
         output["score"] += error
         if error > output["worstScore"]:
