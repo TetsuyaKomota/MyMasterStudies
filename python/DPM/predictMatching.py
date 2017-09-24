@@ -66,8 +66,9 @@ def getWorstData(stateDict, detail=False):
         error = manager.calcDifference(predicted, tempTest["after"])
         # TODO ステップ数のずれを考慮する
         # TODO 他の方法を考える
-        error += (tempTest["before"]["step"]-bMean) * (tempTest["before"]["step"]-bMean)
-        error += (tempTest["after" ]["step"]-aMean) * (tempTest["after" ]["step"]-aMean)
+        tempsteprate = 2
+        error += tempsteprate*(tempTest["before"]["step"]-bMean) * (tempTest["before"]["step"]-bMean)
+        error += tempsteprate*(tempTest["after" ]["step"]-aMean) * (tempTest["after" ]["step"]-aMean)
         # ずれが最大を更新したら記録する
         output["score"] += error
         if error > output["worstScore"]:
