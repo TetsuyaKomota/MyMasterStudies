@@ -116,11 +116,12 @@ def getMatchingfromAllPairs(stateDict):
 # 追加で推定される途中状態に最も近い状態を返す
 def getAdditionalIntermediate(stateList, step, viewPoint, detail=False):
     # 指定したステップ番号のデータを取得する
+    print("[predictMatching]getAdditionalIntermediate:step:"+str(step))
     bState = stateList[step]
     # 取得したデータに対して次の状態を予測する
     aState = manager.predictwithViewPoint(bState, viewPoint)
     # 予測した状態に最も近い状態を stateList から推定する
-    output = None
+    output = stateList[step]
     tempdiff = 1000000000
     for state in stateList:
         if state["step"] <= bState["step"]:
@@ -317,7 +318,8 @@ def DP_main_2(datas, interDict):
         if len(rests[r]) > 2:
             temprests[r] = rests[r]
     rests = temprests
-    print(rests)
+    for r in rests:
+        print(rests[r])
     # 最初の stateDict を作る
     stateDict = {"before":[], "after":[], "fname":[], "isadd":[]}
     for fname in rests:
@@ -344,7 +346,8 @@ def DP_main_2(datas, interDict):
         predicts = {}
         moved = manager.getMovedObject(stateDict)
         for i in range(len(stateDict["before"])):
-            predicts[stateDict["fname"][i]] = getAdditionalIntermediate(datas[stateDict["fname"][i]], stateDict["before"][i]["step"], vp)
+            # step を使う場合は -1
+            predicts[stateDict["fname"][i]] = getAdditionalIntermediate(datas[stateDict["fname"][i]], stateDict["before"][i]["step"]-1, vp)
         # predicts と after の関係から，動作を決定する
         matching = {"before":[], "after":[], "fname":[], "isadd":[]}
         pending = {}
@@ -359,12 +362,14 @@ def DP_main_2(datas, interDict):
             # 新手法は matching すべてに対して predicts を適用していくという
             # ものなので，ignored に対して特別な処理はしない
             # pending であるもののみ，rests に返却するために保存する
-            # elif predicts[stateDict["fname"][i]]["step"] < stateDict["after"][i]["step"]:
-            if manager.calcDifference(predicts[stateDict["fname"][i]], stateDict["after"][i], objs=moved) >= vp[0]["score"] * 0.02:
+            print("aaa"+str(predicts[stateDict["fname"][i]]))
+            print("bbb"+str(stateDict["after"][i]))
+            if manager.calcDifference(predicts[stateDict["fname"][i]], stateDict["after"][i], objs=moved) >= vp[0]["score"] * 0.005 and predicts[stateDict["fname"][i]]["step"] < stateDict["after"][i]["step"]:
                     pending[stateDict["fname"][i]] = stateDict["after"][i]["step"]
         # rests に pending を返却
         for fname in pending:
-            rests[fname] = [pending[fname]] + rests[fname]
+            # インデックスのずれを修正するために -1
+            rests[fname] = [pending[fname]-1] + rests[fname]
 
         # output に matching と pending を追加
         output["matching"].append(matching)
@@ -382,20 +387,14 @@ def DP_main_2(datas, interDict):
         for fname in rests:
             fdata = datas[fname]
             stateDict["before"].append(predicts[fname])
-            stateDict["after" ].append(fdata[rests[fname].pop(0)])
+            if len(rests[fname]) > 0:
+                stateDict["after" ].append(fdata[rests[fname].pop(0)])
+            else:
+                print("EMPTY - " + fname)
+                stateDict["after" ].append(fdata[-1])
             stateDict["fname" ].append(fname)
             stateDict["isadd" ].append(False)
  
-        for fname in stateDict["fname"]:
-            # すでに境界状態を使い果たした（本来そうならないでほしいが）fnameを表示して無視
-            if len(rests[fname]) == 0:
-                print("[predictMatching]DP_main:Empty - "+fname)
-                for i in range(len(stateDict["fname"])):
-                    if stateDict["fname"][i] == fname:
-                        stateDict["before"].pop(i)
-                        stateDict["fname"].pop(i)
-                        break
-                continue
     return output
 
 if __name__ == "__main__":
@@ -493,5 +492,5 @@ if __name__ == "__main__":
         dill.dump(result, f)
     """
     with open("tmp/log_MakerMain/dills/DP_main_results.dill", "wb") as f:
-        # dill.dump(DP_main(datas, getInterDict("3-2500-2500-11-5-1")))
-        dill.dump(DP_main_2(datas, getInterDict("3-2500-2500-11-5-1")))
+        # dill.dump(DP_main(datas, getInterDict("3-2500-2500-11-5-1")), f)
+        dill.dump(DP_main_2(datas, getInterDict("3-2500-2500-11-5-1")), f)

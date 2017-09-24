@@ -42,12 +42,12 @@ for D in d:
     alist.append([a["step"] for a in D["after"]])
 
 plt.xlim(0,500)
-I = 3
+I = 5
 for i in range(I):
     temp = []
     L = int(len(alist)/I)
     for j in range(L):
         temp += alist[L*i+j]
-    plt.hist(temp, bins = 30)
+    plt.hist(temp, bins = max(temp)-min(temp))
 plt.show()
 plt.close()
