@@ -156,7 +156,7 @@ def getViewPoint(stateDict, detail=False):
 # 前後組を引数に，サンプリング->vp 学習を繰り返して
 # 観点を多数決で推定する
 
-def getViewPointwithSampling(stateDict, n_iter=50):
+def getViewPointwithSampling(stateDict, sampleSize=0.5, n_iter=50):
     # 組数を取得
     size = list(range(len(stateDict["before"])))
     # 観点数え上げ用の辞書
@@ -166,7 +166,7 @@ def getViewPointwithSampling(stateDict, n_iter=50):
         # とりあえず一つのデータは一回まで
         pick = {"before":[], "after":[], "fname":[], "isadd":[]}
         random.shuffle(size)
-        for i in size[:int(len(size)/2)]:
+        for i in size[:int(len(size)*sampleSize)]:
             pick["before"].append(stateDict["before"][i])
             pick["after" ].append(stateDict["after" ][i])
             pick["fname" ].append(stateDict["fname" ][i])

@@ -309,7 +309,7 @@ def DP_main(datas, interDict):
 
 # 全データと境界列から，マッチング群を推定して返す
 # interDict : dict : ファイル名をキーに，境界状態のステップ数のリストを持つ辞書
-def DP_main_2(datas, interDict):
+def DP_main_2(datas, interDict, sampleSize=0.5, n_iter=50, distError=0.005):
     output = {"matching":[], "pending":[]}
     rests = copy.deepcopy(interDict)
     # 境界が 0 番, 500番以外にないデータはここで除外する
@@ -339,7 +339,7 @@ def DP_main_2(datas, interDict):
             break
 
         # サンプリングを用いて vp を取得
-        vp = manager.getViewPointwithSampling(stateDict)
+        vp = manager.getViewPointwithSampling(stateDict, sampleSize, n_iter)
         print("get vp:" + str(vp[0]["base"]) + "," + str(vp[0]["ref"]))
 
         # これをもとに predicts を作成
@@ -364,7 +364,7 @@ def DP_main_2(datas, interDict):
             # pending であるもののみ，rests に返却するために保存する
             print("aaa"+str(predicts[stateDict["fname"][i]]))
             print("bbb"+str(stateDict["after"][i]))
-            if manager.calcDifference(predicts[stateDict["fname"][i]], stateDict["after"][i], objs=moved) >= vp[0]["score"] * 0.005 and predicts[stateDict["fname"][i]]["step"] < stateDict["after"][i]["step"]:
+            if manager.calcDifference(predicts[stateDict["fname"][i]], stateDict["after"][i], objs=moved) >= vp[0]["score"] * distError and predicts[stateDict["fname"][i]]["step"] < stateDict["after"][i]["step"]:
                     pending[stateDict["fname"][i]] = stateDict["after"][i]["step"]
         # rests に pending を返却
         for fname in pending:
