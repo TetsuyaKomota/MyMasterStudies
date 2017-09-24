@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import os
 from operator import itemgetter
 import copy
+import random
 
 # Encoder 使って色々するやつ
 
@@ -152,6 +153,51 @@ def getViewPoint(stateDict, detail=False):
                         tempmin = score[1]
     return output
 
+# 前後組を引数に，サンプリング->vp 学習を繰り返して
+# 観点を多数決で推定する
+
+def getViewPointwithSampling(stateDict, n_iter=50):
+    # 組数を取得
+    size = list(range(len(stateDict["before"])))
+    # 観点数え上げ用の辞書
+    vpdict = {}
+    for _ in range(n_iter):
+        # stateDict から半分のサンプリング
+        # とりあえず一つのデータは一回まで
+        pick = {"before":[], "after":[], "fname":[], "isadd":[]}
+        random.shuffle(size)
+        for i in size[:int(len(size)/2)]:
+            pick["before"].append(stateDict["before"][i])
+            pick["after" ].append(stateDict["after" ][i])
+            pick["fname" ].append(stateDict["fname" ][i])
+            pick["isadd" ].append(stateDict["isadd" ][i])
+        
+        # サンプリング結果で vp 学習
+        vp  = getViewPoint(pick)
+        key = (vp[0]["base"], vp[0]["ref"])
+
+        # サンプリング結果を vpdict に保存する
+        if key in vpdict.keys():
+            vpdict[key] += 1
+        else:
+            vpdict[key] =  1
+
+    # 多数決で最大の観点を取得
+    points = sorted(vpdict.items(), key=lambda x: x[1])[0][0]
+    
+    # この観点を用いた場合の分布を求める
+    moved = getMovedObject(stateDict)
+    distribution = getDistribution(stateDict, points[0], points[1], moved)
+    
+    # getViewPoint と同じ形の返り値にして返す
+    better = {}
+    better["base"]  = points[0]
+    better["ref"]   = points[1]
+    better["score"] = distribution[1]
+    better["mean"]  = distribution[0]
+    output = [better]
+    return output
+
 # getViewPoint の結果をもとに，次の状態を推定する
 # state     : 状態
 # viewPoint : getViewPoint の結果
@@ -185,9 +231,9 @@ def show(state, title="show"):
     return True
 
 # 状態二つを引数に，差を計算する
-def calcDifference(state1, state2):
+def calcDifference(state1, state2, objs=objList):
     error = 0
-    for o in objList:
+    for o in objs:
         error += np.linalg.norm(state1[o]-state2[o])
     return error 
 
