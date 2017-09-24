@@ -3,9 +3,11 @@
 import dill
 import matplotlib.pyplot as plt
 
-with open("tmp/log_MakerMain/dills/DP_main_temp.dill", "rb") as f:
+with open("tmp/log_MakerMain/dills/DP_main_2_temp.dill", "rb") as f:
     d = dill.load(f)
 
+d = d["matching"]
+print(d[0]["fname"])
 flist = d[0]["fname"][:25]
 
 line = ""
@@ -46,6 +48,6 @@ for i in range(I):
     L = int(len(alist)/I)
     for j in range(L):
         temp += alist[L*i+j]
-    plt.hist(temp, bins = 75)
+    plt.hist(temp, bins = 30)
 plt.show()
 plt.close()
