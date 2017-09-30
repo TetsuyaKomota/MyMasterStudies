@@ -3,6 +3,7 @@
 nohup.out
 
 .python-version
+.cache/
 
 __init__.py
 
