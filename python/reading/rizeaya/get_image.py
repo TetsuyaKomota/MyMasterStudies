@@ -43,6 +43,6 @@ def getImage(search_item, img_list):
             continue
 
 if __name__ == "__main__":
-    img_list = getImageUrl("がっこうぐらし！ 胡桃 アニメ", 100)
+    img_list = getImageUrl("けものフレンズ 博士", 100)
     print(img_list)
-    getImage("kurumi", img_list)
+    getImage("zerda", img_list)

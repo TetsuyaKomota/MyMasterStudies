@@ -78,6 +78,8 @@ def pick_face_resize(path):
     facerect = cascade.detectMultiScale(image_gray, scaleFactor=1.2, minNeighbors=2, minSize=(10, 10))
  
     # 取得するのは最初の顔(多分一番左上の顔)
+    if len(facerect) < 1:
+        return None
     rect = facerect[0]
 
     #顔だけ切り出して保存
@@ -92,7 +94,7 @@ def pick_face_resize(path):
     return resized
 
 if __name__ == "__main__":
-    charaIdx = ["aya", "azusa", "kurumi", "rize"]
+    charaIdx = ["arai", "kaban", "serval", "zerda"]
     # データを取得する
     fpaths = glob.glob("tmp/face/resized/*")
     # ヒストグラムに変換する
@@ -118,17 +120,21 @@ if __name__ == "__main__":
             print("")
             continue
         im   = pick_face_resize("tmp/demo/"+fname)
+        if im is None:
+            print("ごめん，顔が見つからなかったよ")
+            print("")
+            continue
         cv2.imshow("face", im)
-        cv2.waitKey(0)
         hist = [-1, getHistogram(im)]
         nns  = calc_kNN(hists, hist)
-        charaName = ["綾ちゃん", "あずにゃん", "胡桃ちゃん", "リゼちゃん"]
+        charaName = ["アライさん", "かばんちゃん", "サーバルちゃん", "フェネック"]
         if nns[3] <= 1.65:
             name = charaName[nns[0]]
             print("これは，" + name + "！！")
         else:
             print("これは，まだ知らない人！！")
-
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
         # print(nns[1])
         # print(nns[3])
         print("")

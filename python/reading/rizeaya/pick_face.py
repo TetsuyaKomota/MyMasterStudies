@@ -49,6 +49,7 @@ for ipath in imgPaths:
         #顔だけ切り出して保存
         x = rect[0]
         y = rect[1]
+        pad = 0.1
         width = rect[2]
         height = rect[3]
         dst = image[y:y+height, x:x+width]
