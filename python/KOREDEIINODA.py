@@ -81,10 +81,10 @@ for ne in range(5):
 
                         print("++++++++++ : Finished")
 """
-soinnN = 5000
-soinnE = 5000
 
 """
+soinnN = 5000
+soinnE = 5000
 # 2017/ 9/11
 # SOINN パラメータ，step, paramA の詳細値と，
 # 新たに paramTheta を加えたグリッドサーチ
@@ -128,6 +128,9 @@ for ne in range(3):
 
                 print("++++++++++ : Finished")
 """
+"""
+soinnN = 5000
+soinnE = 5000
 # SOINN のパラメータは 2500, 1250, 625 で試す
 # 結果は GettingIntermediated_20170911, SYUKEISURUNODA_20170911 参照
 for ne in range(3):
@@ -173,3 +176,50 @@ for ne in range(3):
                     inter.execute(dirName)
 
                     print("++++++++++ : Finished")
+"""
+# SOINN のパラメータは2000, 2500, 3000 で試す
+soinnN = 1500
+soinnE = 1500
+for ne in range(3):
+    soinnN += 500
+    soinnE += 500
+    step = 2
+    # step は3 で試す
+    for s in range(1):
+        step += 1
+        import HDP_HMM.EncodewithSOINN as soinn
+
+        print("++++------ : Encoding with SOINN")
+        soinn.execute(step = step, soinnN = soinnN, soinnE = soinnE)
+
+        import HPYLM.tasks.ParsingfromSOINN_results as hpylm
+        
+        paramA = 9
+        # paramA は11 で試す
+        for p in range(1):
+            paramA += 2
+            # paramTheta は 2 で試す
+            paramTheta = 1
+            for pT in range(1):
+                paramTheta += 1
+                # paramNumS, T は 1, 3, 5, 7 で試す
+                paramNum = -1
+                for pN in range(4):
+                    paramNum += 2
+                    # 繰り返しで結果が変わるかもなので，5回ずつ結果を出す
+                    for n_iter in range(5):
+                        print("++++++---- : Parsing with HPYLM")
+                        hpylm.execute(paramA = paramA, paramTheta = paramTheta, paramNum, paramNum)
+
+                        import HPYLM.tasks.GettingIntermmediates as inter
+
+                        print("++++++++-- : Getting intermmediates")
+                        dirName = str(step) + "-"
+                        dirName += str(int(soinnN)) + "-"
+                        dirName += str(int(soinnE)) + "-"
+                        dirName += str(paramA) + "-"
+                        dirName += str(paramTheta) + "-"
+                        dirName += str(n_iter)
+                        inter.execute(dirName)
+
+                        print("++++++++++ : Finished")

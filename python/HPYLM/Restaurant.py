@@ -24,7 +24,9 @@ class Restaurant:
     # customers : 客の配列, テーブル番号（その客が座っているテーブルのテーブル配列上のインデックス）を要素とする
     # paramA    : 基底測度の係数
     # paramTehta: 基底強度θ の|u| に関する比例定数.大きいほど文脈よりも基底の影響を大きく受ける
-    def __init__(self, parent, u, paramA = 5, paramTheta = 1.0):
+    # paramNumS : 各文に挿入する始端単語の数
+    # paramNumT : 各文に挿入する終端単語の数
+    def __init__(self, parent, u, paramA = 5, paramTheta = 1.0, paramNumS=0, paramNumT=1):
         self.parent = parent
         self.paramA = paramA
         self.paramTheta = paramTheta
@@ -32,6 +34,8 @@ class Restaurant:
         self.tables    = []
         self.customers = []
         self.childs    = {}
+        self.paramNumS = paramNumS
+        self.paramNumT = paramNumT
         # デバッグ用．自分の文脈を表示する
         # print("generated new Context :"+ str(self.getU()))
 
@@ -439,8 +443,8 @@ class Restaurant:
         if detail == True:
             print("[Restaurant]sampling:start " + str(newU) + "!!!")
         length = 0
-        # 最後の単語は終端単語なので無視する
-        for w in u[:-1]:
+        # 始端，終端単語を無視する
+        for w in u[self.paramNumS:-1*self.paramNumT]:
             length = length + len(w)
         length -= 1
         # 以下の idx の回し方だと，常に手前の分割から評価してしまう
@@ -486,7 +490,10 @@ class Restaurant:
         # 各文章の最終単語は sampling の際の境界変換時に参照しないので，
         # 最後まで独立に最終単語であり続ける
         for s in currentSentences:
-            currentSentences[s].append("~")
+            for ns in range(self.paramNumS):
+                currentSentences[s] = ["~"] + currentSentences[s]
+            for ns in range(self.paramNumT):
+                currentSentences[s].append("~")
         # 最初に，文章全てをモデルに代入する
         for s in currentSentences:
             self.addCustomerfromSentence(currentSentences[s])
@@ -508,7 +515,7 @@ class Restaurant:
                     print(s + ":" + str(currentSentences[s]))
         # 各文章から終端単語 '~' を除去する
         for s in currentSentences:
-            currentSentences[s] = currentSentences[s][:-1]
+            currentSentences[s] = currentSentences[s][self.paramNumS:-1*self.paramNumT]
         # 最終結果を表示する
         print("[Restaurant]executeParsing:results:")
         for s in currentSentences:
