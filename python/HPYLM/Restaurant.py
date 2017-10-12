@@ -474,7 +474,8 @@ class Restaurant:
     # 文章の組（配列）を引数に，繰り返し学習して形態素解析の結果を返す
         # sentences : list(list) : 文章(単語の配列)の配列
         # iteration : int        : 再帰回数
-    def executeParsing(self, sentences, iteration):
+        # reverse   : boolean    : 逆向き解析を行うか
+    def executeParsing(self, sentences, iteration, reverse=False):
         # 根店以外で呼び出された場合は無効
         if self.parent is not None:
             return None
@@ -486,7 +487,13 @@ class Restaurant:
             for i in range(len(currentSentences)):
                 dic[str(i)] = currentSentences[i]
             currentSentences = dic
-        # 各文章に終端単語 '~' をつける
+        # reverse = True なら，各単語を反転し，そのうえで単語の並び自体も反転する
+        if reverse == True:
+            for s in currentSentences:
+                for wi, w in enumerate(currentSentences[s]):
+                    currentSentences[s][wi] = w[::-1]
+                currentSentences[s].reverse()
+        # 各文章に始終端単語 '~' をつける
         # 各文章の最終単語は sampling の際の境界変換時に参照しないので，
         # 最後まで独立に最終単語であり続ける
         for s in currentSentences:
@@ -516,6 +523,12 @@ class Restaurant:
         # 各文章から終端単語 '~' を除去する
         for s in currentSentences:
             currentSentences[s] = currentSentences[s][self.paramNumS:-1*self.paramNumT]
+        # reverse = True なら，各単語を反転し，そのうえで単語の並び自体も反転する
+        if reverse == True:
+            for s in currentSentences:
+                for wi, w in enumerate(currentSentences[s]):
+                    currentSentences[s][wi] = w[::-1]
+                currentSentences[s].reverse()
         # 最終結果を表示する
         print("[Restaurant]executeParsing:results:")
         for s in currentSentences:
