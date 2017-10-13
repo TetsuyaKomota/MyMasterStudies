@@ -219,6 +219,7 @@ for ne in range(3):
                         dirName += str(int(soinnE)) + "-"
                         dirName += str(paramA) + "-"
                         dirName += str(paramTheta) + "-"
+                        dirName += str(paramNum) + "-"
                         dirName += str(n_iter)
                         inter.execute(dirName)
 
