@@ -5,6 +5,7 @@ import glob
 import os
 
 fpaths = glob.glob("tmp/face/*")
+resizeTo = 30
 
 xmax = 0
 ymax = 0
@@ -25,7 +26,7 @@ for fpath in fpaths:
     ymin = min(ymin, size[0])
     xmin = min(xmin, size[1])
 
-    resized = cv2.resize(img, (800, 800), interpolation = cv2.INTER_LINEAR)
+    resized = cv2.resize(img, (resizeTo, resizeTo), interpolation = cv2.INTER_LINEAR)
     cv2.imwrite("tmp/face/resized/"+os.path.basename(fpath), resized)
 
 
