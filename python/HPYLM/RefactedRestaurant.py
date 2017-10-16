@@ -1,6 +1,10 @@
 # coding = utf-8
 
 import random
+import numpy as np
+import dill
+import time
+from copy import deepcopy
 
 # restaurants は各要素 [[テーブル配列], [客配列]]
 # それを識別するための定数
@@ -53,10 +57,10 @@ class Franchise:
 
     def getCustomerListofWord(self, u, word):
         rest = self.getRestaurant(u)
-        customerLIst = []
-        tids = getTableListofWord(u, word)
+        customerList = []
+        tids = self.getTableListofWord(u, word)
         for tid in tids:
-            customerList += self.countCustomersofTable(u, tid)
+            customerList += self.getCustomerListofTable(u, tid)
         return customerList
 
     def addTableofWord(self, u, pid, word):
@@ -102,7 +106,7 @@ class Franchise:
         if u not in self.restaurants.keys():
             self.restaurants[u] = [[], []]
 
-    # ピットマンヨー過程から，指定した単語のテーブルID を取得
+    # PitmanYor過程から，指定した単語のテーブルID を取得
     # 単語指定の条件付確率を用いる
     # 新テーブルが選択される場合は NEW を返す
     def pickwithPitmanYor(self, u, word):
@@ -170,7 +174,115 @@ class Franchise:
                 continue
             tid = self.getTableListofWord(tuple(part[:-1]), part[-1])[0]
             self.eliminateCustomerofTable(tuple(part[:-1]), tid)
-       
+
+    # 指定した文脈で，指定した単語が生成される確率
+    def calcProbabilityforU(self, u, w):
+        c_uw = len(self.getCustomerListofWord(u, w))
+        c_u  = len(self.restaurants[u][CUSTOMER])
+        t_uw = len([t for t in self.getTableListofWord(u,w) if t!=DELETED])
+        t_u  = len([t for t in self.restaurants[u][TABLE] if t!=DELETED])
+        if len(u) == 0:
+            Ppar = self.calcProbabilityofBaseMeasure(w)
+        else:
+            Ppar = self.calcProbabilityforU(u[1:], w)
+        term1 =  (1.0*(c_uw-self.D*t_uw)) / (self.THETA+c_u)
+        term2 = ((1.0*(self.THETA+self.D*t_u)) / (self.THETA+c_u)) * Ppar
+        return term1 + term2
+
+    # 基底測度は単語長さの正規分布
+    def calcProbabilityofBaseMeasure(self, w):
+        return np.exp(-len(w) * self.A)
+
+    # 指定した文章の生成確率
+    # 終始端単語は含まれている前提
+    def calcProbability(self, sentence):
+        output = 1
+        part = [PADWORD for _ in range(self.LEN)]
+        for word in sentence:
+            part = part[1:] + [word]
+            # すべてパディングであるような文脈は無視
+            if part == [PADWORD for _ in range(self.LEN)]:
+                continue
+            output *= self.calcProbabilityforU(tuple(part[:-1]), part[-1])
+        return output 
+
+    # 文章と番号を引数に，境界状態を入れ替える
+    def changeBoundary(self, sentence, charsIdx):
+        if charsIdx <= 0 or charsIdx >= sum([len(w) for w in sentence]):
+            return sentence
+        currentNumofChars = 0
+        changedIdx  = -1
+        while currentNumofChars < charsIdx:
+            changedIdx  += 1
+            currentNumofChars += len(sentence[changedIdx])
+
+        o =  sentence[:changedIdx]
+        if currentNumofChars == charsIdx:
+            o += [sentence[changedIdx]+sentence[changedIdx+1]]
+            o += sentence[changedIdx+2:]
+        else:
+            div = charsIdx - (currentNumofChars-len(sentence[changedIdx]))
+            o  += [sentence[changedIdx][:div],sentence[changedIdx][div:]]
+            o  += sentence[changedIdx+1:]
+        return o 
+
+    # サンプリング
+    def sampling(self, sentence):
+        # 古い文章を削除
+        self.eliminateSentence(sentence)
+        newSentence = deepcopy(sentence)
+        # 終始端単語を無視
+        length = sum([len(w) for w in sentence if w!=PADWORD])-1
+        idxList = list(range(length))
+        random.shuffle(idxList)
+        # 始端単語を無視するためのオフセット
+        padlen = len(PADWORD)*self.PAD+1
+        for idx in idxList:
+            newSentence_a = self.changeBoundary(newSentence, idx+padlen)
+            p_b = self.calcProbability(newSentence)
+            p_a = self.calcProbability(newSentence_a)
+            if random.random() < p_a / (p_a + p_b):
+                newSentence = newSentence_a
+        # 新しい文章を挿入
+        self.addSentence(newSentence)
+        return newSentence
+
+    # 辞書内の全文章を反転(各単語を反転し，単語の並び自体も反転)
+    def reverseSentences(self, sentenceDict):
+        output = {}
+        for s in sentenceDict:
+            output[s] = []
+            for i in range(len(sentenceDict[s])):
+                output[s].append(sentenceDict[s][-i-1][::-1]) 
+        return output
+
+    # 実行
+    def executeParsing(self, sentenceDict, n_iter, reverse=False):
+        current = deepcopy(sentenceDict)
+        if reverse == True:
+            current = self.reverseSentences(current)
+        PADS = [PADWORD for _ in range(self.PAD)]
+        for c in current:
+            current[c] = deepcopy(PADS)+current[c]+deepcopy(PADS)
+            self.addSentence(current[c])
+        for i in range(n_iter):
+            for c in current:
+                current[c] = self.sampling(current[c])
+            if i % (int(n_iter/10)) == 0:
+                print("[RefactedRest]executeParsing:iteration:"+str(i))
+                print("[RefactedRest]executeParsing:currentSentences:")
+                for c in current:
+                    print(c + ":" + str(current[c]))
+        for c in current:
+            current[c] = [w for w in current[c] if w != PADWORD] 
+        if reverse == True:
+            current = self.reverseSentences(current)
+        print("[RefactedRest]executeParsing:results:")
+        for c in current:
+            print(c + ":" + str(current[c]))
+        return current
+
+
     # デバッグ用の出力メソッド
     def toPrint(self):
         print("===================")
@@ -199,13 +311,23 @@ if __name__ == "__main__":
     f.eliminateSentence(["今日", "も", "また", "雨", "が", "降ったよ"])
     f.toPrint()
 
+    test = ["今日", "も", "また", "雨", "が", "降ったよ"]
+    for i in range(1, 11):
+        print(f.changeBoundary(test, i))
 
+    data = {}
+    data["1"] = ["りんごぶどうみかんばななもも"]
+    data["2"] = ["ももみかんばななりんごぶどう"]
+    data["3"] = ["ぶどうばななみかんりんごもも"]
+    data["4"] = ["ばななりんごみかんももぶどう"]
+    data["5"] = ["みかんももばななりんごぶどう"]
 
+    print(f.reverseSentences(data))
 
-
-
-
-
+    for i in range(10):
+        with open("tmp/RefactedRest_result.dill", "wb") as g:
+            dill.dump(f.executeParsing(data, 100, reverse=True), g)
+        time.sleep(5)
 
 
 
