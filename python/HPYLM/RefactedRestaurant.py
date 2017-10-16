@@ -16,7 +16,7 @@ T_WORD  = 1
 # 根文脈のテーブルにつける PID
 BASE_PID = -1
 
-# 削除済みの要素(客，テーブル)を表す
+# 削除済みの要素(テーブル)を表す
 DELETED = "THIS FACTOR HAVE DELETED"
 
 # 終始端単語
@@ -73,14 +73,19 @@ class Franchise:
 
     def eliminateCustomerofTable(self, u, tableId):
         rest = self.getRestaurant(u)
+        pid  = rest[TABLE][tableId][T_PID]
         CustomerList = self.getCustomerListofTable(u, tableId)
         if len(CustomerList) == 0:
+            print("多分何かがおかしいよ")
             return
+        if len(CustomerList) == 1:
+            rest[TABLE][tableId] = DELETED
+            if len(rest[CUSTOMER]) == 1:
+                del self.restaurants[u]
         delCustomer = CustomerList[0]
-        rest[CUSTOMER][delCustomer] = DELETED
+        del rest[CUSTOMER][delCustomer]
         # そのテーブルを生成した親文脈のテーブルから代理客を削除
         if len(u) > 0:
-            pid = rest[TABLE][tableId][T_PID]
             self.eliminateCustomerofTable(u[1:], pid)
 
     # 文脈を取得する
@@ -93,13 +98,9 @@ class Franchise:
         # 文脈が LEN より長い場合は生成しない
         if len(u) > self.LEN:
             return 
-        # 文脈が存在しない，または DELETED なら新たに生成
-        if u not in self.restaurants.keys() \
-                or self.restaurants[u] == DELETED:
+        # 文脈が存在しないなら新たに生成
+        if u not in self.restaurants.keys():
             self.restaurants[u] = [[], []]
- 
-    def eliminateRestaurant(self, u):
-        self.restaurants[u] = DELETED
 
     # ピットマンヨー過程から，指定した単語のテーブルID を取得
     # 単語指定の条件付確率を用いる
@@ -145,17 +146,30 @@ class Franchise:
     # 文を代入して客を配置
     # 新実装は全客に対して代理客を生成するので，
     # LEN の長さに分割してそのまま代入するだけでいい
-    def  addSentence(self, sentence):
+    def addSentence(self, sentence):
         part = [PADWORD for _ in range(self.LEN)]
         for word in sentence:
             part = part[1:] + [word]
             # すべてパディングであるような文脈は無視
             if part == [PADWORD for _ in range(self.LEN)]:
                 continue
-            print("added:" + str(part))
             self.addRestaurant(tuple(part[:-1]))
             self.addCustomerofWord(tuple(part[:-1]), part[-1])
-            self.toPrint()
+ 
+    # 文を代入して客を削除
+    # 新実装は全客に対して代理客を生成するので，
+    # LEN の長さに分割してそのまま削除するだけでいい
+    # 削除に関しては Pitman-Yor 過程する必要なく，
+    # また add されている前提なので文脈生成も必要なし
+    def eliminateSentence(self, sentence):
+        part = [PADWORD for _ in range(self.LEN)]
+        for word in sentence:
+            part = part[1:] + [word]
+            # すべてパディングであるような文脈は無視
+            if part == [PADWORD for _ in range(self.LEN)]:
+                continue
+            tid = self.getTableListofWord(tuple(part[:-1]), part[-1])[0]
+            self.eliminateCustomerofTable(tuple(part[:-1]), tid)
        
     # デバッグ用の出力メソッド
     def toPrint(self):
@@ -181,6 +195,8 @@ if __name__ == "__main__":
     f = Franchise(1, 1, 1, 1, 3)
     f.addSentence(["今日", "も", "また", "人", "が", "死んだよ"])
     f.addSentence(["今日", "も", "また", "雨", "が", "降ったよ"])
+    f.toPrint()
+    f.eliminateSentence(["今日", "も", "また", "雨", "が", "降ったよ"])
     f.toPrint()
 
 
