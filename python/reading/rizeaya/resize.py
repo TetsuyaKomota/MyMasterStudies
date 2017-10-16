@@ -5,7 +5,7 @@ import glob
 import os
 
 fpaths = glob.glob("tmp/face/*")
-resizeTo = 30
+resizeTo = 28
 
 xmax = 0
 ymax = 0
