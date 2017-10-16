@@ -20,9 +20,6 @@ T_WORD  = 1
 # 根文脈のテーブルにつける PID
 BASE_PID = -1
 
-# 削除済みの要素(テーブル)を表す
-DELETED = "THIS FACTOR HAVE DELETED"
-
 # 終始端単語
 PADWORD = "~"
 
@@ -44,6 +41,12 @@ class Franchise:
         self.PAD         = PAD
         self.LEN         = LEN
         self.restaurants = {():[[], []]}
+
+    def getTheta(self, u):
+        return self.THETA * (len(u) + 1.0)
+
+    def getD(self, u):
+        return (self.D*len(u)) / (len(u)+1.0)
 
     # テーブル ID 指定でそのテーブルの客のID配列を取得
     # 客数を知りたいときはこれを len すればいい
@@ -82,15 +85,28 @@ class Franchise:
         if len(CustomerList) == 0:
             print("多分何かがおかしいよ")
             return
-        if len(CustomerList) == 1:
-            rest[TABLE][tableId] = DELETED
-            if len(rest[CUSTOMER]) == 1:
-                del self.restaurants[u]
         delCustomer = CustomerList[0]
         del rest[CUSTOMER][delCustomer]
+        if len(self.getCustomerListofTable(u, tableId)) == 0:
+            self.eliminateTable(u, tableId)
+            if len(rest[CUSTOMER]) == 0:
+                del self.restaurants[u]
         # そのテーブルを生成した親文脈のテーブルから代理客を削除
         if len(u) > 0:
             self.eliminateCustomerofTable(u[1:], pid)
+
+    def eliminateTable(self, u, tableId):
+        rest = self.restaurants[u]
+        # その文脈の客のテーブルID を修正
+        for i, c in enumerate(rest[CUSTOMER]):
+            if c > tableId:
+                rest[CUSTOMER][i] -= 1
+        # 子文脈の PID も修正する
+        for cu in [cu for cu in self.restaurants.keys() if cu[1:]==u]:
+            for t in self.restaurants[cu][TABLE]:
+                if t[T_PID] > tableId:
+                    t[T_PID] -= 1
+        del rest[TABLE][tableId]
 
     # 文脈を取得する
     # 文脈がない場合は生成する
@@ -112,7 +128,7 @@ class Franchise:
     def pickwithPitmanYor(self, u, word):
         rest = self.getRestaurant(u)
         tableList = self.getTableListofWord(u, word)
-        tableHist = {NEW:self.THETA}
+        tableHist = {NEW:self.getTheta(u)}
         for tid in tableList:
             tableHist[tid] = len(self.getCustomerListofTable(u, tid))
         total = sum(tableHist.values())
@@ -179,14 +195,16 @@ class Franchise:
     def calcProbabilityforU(self, u, w):
         c_uw = len(self.getCustomerListofWord(u, w))
         c_u  = len(self.restaurants[u][CUSTOMER])
-        t_uw = len([t for t in self.getTableListofWord(u,w) if t!=DELETED])
-        t_u  = len([t for t in self.restaurants[u][TABLE] if t!=DELETED])
+        t_uw = len(self.getTableListofWord(u, w))
+        t_u  = len(self.restaurants[u][TABLE])
+        D    = self.getD(u)
+        T    = self.getTheta(u)
         if len(u) == 0:
             Ppar = self.calcProbabilityofBaseMeasure(w)
         else:
             Ppar = self.calcProbabilityforU(u[1:], w)
-        term1 =  (1.0*(c_uw-self.D*t_uw)) / (self.THETA+c_u)
-        term2 = ((1.0*(self.THETA+self.D*t_u)) / (self.THETA+c_u)) * Ppar
+        term1 =  (1.0*(c_uw-D*t_uw)) / (T+c_u)
+        term2 = ((1.0*(T+D*t_u)) / (T+c_u)) * Ppar
         return term1 + term2
 
     # 基底測度は単語長さの正規分布
@@ -304,7 +322,8 @@ class Franchise:
 
 
 if __name__ == "__main__":
-    f = Franchise(1, 1, 1, 1, 3)
+    f = Franchise(1, 1, 1, 3, 3)
+    """
     f.addSentence(["今日", "も", "また", "人", "が", "死んだよ"])
     f.addSentence(["今日", "も", "また", "雨", "が", "降ったよ"])
     f.toPrint()
@@ -314,6 +333,7 @@ if __name__ == "__main__":
     test = ["今日", "も", "また", "雨", "が", "降ったよ"]
     for i in range(1, 11):
         print(f.changeBoundary(test, i))
+    """
 
     data = {}
     data["1"] = ["りんごぶどうみかんばななもも"]
@@ -322,12 +342,8 @@ if __name__ == "__main__":
     data["4"] = ["ばななりんごみかんももぶどう"]
     data["5"] = ["みかんももばななりんごぶどう"]
 
-    print(f.reverseSentences(data))
+    # print(f.reverseSentences(data))
 
     for i in range(10):
         with open("tmp/RefactedRest_result.dill", "wb") as g:
-            dill.dump(f.executeParsing(data, 100, reverse=True), g)
-        time.sleep(5)
-
-
-
+            dill.dump(f.executeParsing(data, 3000), g)
