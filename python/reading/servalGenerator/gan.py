@@ -11,9 +11,10 @@ import os
 from keras.datasets import mnist
 from keras.optimizers import Adam
 from PIL import Image
+import FriendsLoader
 
-BATCH_SIZE = 32
-NUM_EPOCH = 20
+BATCH_SIZE = 30
+NUM_EPOCH = 1000
 GENERATED_IMAGE_PATH = "tmp/" # 生成画像の保存先
 
 def generator_model():
@@ -30,7 +31,7 @@ def generator_model():
     model.add(BatchNormalization())
     model.add(Activation("relu"))
     model.add(UpSampling2D((2, 2)))
-    model.add(Conv2D(1, (5, 5), padding="same"))
+    model.add(Conv2D(3, (5, 5), padding="same"))
     model.add(Activation("tanh"))
     return model
 
@@ -39,7 +40,7 @@ def discriminator_model():
     model.add(Conv2D(64, (5, 5),
                     strides=(2, 2),
                     padding='same',
-                    input_shape=(28, 28, 1))) # ここ注意
+                    input_shape=(28, 28, 3))) # ここ注意
     model.add(LeakyReLU(0.2))
     model.add(Conv2D(128, (5, 5), strides=(2, 2)))
     model.add(LeakyReLU(0.2))
@@ -59,19 +60,20 @@ def combine_images(generated_images):
     cols = int(math.sqrt(total))
     rows = math.ceil(float(total)/cols)
     width, height = generated_images.shape[1:3]
-    combined_image = np.zeros((height*rows, width*cols),
-                              dtype=generated_images.dtype)
+    combined_image = np.zeros((height*rows, width*cols, 3),dtype=generated_images.dtype)
 
     for index, image in enumerate(generated_images):
         i = int(index/cols)
         j = index % cols
-        combined_image[width*i:width*(i+1), height*j:height*(j+1)] = image[:, :, 0]
+        for k in range(3):
+            combined_image[width*i:width*(i+1), height*j:height*(j+1), k] = image[:, :, k]
     return combined_image
 
 def train():
-    (X_train, y_train), (_, _) = mnist.load_data()
+    # (X_train, y_train), (_, _) = mnist.load_data()
+    (X_train, y_train), (_, _) = FriendsLoader.load_data()
     X_train = (X_train.astype(np.float32) - 127.5)/127.5
-    X_train = X_train.reshape(X_train.shape[0], X_train.shape[1], X_train.shape[2], 1)
+    X_train = X_train.reshape(X_train.shape[0], X_train.shape[1], X_train.shape[2], 3)
 
     # メモ : X_train.shape = (60000, 28, 28, 1)
 
@@ -100,13 +102,12 @@ def train():
             generated_images = generator.predict(noise, verbose=0)
 
             # 生成画像を出力
-            if index % 100 == 0:
+            if index % 10 == 0:
                 image = combine_images(generated_images)
                 image = image*127.5 + 127.5
                 if not os.path.exists(GENERATED_IMAGE_PATH):
                     os.mkdir(GENERATED_IMAGE_PATH)
-                Image.fromarray(image.astype(np.uint8))\
-                    .save(GENERATED_IMAGE_PATH+"%04d_%04d.png" % (epoch, index))
+                Image.fromarray(image.astype(np.uint8)).save(GENERATED_IMAGE_PATH+"%04d_%04d.png" % (epoch, index))
 
             # discriminatorを更新
             X = np.concatenate((image_batch, generated_images))
