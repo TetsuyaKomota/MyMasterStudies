@@ -13,19 +13,21 @@ from keras.optimizers import Adam
 from PIL import Image
 import FriendsLoader
 
-BATCH_SIZE = 30
+IMG_SIZE = 100
+BATCH_SIZE = 6
 NUM_EPOCH = 1000
 GENERATED_IMAGE_PATH = "tmp/" # 生成画像の保存先
 
 def generator_model():
+    layerSize = int(IMG_SIZE/4)
     model = Sequential()
     model.add(Dense(1024, input_shape=(100,)))
     model.add(BatchNormalization())
     model.add(Activation("relu"))
-    model.add(Dense(7*7*128))
+    model.add(Dense(layerSize*layerSize*128))
     model.add(BatchNormalization())
     model.add(Activation("relu"))
-    model.add(Reshape((7, 7, 128)))
+    model.add(Reshape((layerSize, layerSize, 128)))
     model.add(UpSampling2D((2, 2)))
     model.add(Conv2D(64, (5, 5), padding="same"))
     model.add(BatchNormalization())
@@ -40,7 +42,7 @@ def discriminator_model():
     model.add(Conv2D(64, (5, 5),
                     strides=(2, 2),
                     padding='same',
-                    input_shape=(28, 28, 3))) # ここ注意
+                    input_shape=(IMG_SIZE, IMG_SIZE, 3))) # ここ注意
     model.add(LeakyReLU(0.2))
     model.add(Conv2D(128, (5, 5), strides=(2, 2)))
     model.add(LeakyReLU(0.2))
@@ -102,7 +104,7 @@ def train():
             generated_images = generator.predict(noise, verbose=0)
 
             # 生成画像を出力
-            if index % 10 == 0:
+            if index % 50 == 0:
                 image = combine_images(generated_images)
                 image = image*127.5 + 127.5
                 if not os.path.exists(GENERATED_IMAGE_PATH):
