@@ -209,7 +209,7 @@ for ne in range(3):
                     # 繰り返しで結果が変わるかもなので，5回ずつ結果を出す
                     for n_iter in range(5):
                         print("++++++---- : Parsing with HPYLM")
-                        hpylm.execute(paramA = paramA, paramTheta = paramTheta, paramNumS=paramNum, paramNumT=paramNum)
+                        hpylm.execute(paramA = paramA, paramTheta = paramTheta, paramNumS=paramNum, paramNumT=paramNum, reverse=True)
 
                         import HPYLM.tasks.GettingIntermmediates as inter
 
