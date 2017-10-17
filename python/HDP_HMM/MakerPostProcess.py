@@ -89,6 +89,21 @@ def getVelocityList(datas, timeDelta=0.01):
     output.append(output[-1])
     return output
 
+def execute(isDO):
+    if isDO == False:
+        return 
+    filepaths = glob.glob("tmp/log_MakerMain/*")
+    for p in filepaths:
+        if p[-4:] != ".csv":
+            continue
+        output = inputData(p)
+        output = getHandData(output)
+        output = getTMAList(output)
+        output = getVelocityList(output)
+        outputData(output, p)
+
+
+
 if __name__ == "__main__":
     filepaths = glob.glob("tmp/log_MakerMain/*")
     for p in filepaths:

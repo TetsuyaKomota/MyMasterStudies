@@ -2,7 +2,7 @@ import HDP_HMM.MakerMain as makerMain
 import numpy as np
 from random import random
 
-def test1(maker):
+def test1(maker, inits):
     # 初期化
     maker.setXs("hand", [1000, 1000])
     maker.setXs("red", [10000, 1000])
@@ -113,7 +113,22 @@ def test3(maker, inits, num=0):
         maker.executeCircle("hand", 100)
     maker.execute(100-rand)
 
-
+def execute(testNumber, inits, numofData, detail=False):
+    if testNumber == 1:
+        testMethod = test1
+    elif testNumber == 2:
+        testMethod = test2
+    elif testNumber == 3:
+        testMethod = test3
+    else:
+        if detail == True:
+            print("[MakerMotions]execute:invalid testNumber:", end="")
+            peinr(str(testNumber))
+        return 
+    for i in range(numofData):
+        filename = "000000"+"{0:03d}".format(i)
+        maker = makerMain.Maker(filename)
+        testMethod(maker, inits)
 
 if __name__ == "__main__":
     """

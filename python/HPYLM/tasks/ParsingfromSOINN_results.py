@@ -8,11 +8,12 @@ import sys, io
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 
-def execute(paramA=5, paramTheta=1.0, paramNumS=0, paramNumT=1, reverse=False):
+# def execute(paramA=5, paramTheta=1.0, paramNumS=0, paramNumT=1, reverse=False):
+def execute(D=1, A=5, Theta=1.0, PAD=1, reverse=False):
     print("Start Parsing Test (from tmp/SOINN_results.dill)")
 
     # rest = Restaurant.Restaurant(None, [], paramA = paramA, paramTheta = paramTheta, paramNumS=paramNumS, paramNumT=paramNumT)
-    rest =RefactedRestaurant.Franchise(1, paramA, paramTheta, paramNumS, 2)
+    rest =RefactedRestaurant.Franchise(D, A, Theta, PAD, 2)
 
     # with open("tmp/HMM_results.dill", "rb") as f:
     with open("tmp/log_MakerMain/dills/SOINN_results.dill", "rb") as f:

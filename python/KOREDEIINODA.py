@@ -5,6 +5,14 @@ import glob
 import HDP_HMM.MakerMotions as makerMotions
 import HDP_HMM.MakerMain as makerMain
 
+print("注意!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+print("これはもう古い！ HONTONIKOREDEIINODA.py を実行するべし!!!")
+print("注意!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+print("これはもう古い！ HONTONIKOREDEIINODA.py を実行するべし!!!")
+print("注意!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+print("これはもう古い！ HONTONIKOREDEIINODA.py を実行するべし!!!")
+
+
 """
 print("---------- : Making datas")
 inits = {}

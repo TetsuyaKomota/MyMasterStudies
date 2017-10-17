@@ -6,7 +6,8 @@ import os
 
 # HPYLM_results.dill と ENC_results_naive.dill から，
 # 単語境界のステップ数を取得する
-def execute(dirName = "gomi"):
+def execute(dirNameList = ["gomi"]):
+        dirName = "-".join([str(d) for d in dirNameList])
         # HPYLM の結果のパス
         RES_PATH_HPYLM     = "tmp/log_MakerMain/dills/HPYLM_results.dill"
         # 縮約前の ENC(HMM or SOINN) の符号化結果のパス
