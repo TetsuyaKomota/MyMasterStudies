@@ -33,7 +33,6 @@ class Franchise:
     # THETA  : 強度
     # PAD    : 終始端単語の数
     # LEN    : 文脈長さ
-
     def __init__(self, D, A, THETA, PAD, LEN):
         self.D           = D
         self.A           = A
@@ -108,8 +107,7 @@ class Franchise:
                     t[T_PID] -= 1
         del rest[TABLE][tableId]
 
-    # 文脈を取得する
-    # 文脈がない場合は生成する
+    # 文脈を取得する．文脈がない場合は生成する
     def getRestaurant(self, u):
         self.addRestaurant(u)
         return self.restaurants[u]
@@ -286,7 +284,7 @@ class Franchise:
         for i in range(n_iter):
             for c in current:
                 current[c] = self.sampling(current[c])
-            if i % (int(n_iter/10)) == 0:
+            if i % (int(n_iter/100)) == 0:
                 print("[RefactedRest]executeParsing:iteration:"+str(i))
                 print("[RefactedRest]executeParsing:currentSentences:")
                 for c in current:
@@ -299,7 +297,6 @@ class Franchise:
         for c in current:
             print(c + ":" + str(current[c]))
         return current
-
 
     # デバッグ用の出力メソッド
     def toPrint(self):
@@ -320,6 +317,18 @@ class Franchise:
                 continue
             self.sub_toPrint(cu)
 
+    def translate(self, number):
+        # 61 は 「~」, 62 ~ 95 は特殊文字なので飛ばす
+        if number >= 61:
+            return (chr(ord("A")+number+35))
+        return (chr(ord("A")+number))
+
+    # アルファベットを数字に変換
+    def retranslate(self, alphabet):
+        # 96 以上なら特殊文字回避のため += 36 されてるはず
+        if ord(alphabet) - ord("A") >= 97:
+            return ord(alphabet) - ord("A") - 35
+        return ord(alphabet) - ord("A")
 
 if __name__ == "__main__":
     f = Franchise(1, 1, 1, 3, 3)
