@@ -67,17 +67,17 @@ def run():
         if p == NOPARAMS:
             break
         print("---------- : Making datas")
-        makerMotions.execute(p["00testNumber"], p["01inits"], p["02numofData"])
+        # makerMotions.execute(p["00testNumber"], p["01inits"], p["02numofData"])
         print("++-------- : Post processing ")
-        post.execute(False)
+        # post.execute(False)
         print("++++------ : Encoding with SOINN")
-        soinn.execute(p["03step"], soinnN=p["04soinn"], soinnE=p["04soinn"])
-        exit()
+        # soinn.execute(p["03step"], soinnN=p["04soinn"], soinnE=p["04soinn"])
         print("++++++---- : Parsing with HPYLM")
         hpylm.execute(D=p["05D"], A=p["06A"], Theta=p["07Theta"], PAD=p["08PAD"], reverse=p["09reverse"])
         print("++++++++-- : Getting intermmediates")
         inter.execute(pm.getParamNameList)
         print("++++++++++ : Finished")
+        p = pm.nextParams()
 
 if __name__ == "__main__":
     run()
