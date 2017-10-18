@@ -40,6 +40,7 @@ class Franchise:
         self.PAD         = PAD
         self.LEN         = LEN
         self.restaurants = {():[[], []]}
+        self.clean       = 0
 
     def getTheta(self, u):
         return self.THETA * (len(u) + 1.0)
@@ -88,8 +89,6 @@ class Franchise:
         del rest[CUSTOMER][delCustomer]
         if len(self.getCustomerListofTable(u, tableId)) == 0:
             self.eliminateTable(u, tableId)
-            if len(rest[CUSTOMER]) == 0:
-                del self.restaurants[u]
         # そのテーブルを生成した親文脈のテーブルから代理客を削除
         if len(u) > 0:
             self.eliminateCustomerofTable(u[1:], pid)
@@ -107,8 +106,21 @@ class Franchise:
                     t[T_PID] -= 1
         del rest[TABLE][tableId]
 
+    # 無駄にあるレストランを削除する
+    def cleanEmptyRestaurant(self):
+        delList = []
+        for u in self.restaurants.keys():
+            if u != () and self.restaurants[u] == [[], []]:
+                delList.append(u)
+        for u in delList:
+            del self.restaurants[u]
+        self.clean = len(self.restaurants)
+
     # 文脈を取得する．文脈がない場合は生成する
     def getRestaurant(self, u):
+        # 店数が一定以上の場合，無駄な店をクリーニング
+        if len(self.restaurants) > 2*self.clean:
+            self.cleanEmptyRestaurant()
         self.addRestaurant(u)
         return self.restaurants[u]
 
@@ -296,6 +308,8 @@ class Franchise:
         print("[RefactedRest]executeParsing:results:")
         for c in current:
             print(c + ":" + str(current[c]))
+        # 最後に掃除する
+        self.cleanEmptyRestaurant()
         return current
 
     # デバッグ用の出力メソッド
@@ -353,10 +367,15 @@ if __name__ == "__main__":
 
     # print(f.reverseSentences(data))
 
+    from datetime import datetime
     for i in range(1):
         with open("tmp/RefactedRest_result.dill", "wb") as g:
+            ptime = datetime.now().timestamp()
             dill.dump(f.executeParsing(data, 1000), g)
+            ptime = datetime.now().timestamp() - ptime
 
     f.toPrint()
     print(f.restaurants.keys())
     print(len(f.restaurants))
+    print(len([1 for r in f.restaurants.values() if len(r[CUSTOMER])+len(r[TABLE])==0]))
+    print(ptime)
