@@ -5,11 +5,10 @@ import RefactedRestaurant
 import dill
 import sys, io
 
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
-
 
 # def execute(paramA=5, paramTheta=1.0, paramNumS=0, paramNumT=1, reverse=False):
 def execute(D=1, A=5, Theta=1.0, PAD=1, reverse=False):
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
     print("Start Parsing Test (from tmp/SOINN_results.dill)")
 
     # rest = Restaurant.Restaurant(None, [], paramA = paramA, paramTheta = paramTheta, paramNumS=paramNumS, paramNumT=paramNumT)

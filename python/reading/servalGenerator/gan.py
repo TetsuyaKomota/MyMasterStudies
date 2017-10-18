@@ -13,8 +13,8 @@ from keras.optimizers import Adam
 from PIL import Image
 import FriendsLoader
 
-IMG_SIZE = 100
-BATCH_SIZE = 6
+IMG_SIZE = 200
+BATCH_SIZE = 9
 NUM_EPOCH = 1000
 GENERATED_IMAGE_PATH = "tmp/" # 生成画像の保存先
 
@@ -100,7 +100,7 @@ def train():
     for epoch in range(NUM_EPOCH):
 
         for index in range(num_batches):
-            noise = np.array([np.random.uniform(-1, 1, 100) for _ in range(BATCH_SIZE)])
+            noise = np.array([np.random.uniform(-1, 1, IMG_SIZE) for _ in range(BATCH_SIZE)])
             
             # メモ : noise.shape = (32(バッチサイズ), 100)
 
@@ -121,7 +121,7 @@ def train():
             d_loss = discriminator.train_on_batch(X, y)
 
             # generatorを更新
-            noise = np.array([np.random.uniform(-1, 1, 100) for _ in range(BATCH_SIZE)])
+            noise = np.array([np.random.uniform(-1, 1, IMG_SIZE) for _ in range(BATCH_SIZE)])
             g_loss = dcgan.train_on_batch(noise, [1]*BATCH_SIZE)
             print("epoch: %d, batch: %d, g_loss: %f, d_loss: %f" % (epoch, index, g_loss, d_loss))
 
