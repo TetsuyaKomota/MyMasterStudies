@@ -298,7 +298,7 @@ class Franchise:
         for i in range(n_iter):
             for c in current:
                 current[c] = self.sampling(current[c])
-            if i % (int(n_iter/100)) == 0:
+            if i % (int(n_iter/10)) == 0:
                 print("[RefactedRest]executeParsing:iteration:"+str(i))
                 print("[RefactedRest]executeParsing:currentSentences:")
                 for c in current:

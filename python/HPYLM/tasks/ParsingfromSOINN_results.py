@@ -35,9 +35,9 @@ def execute(D=1, A=5, Theta=1.0, PAD=1, reverse=False):
     for s in u:
         print(u[s][0])
 
-    result = rest.executeParsing(u, 10000)
+    result = rest.executeParsing(u, 10)
     if reverse == True:
-        result_rev = rest.executeParsing(u, 10000, reverse=True)
+        result_rev = rest.executeParsing(u, 10, reverse=True)
         for s in result_rev:
             result[s + str("_rev")] = result_rev[s]
 
