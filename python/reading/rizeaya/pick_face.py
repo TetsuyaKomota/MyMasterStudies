@@ -28,7 +28,7 @@ for ipath in imgPaths:
     cascade = cv2.CascadeClassifier(cascade_path)
     
     #物体認識（顔認識）の実行
-    facerect = cascade.detectMultiScale(image_gray, scaleFactor=1.2, minNeighbors=2, minSize=(10, 10))
+    facerect = cascade.detectMultiScale(image_gray, scaleFactor=1.2, minNeighbors=2, minSize=(50, 50))
     # facerect = cascade.detectMultiScale(image_gray, scaleFactor=1.2)
     
     print("face rectangle")
