@@ -353,6 +353,10 @@ if __name__ == "__main__":
 
     # print(f.reverseSentences(data))
 
-    for i in range(10):
+    for i in range(1):
         with open("tmp/RefactedRest_result.dill", "wb") as g:
-            dill.dump(f.executeParsing(data, 3000), g)
+            dill.dump(f.executeParsing(data, 1000), g)
+
+    f.toPrint()
+    print(f.restaurants.keys())
+    print(len(f.restaurants))
