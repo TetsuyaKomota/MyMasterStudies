@@ -4,6 +4,7 @@ import random
 import numpy as np
 import dill
 import time
+from datetime import datetime
 from copy import deepcopy
 
 # restaurants は各要素 [[テーブル配列], [客配列]]
@@ -39,8 +40,10 @@ class Franchise:
         self.THETA       = THETA
         self.PAD         = PAD
         self.LEN         = LEN
+        # フィールド
         self.restaurants = {():[[], []]}
         self.clean       = 0
+        self.timeScore   = {}
 
     def getTheta(self, u):
         return self.THETA * (len(u) + 1.0)
@@ -164,7 +167,6 @@ class Franchise:
                 # addCustomerofTable が代理客を生成するので，
                 # 新テーブル生成時に代理客を配置しないように
                 # add=False とする
-                self.addRestaurant(u[:-1])
                 pid = self.addCustomerofWord(u[1:], word, add=False)
             self.addTableofWord(u, pid, word)
             tid = len(self.restaurants[u][TABLE])-1
@@ -183,7 +185,6 @@ class Franchise:
             # すべてパディングであるような文脈は無視
             if part == [PADWORD for _ in range(self.LEN)]:
                 continue
-            self.addRestaurant(tuple(part[:-1]))
             self.addCustomerofWord(tuple(part[:-1]), part[-1])
  
     # 文を代入して客を削除
@@ -256,6 +257,7 @@ class Franchise:
 
     # サンプリング
     def sampling(self, sentence):
+        timeScore = []
         # 古い文章を削除
         self.eliminateSentence(sentence)
         newSentence = deepcopy(sentence)
@@ -312,6 +314,24 @@ class Franchise:
         self.cleanEmptyRestaurant()
         return current
 
+    def debug_start(self, idx):
+        if idx not in self.timeScore.keys():
+            self.timeScore[idx] = []
+        self.timeScore[idx].append(datetime.now().timestamp())
+
+    def debug_endof(self, idx):
+        if idx not in self.timeScore.keys():
+            return 
+        self.timeScore[idx][-1] *= -1
+        self.timeScore[idx][-1] += datetime.now().timestamp()
+
+    def debug_result(self):
+        output = {}
+        for idx in self.timeScore.keys():
+            scores = self.timeScore[idx]
+            output[idx] = sum(scores)/len(scores)
+        return output
+
     # デバッグ用の出力メソッド
     def toPrint(self):
         print("===================")
@@ -367,15 +387,13 @@ if __name__ == "__main__":
 
     # print(f.reverseSentences(data))
 
-    from datetime import datetime
     for i in range(1):
         with open("tmp/RefactedRest_result.dill", "wb") as g:
             ptime = datetime.now().timestamp()
-            dill.dump(f.executeParsing(data, 1000), g)
+            dill.dump(f.executeParsing(data, 300), g)
             ptime = datetime.now().timestamp() - ptime
 
     f.toPrint()
-    print(f.restaurants.keys())
-    print(len(f.restaurants))
-    print(len([1 for r in f.restaurants.values() if len(r[CUSTOMER])+len(r[TABLE])==0]))
-    print(ptime)
+    res = f.debug_result()
+    for r in res:
+        print(r + "\t\t: " + str(res[r]))
