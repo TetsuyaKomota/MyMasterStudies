@@ -75,7 +75,7 @@ def run():
         print("++++++---- : Parsing with HPYLM")
         hpylm.execute(D=p["05D"], A=p["06A"], Theta=p["07Theta"], PAD=p["08PAD"], reverse=p["09reverse"])
         print("++++++++-- : Getting intermmediates")
-        inter.execute(pm.getParamNameList())
+        inter.execute([p[name] for name in pm.getParamNameList()])
         print("++++++++++ : Finished")
         p = pm.nextParams()
 
