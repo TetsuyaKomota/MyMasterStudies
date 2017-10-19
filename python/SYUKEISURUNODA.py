@@ -28,7 +28,7 @@ for g in glob.glob(root + dirs[0] + "*"):
 # 最終状態は途中上代に含めているはずなので，
 # 途中状態ファイルの最後のログのステップ数を見ればいいはず
 maxstep = 0
-with open(root + dirs[1] + files[0], "r", encoding = "utf-8") as f:
+with open(root + dirs[0] + files[0], "r", encoding = "utf-8") as f:
     while True:
         line = f.readline().split(",")[0]
         if line == "":

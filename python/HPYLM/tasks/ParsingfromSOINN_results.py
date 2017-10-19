@@ -7,7 +7,7 @@ import sys, io
 
 
 # def execute(paramA=5, paramTheta=1.0, paramNumS=0, paramNumT=1, reverse=False):
-def execute(D=1, A=5, Theta=1.0, PAD=1, reverse=False):
+def execute(D=1, A=5, Theta=1.0, PAD=1, hpylm_iter=1000, reverse=False):
     # sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
     print("Start Parsing Test (from tmp/SOINN_results.dill)")
 
@@ -35,9 +35,9 @@ def execute(D=1, A=5, Theta=1.0, PAD=1, reverse=False):
     for s in u:
         print(u[s][0])
 
-    result = rest.executeParsing(u, 10)
+    result = rest.executeParsing(u, hpylm_iter)
     if reverse == True:
-        result_rev = rest.executeParsing(u, 10, reverse=True)
+        result_rev = rest.executeParsing(u, hpylm_iter, reverse=True)
         for s in result_rev:
             result[s + str("_rev")] = result_rev[s]
 
