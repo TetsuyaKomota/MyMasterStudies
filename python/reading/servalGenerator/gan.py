@@ -13,8 +13,8 @@ from keras.optimizers import Adam
 from PIL import Image
 import FriendsLoader
 
-IMG_SIZE = 200
-BATCH_SIZE = 9
+IMG_SIZE = 100
+BATCH_SIZE = 500
 NUM_EPOCH = 1000
 GENERATED_IMAGE_PATH = "tmp/" # 生成画像の保存先
 
