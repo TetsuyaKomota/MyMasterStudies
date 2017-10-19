@@ -73,7 +73,7 @@ def run():
         print("++++------ : Encoding with SOINN")
         # soinn.execute(p["03step"], soinnN=p["04soinn"], soinnE=p["04soinn"])
         print("++++++---- : Parsing with HPYLM")
-        hpylm.execute(D=p["05D"], A=p["06A"], Theta=p["07Theta"], PAD=p["08PAD"], reverse=p["09reverse"])
+        hpylm.execute(D=p["05D"], A=p["06A"], Theta=p["07Theta"], PAD=p["08PAD"], hpylm_iter=p["10hpylm_iter"], reverse=p["09reverse"])
         print("++++++++-- : Getting intermmediates")
         inter.execute([p[name] for name in pm.getParamNameList()])
         print("++++++++++ : Finished")
