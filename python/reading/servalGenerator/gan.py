@@ -14,14 +14,14 @@ from PIL import Image
 import FriendsLoader
 
 IMG_SIZE = 100
-BATCH_SIZE = 500
+BATCH_SIZE = 100
 NUM_EPOCH = 1000
 GENERATED_IMAGE_PATH = "tmp/" # 生成画像の保存先
 
 def generator_model():
-    layerSize = int(IMG_SIZE/8)
+    layerSize = int(IMG_SIZE/4)
     model = Sequential()
-    model.add(Dense(1024, input_shape=(IMG_SIZE,)))
+    model.add(Dense(2048, input_shape=(IMG_SIZE,)))
     model.add(BatchNormalization())
     model.add(Activation("relu"))
     model.add(Dense(layerSize*layerSize*256))
@@ -30,10 +30,6 @@ def generator_model():
     model.add(Reshape((layerSize, layerSize, 256)))
     model.add(UpSampling2D((2, 2)))
     model.add(Conv2D(128, (5, 5), padding="same"))
-    model.add(BatchNormalization())
-    model.add(Activation("relu"))
-    model.add(UpSampling2D((2, 2)))
-    model.add(Conv2D(64,  (5, 5), padding="same"))
     model.add(BatchNormalization())
     model.add(Activation("relu"))
     model.add(UpSampling2D((2, 2)))
@@ -54,9 +50,9 @@ def discriminator_model():
     model.add(Dense(512))
     model.add(LeakyReLU(0.2))
     model.add(Dropout(0.5))
-    model.add(Dense(128))
-    model.add(LeakyReLU(0.2))
-    model.add(Dropout(0.5))
+#     model.add(Dense(128))
+#     model.add(LeakyReLU(0.2))
+#     model.add(Dropout(0.5))
     model.add(Dense(1))
     model.add(Activation("sigmoid"))
     return model
