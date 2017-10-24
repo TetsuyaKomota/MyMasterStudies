@@ -1,4 +1,5 @@
 from keras.models import Sequential
+from keras.models import model_from_json
 from keras.layers import Dense, Activation, Reshape
 from keras.layers.normalization import BatchNormalization
 from keras.layers.convolutional import UpSampling2D
@@ -79,18 +80,33 @@ def train():
 
     # メモ : X_train.shape = (60000, 28, 28, 1)
 
-    discriminator = discriminator_model()
+    if os.path.exists("discriminator.json"):
+        with open("discriminator.json", "r", encoding="utf-8") as f:
+            discriminator = model_from_json(f.read())
+    else:
+        discriminator = discriminator_model()
     d_opt = Adam(lr=1e-5, beta_1=0.1)
+    if os.path.exists("discriminator.h5"):
+        discriminator.load_weights("discriminator.h5", by_name=False)
     discriminator.compile(loss="binary_crossentropy", optimizer=d_opt)
+    with open("discriminator.json", "w", encoding="utf-8") as f:
+        f.write(discriminator.to_json())
     discriminator.summary()
 
     # generator+discriminator （discriminator部分の重みは固定）
     discriminator.trainable = False
-    generator = generator_model()
+    if os.path.exists("generator.json"):
+        with open("generator.json", "r", encoding="utf-8") as f:
+            generator = model_from_json(f.read())
+    else:
+        generator = generator_model()
     dcgan = Sequential([generator, discriminator])
     g_opt = Adam(lr=2e-4, beta_1=0.5)
+    if os.path.exists("generator.h5"):
+        generator.load_weights("generator.h5", by_name=False)
     dcgan.compile(loss="binary_crossentropy", optimizer=g_opt)
-
+    with open("generator.json", "w", encoding="utf-8") as f:
+        f.write(generator.to_json())
     num_batches = int(X_train.shape[0] / BATCH_SIZE)
     print("Number of batches:", num_batches)
     for epoch in range(NUM_EPOCH):
