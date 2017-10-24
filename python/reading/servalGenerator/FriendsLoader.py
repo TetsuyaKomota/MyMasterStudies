@@ -28,3 +28,4 @@ def load_data(test_rate=0):
 if __name__ == "__main__":
     (X_train, y_train), (_, _) = load_data()
     print(X_train.shape)
+    print(X_train[0])

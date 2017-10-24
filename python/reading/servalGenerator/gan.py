@@ -10,11 +10,11 @@ import numpy as np
 import os
 from keras.datasets import mnist
 from keras.optimizers import Adam
-from PIL import Image
 import FriendsLoader
+import cv2
 
 IMG_SIZE = 100
-BATCH_SIZE = 100
+BATCH_SIZE = 500
 NUM_EPOCH = 1000
 GENERATED_IMAGE_PATH = "tmp/" # 生成画像の保存先
 
@@ -50,9 +50,6 @@ def discriminator_model():
     model.add(Dense(512))
     model.add(LeakyReLU(0.2))
     model.add(Dropout(0.5))
-#     model.add(Dense(128))
-#     model.add(LeakyReLU(0.2))
-#     model.add(Dropout(0.5))
     model.add(Dense(1))
     model.add(Activation("sigmoid"))
     return model
@@ -112,7 +109,7 @@ def train():
                 image = image*127.5 + 127.5
                 if not os.path.exists(GENERATED_IMAGE_PATH):
                     os.mkdir(GENERATED_IMAGE_PATH)
-                Image.fromarray(image.astype(np.uint8)).save(GENERATED_IMAGE_PATH+"%04d_%04d.png" % (epoch, index))
+                cv2.imwrite(GENERATED_IMAGE_PATH+"%04d_%04d.png" % (epoch, index), image.astype(np.uint8))
 
             # discriminatorを更新
             X = np.concatenate((image_batch, generated_images))
