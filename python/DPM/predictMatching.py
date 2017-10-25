@@ -14,7 +14,7 @@ THRESHOLD = 1.7
 # 追加で推定される途中状態に最も近い状態を返す
 def getAdditionalIntermediate(stateList, step, viewPoint, detail=False):
     # 指定したステップ番号のデータを取得する
-    print("[predictMatching]getAdditionalIntermediate:step:"+str(step))
+    # print("[predictMatching]getAdditionalIntermediate:step:"+str(step))
     bState = stateList[step]
     # 取得したデータに対して次の状態を予測する
     aState = manager.predictwithViewPoint(bState, viewPoint)
@@ -91,7 +91,7 @@ def DP_main(datas, interDict, sampleSize=0.5, n_iter=50, distError=0.005):
 
         # サンプリングを用いて vp を取得
         vp = manager.getViewPointwithSampling(stateDict,sampleSize,n_iter)
-        print("get vp:" + str(vp["base"]) + "," + str(vp["ref"]))
+        # print("get vp:" + str(vp["base"]) + "," + str(vp["ref"]))
 
         pending  = {}
         matching = {"before":[], "after":[], "fname":[]}
@@ -145,7 +145,7 @@ def DP_main(datas, interDict, sampleSize=0.5, n_iter=50, distError=0.005):
             if len(rests[fname]) > 0:
                 stateDict["after"].append(fdata[rests[fname].pop(0)])
             else:
-                print("EMPTY - " + fname)
+                # print("EMPTY - " + fname)
                 stateDict["after" ].append(fdata[-1])
             stateDict["fname"].append(fname)
  

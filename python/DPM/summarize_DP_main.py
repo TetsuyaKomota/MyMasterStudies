@@ -14,7 +14,8 @@ def run(path = "tmp/summarize_DP_main/img.png"):
             d = dill.load(f)
 
         matchList = d["matching"]
-        
+        print("[summarize_DP_main]num of matching:" + str(len(matchList)))       
+ 
         alist = []
         for m in matchList:
             alist.append([a["step"] for a in m["after"]])
