@@ -10,7 +10,7 @@ def run(path = "tmp/summarize_DP_main/img.png"):
             imgpath += ".png"
         else:
             imgpath = path
-        with open("tmp/log_MakerMain/dills/DP_main_2_temp.dill", "rb") as f:
+        with open("tmp/log_MakerMain/dills/DP_main_temp.dill", "rb") as f:
             d = dill.load(f)
 
         matchList = d["matching"]

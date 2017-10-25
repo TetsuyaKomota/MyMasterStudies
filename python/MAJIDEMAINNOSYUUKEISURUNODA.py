@@ -25,7 +25,7 @@ def run():
         print("---------- : make DP_main_results.dill")
         with open("tmp/log_MakerMain/dills/DP_main_results.dill", "wb") as f:
             interdict = matching.getInterDict(dirname)
-            dill.dump(matching.DP_main_2(datas, interdict, \
+            dill.dump(matching.DP_main(datas, interdict, \
                 sampleSize=pm.pick(p, "sampleSize"), \
                 n_iter=pm.pick(p, "n_iter"),\
                 distError=pm.pick(p, "distError")), f)

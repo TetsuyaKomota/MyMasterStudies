@@ -41,10 +41,12 @@ def getAdditionalIntermediate(stateList, step, viewPoint, detail=False):
             break
     return output
 
-# ディレクトリ名を指定して，ファイル名をキー，境界のidx リストを値とする辞書を作る
+# ディレクトリ名を指定して，ファイル名をキー，
+# 境界のidx リストを値とする辞書を作る
 def getInterDict(dirname):
-    output = {}
-    fpaths = glob.glob("tmp/log_MakerMain/GettingIntermediated/"+dirname+"/*")
+    output  = {}
+    dirpath = "tmp/log_MakerMain/GettingIntermediated/"+dirname+"/*"
+    fpaths = glob.glob(dirpath)
     for fpath in fpaths:
         if os.path.isdir(fpath) == True:
             continue
@@ -56,14 +58,12 @@ def getInterDict(dirname):
                 line = f.readline()
                 if line == "":
                     break
-                # csv ファイルの境界のインデックスは 1~500 になっているので，
-                # 0~499 にするために 1引く
-                output[fname].append(int(line.split(",")[0])-1)
+                output[fname].append(int(line.split(",")[0]))
     return output
 
 # 全データと境界列から，マッチング群を推定して返す
-# interDict : dict : ファイル名をキーに，境界状態のステップ数のリストを持つ辞書
-def DP_main_2(datas, interDict, sampleSize=0.5, n_iter=50, distError=0.005):
+# interDict : dict : ファイル名をキー，境界のステップ数のリストを持つ辞書
+def DP_main(datas, interDict, sampleSize=0.5, n_iter=50, distError=0.005):
     output = {"matching":[], "pending":[]}
     rests = copy.deepcopy(interDict)
     # 境界が 0 番, 500番以外にないデータはここで除外する
@@ -90,52 +90,64 @@ def DP_main_2(datas, interDict, sampleSize=0.5, n_iter=50, distError=0.005):
             break
 
         # サンプリングを用いて vp を取得
-        vp = manager.getViewPointwithSampling(stateDict, sampleSize, n_iter)
-        print("get vp:" + str(vp[0]["base"]) + "," + str(vp[0]["ref"]))
+        vp = manager.getViewPointwithSampling(stateDict,sampleSize,n_iter)
+        print("get vp:" + str(vp["base"]) + "," + str(vp["ref"]))
 
-        # これをもとに predicts を作成
-        predicts = {}
-        moved = manager.getMovedObject(stateDict)
-        for i in range(len(stateDict["before"])):
-            # step を使う場合は -1
-            predicts[stateDict["fname"][i]] = getAdditionalIntermediate(datas[stateDict["fname"][i]], stateDict["before"][i]["step"]-1, vp)
-        # predicts と after の関係から，動作を決定する
+        pending  = {}
         matching = {"before":[], "after":[], "fname":[]}
-        pending = {}
-
+        moved = manager.getMovedObject(stateDict)
+        
         for i in range(len(stateDict["before"])):
-            # predicts と after の差が score の一定倍程度なら
-            # matching として保存
-            matching["before"].append(stateDict["before"][i]) 
-            matching["after" ].append(predicts[stateDict["fname"][i]]) 
-            matching["fname" ].append(stateDict["fname" ][i]) 
-            # 新手法は matching すべてに対して predicts を適用していくという
-            # ものなので，ignored に対して特別な処理はしない
-            # pending であるもののみ，rests に返却するために保存する
-            if manager.calcDifference(predicts[stateDict["fname"][i]], stateDict["after"][i], objs=moved) >= vp[0]["score"] * distError and predicts[stateDict["fname"][i]]["step"] < stateDict["after"][i]["step"]:
-                    pending[stateDict["fname"][i]] = stateDict["after"][i]["step"]
+            # この i は「各ファイルの」という意味である
+            # ファイル名は fname に i のインデックスで入っているので
+            # 分かりやすいようにここで取得しておく
+            fname  = stateDict["fname" ][i]
+            before = stateDict["before"][i]
+            after  = stateDict["after "][i]
+            
+            # vp を用いて，境界の推定をやり直す
+            bStep  = before["step"]
+            addInter = getAdditionalIntermediate(datas[fname], bStep, vp)
+
+            # matching の更新
+            matching["before"].append(before) 
+            matching["after" ].append(addInter) 
+            matching["fname" ].append(fname) 
+            
+            # pending の更新
+            # 最初の条件は，「predict よりもほんのちょっと後ろの after を
+            # 次の境界としない」為の条件
+            # または「正しい after だった」場合に
+            # ちゃんと動くようにするためのもの
+            # predict からある程度以上離れていれば，次の境界とする
+            d = manager.calcDifference(addInter, after, objs=moved)
+            if d >= vp["score"] * distError \
+                    and addInter["step"] < after["step"]:
+                pending[fname] = after["step"]
+
         # rests に pending を返却
         for fname in pending:
-            # インデックスのずれを修正するために -1
-            rests[fname] = [pending[fname]-1] + rests[fname]
+            rests[fname] = [pending[fname]] + rests[fname]
 
         # output に matching と pending を追加
         output["matching"].append(matching)
         output["pending" ].append(pending)
-        with open("tmp/log_MakerMain/dills/DP_main_2_temp.dill", "wb") as f:
+        with open("tmp/log_MakerMain/dills/DP_main_temp.dill", "wb") as f:
             dill.dump(output, f)
  
        # 次の stateDict を作る
         stateDict = {"before":[], "after":[], "fname":[]}
         for fname in rests:
             fdata = datas[fname]
-            stateDict["before"].append(predicts[fname])
+            # 次の before は今の matching の after
+            idx   = matching["fname"].index(fname)
+            stateDict["before"].append(matching[after][idx])
             if len(rests[fname]) > 0:
-                stateDict["after" ].append(fdata[rests[fname].pop(0)])
+                stateDict["after"].append(fdata[rests[fname].pop(0)])
             else:
                 print("EMPTY - " + fname)
                 stateDict["after" ].append(fdata[-1])
-            stateDict["fname" ].append(fname)
+            stateDict["fname"].append(fname)
  
     return output
 
@@ -144,4 +156,4 @@ if __name__ == "__main__":
     # データ取得
     datas = manager.getStateswithViewPoint(filepaths, [], [])
     with open("tmp/log_MakerMain/dills/DP_main_results.dill", "wb") as f:
-        dill.dump(DP_main_2(datas, getInterDict("3-2500-2500-11-5-1")), f)
+        dill.dump(DP_main(datas, getInterDict("3-2500-2500-11-5-1")), f)

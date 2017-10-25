@@ -255,7 +255,7 @@ class Maker:
     def debug_log(self):
         # 出力の順番はステップ数，ハンド，colorList 順のオブジェクト
         # ハンドとオブジェクトはそれぞれ座標，速度，加速度
-        self.f.write(str(self.timeStep) + ",")
+        self.f.write(str(self.timeStep-1) + ",")
         self.f.write(str(self.handX[0])+","+str(self.handX[1])+",")
         self.f.write(str(self.handV[0])+","+str(self.handV[1])+",")
         self.f.write(str(self.handA[0])+","+str(self.handA[1])+",")

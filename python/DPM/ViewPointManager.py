@@ -51,11 +51,11 @@ def getDistribution(stateDict, baseList, refList, movedObject):
     size = len(stateDict["before"])
     # 前後のデータ数が違えばそこでエラー終了
     if size != len(stateDict["after"]):
-        print("[ViewPointManager]getViewPoint:different size")
+        print("[ViewPointManager]getDistribution:different size")
         return []
     # ゼロ個だったら何かおかしいのでエラー終了
     if size == 0:
-        print("[ViewPointManager]getViewPoint:size is zero")
+        print("[ViewPointManager]getDistribution:size is zero")
         return []
     move = []
     transafter = []
@@ -151,7 +151,8 @@ def getViewPoint(stateDict, detail=False):
                         better["mean"]  = score[0]
                         output = [better] + output
                         tempmin = score[1]
-    return output
+    # 再考の結果のみ返す
+    return output[0]
 
 # 前後組を引数に，サンプリング->vp 学習を繰り返して
 # 観点を多数決で推定する
@@ -174,7 +175,7 @@ def getViewPointwithSampling(stateDict, sampleSize=0.5, n_iter=50):
         
         # サンプリング結果で vp 学習
         vp  = getViewPoint(pick)
-        key = (vp[0]["base"], vp[0]["ref"])
+        key = (vp["base"], vp["ref"])
 
         # サンプリング結果を vpdict に保存する
         if key in vpdict.keys():
@@ -195,20 +196,22 @@ def getViewPointwithSampling(stateDict, sampleSize=0.5, n_iter=50):
     better["ref"]   = points[1]
     better["score"] = distribution[1]
     better["mean"]  = distribution[0]
-    output = [better]
-    return output
+    return better
 
 # getViewPoint の結果をもとに，次の状態を推定する
 # state     : 状態
 # viewPoint : getViewPoint の結果
 def predictwithViewPoint(state, viewPoint):
     moved  = copy.deepcopy(state)
-    for m in viewPoint[0]["mean"]:
-        moved[m] = viewPoint[0]["mean"][m]
-    moved = encoder.retransformforViewPoint(moved, viewPoint[0]["base"], viewPoint[0]["ref"])
+    base   = viewPoint["base"] 
+    ref    = viewPoint["ref" ] 
+    mean   = viewPoint["mean"] 
+    for m in mean:
+        moved[m] = viewPoint["mean"][m]
+    moved = encoder.retransformforViewPoint(moved, base, ref)
     output = {}
     for s in state:
-        if s in viewPoint[0]["mean"]:
+        if s in mean:
             output[s] = moved[s]
         else:
             output[s] = state[s]
@@ -269,24 +272,6 @@ def savefig(state,path="tmp/forslides",name="fig.png",log=True,inter=False):
     return True
 
 if __name__ == "__main__":
-    """
-    dirpath = "tmp/log_MakerMain/GettingIntermediated/3-2500-2500-9/*"
-    filepaths = glob.glob(dirpath)
-    # hand を中心に変換したデータを取得
-    datas = getStateswithViewPoint(filepaths, ["hand"], [])
-    for d in datas:
-        print(d)
-        print(datas[d])
-    with open("tmp/log_MakerMain/dills/test_pov.dill", "wb") as f:
-        dill.dump(datas, f)
-    print("\n\n\n")
-    testData = datas[list(datas.keys())[0]]
-    # 描画のテスト
-    print(testData[0])
-    show(testData[0])
-    # 観点取得のテスト
-    getViewPoint(testData)
-    """
     filepaths = glob.glob("tmp/log_MakerMain/*")
     # データ取得
     datas = getStateswithViewPoint(filepaths, [], [])
