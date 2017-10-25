@@ -3,7 +3,13 @@
 import dill
 import matplotlib.pyplot as plt
 
-def run(path = "tmp/summarize_DP_main/"):
+def run(path = "tmp/summarize_DP_main/img.png"):
+        if isinstance(path, list):
+            imgpath  = "tmp/MAINNOSYUUKEISURUNODA_results/"
+            imgpath += "-".join([str(d) for d in path])
+            imgpath += ".png"
+        else:
+            imgpath = path
         with open("tmp/log_MakerMain/dills/DP_main_2_temp.dill", "rb") as f:
             d = dill.load(f)
 
@@ -51,7 +57,7 @@ def run(path = "tmp/summarize_DP_main/"):
                 temp += alist[L*i+j]
             plt.hist(temp, bins = int((max(temp)-min(temp))/4))
         # plt.show()
-        plt.savefig(path)
+        plt.savefig(imgpath)
         plt.close()
 
 if __name__ == "__main__":

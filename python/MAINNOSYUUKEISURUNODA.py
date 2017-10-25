@@ -8,6 +8,14 @@ import glob
 filepaths = glob.glob("tmp/log_MakerMain/*")
 # データ取得
 datas = manager.getStateswithViewPoint(filepaths, [], [])
+
+
+print("注意!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+print("これはもう古い！ MAJIDEMAINNOSYUKEISYURUNODA.py を実行するべし!!!")
+print("注意!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+print("これはもう古い！ MAJIDEMAINNOSYUKEISYURUNODA.py を実行するべし!!!")
+print("注意!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+print("これはもう古い！ MAJIDEMAINNOSYUKEISYURUNODA.py を実行するべし!!!")
  
 sampleSize = 0.0
 for _1 in range(10):
