@@ -25,13 +25,11 @@ def run(path = "tmp/summarize_DP_main/img.png"):
         I = 5
         j = 0
         for i in range(I):
-            print("asdfjashlak")
             temp = []
             L = int(total/I)
             while True:
                 if len(temp) >= L or j == len(alist):
                     break
-                print(str(j)+"/"+str(len(alist)))
                 temp += alist[j]
                 j += 1
             if len(temp) == 0:

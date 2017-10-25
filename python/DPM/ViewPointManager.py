@@ -165,13 +165,12 @@ def getViewPointwithSampling(stateDict, sampleSize=0.5, n_iter=50):
     for _ in range(n_iter):
         # stateDict から半分のサンプリング
         # とりあえず一つのデータは一回まで
-        pick = {"before":[], "after":[], "fname":[], "isadd":[]}
+        pick = {"before":[], "after":[], "fname":[]}
         random.shuffle(size)
         for i in size[:int(len(size)*sampleSize)]:
             pick["before"].append(stateDict["before"][i])
             pick["after" ].append(stateDict["after" ][i])
             pick["fname" ].append(stateDict["fname" ][i])
-            pick["isadd" ].append(stateDict["isadd" ][i])
         
         # サンプリング結果で vp 学習
         vp  = getViewPoint(pick)

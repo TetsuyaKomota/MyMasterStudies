@@ -103,7 +103,7 @@ def DP_main(datas, interDict, sampleSize=0.5, n_iter=50, distError=0.005):
             # 分かりやすいようにここで取得しておく
             fname  = stateDict["fname" ][i]
             before = stateDict["before"][i]
-            after  = stateDict["after "][i]
+            after  = stateDict["after" ][i]
             
             # vp を用いて，境界の推定をやり直す
             bStep  = before["step"]
@@ -141,7 +141,7 @@ def DP_main(datas, interDict, sampleSize=0.5, n_iter=50, distError=0.005):
             fdata = datas[fname]
             # 次の before は今の matching の after
             idx   = matching["fname"].index(fname)
-            stateDict["before"].append(matching[after][idx])
+            stateDict["before"].append(matching["after"][idx])
             if len(rests[fname]) > 0:
                 stateDict["after"].append(fdata[rests[fname].pop(0)])
             else:

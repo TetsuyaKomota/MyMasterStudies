@@ -14,6 +14,7 @@ def run():
     # データ取得
     datas = manager.getStateswithViewPoint(filepaths, [], [])
     pm = ParamManager("MAINSYU")
+    pm.printREADME("MAINSYU")
     p  = pm.firstParams()
 
     count = 0

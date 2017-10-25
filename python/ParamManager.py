@@ -50,12 +50,17 @@ class ParamManager:
             self.counter[i][IDX] = 0
             return self.sub_nextParams(i+1)
 
-    def printREADME(self):
-        fpath = "tmp/log_MakerMain/GettingIntermediated/README.txt"
+    def printREADME(self, name="HONKORE"):
+        if name == "HONKORE":
+            fpath = "tmp/log_MakerMain/GettingIntermediated/README.txt"
+            explanation = setting.HONKORE_EXPLANATION
+        elif name == "MAINSYU":
+            fpath = "tmp/MAINNOSYUUKEISURUNODA_results/README.txt"
+            explanation = setting.MAINSYU_EXPLANATION
         with open(fpath, "w", encoding="utf-8") as f:
             f.write("ディレクトリのパラメータは以下の順に並んでいます\n")
             f.write(str(self.getParamNameList()))
             f.write("\n\n")
-            f.write(setting.HONKORE_EXPLANATION)
+            f.write(explanation)
 
 
