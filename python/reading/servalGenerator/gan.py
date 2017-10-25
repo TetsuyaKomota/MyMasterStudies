@@ -15,7 +15,7 @@ import FriendsLoader
 import cv2
 
 IMG_SIZE = 100
-BATCH_SIZE = 500
+BATCH_SIZE = 100
 NUM_EPOCH = 1000
 GENERATED_IMAGE_PATH = "tmp/" # 生成画像の保存先
 

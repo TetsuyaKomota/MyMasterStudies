@@ -19,6 +19,14 @@ class ParamManager:
         self.params  = setting.HONKORE_PARAMS
         self.counter = []
 
+    def pick(self, paramList, key):
+        # paramList のキーには自動割り振りの数字インデックスがついている
+        # 利用時にそれがいくつかわからないため，キー名のみで指定できるように変更する
+        for p in paramList.keys():
+            if key in p:
+                return paramList[p]
+        return None
+
     def getParamNameList(self):
         return sorted(list(self.params.keys()))
 
@@ -67,13 +75,14 @@ def run():
         if p == NOPARAMS:
             break
         print("---------- : Making datas")
-        # makerMotions.execute(p["00testNumber"], p["01inits"], p["02numofData"])
+        # makerMotions.execute(pm.pick(p, "testNumber"), pm.pick(p, "inits"), pm.pick(p, "numofData"))
         print("++-------- : Post processing ")
         # post.execute(False)
         print("++++------ : Encoding with SOINN")
-        # soinn.execute(p["03step"], soinnN=p["04soinn"], soinnE=p["04soinn"])
+        # soinn.execute(pm.pick(p, "step"), soinnN=pm.pick(p, "soinn"), soinnE=pm.pick(p, "soinn"))
         print("++++++---- : Parsing with HPYLM")
-        hpylm.execute(D=p["05D"], A=p["06A"], Theta=p["07Theta"], PAD=p["08PAD"], hpylm_iter=p["10hpylm_iter"], reverse=p["09reverse"])
+        hpylm.execute(D=pm.pick(p, "D"), A=pm.pick(p, "A"), Theta=pm.pick(p, "Theta"), \
+                        PAD=pm.pick(p, "PAD"), hpylm_iter=pm.pick(p, "hpylm_iter"), reverse=pm.pick(p, "reverse"))
         print("++++++++-- : Getting intermmediates")
         inter.execute([p[name] for name in pm.getParamNameList()])
         print("++++++++++ : Finished")
