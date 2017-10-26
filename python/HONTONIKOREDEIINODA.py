@@ -22,11 +22,11 @@ def run():
         if p == NOPARAMS:
             break
         print("---------- : Making datas")
-        # makerMotions.execute(pm.pick(p, "testNumber"), pm.pick(p, "inits"), pm.pick(p, "numofData"))
+        makerMotions.execute(pm.pick(p, "testNumber"), pm.pick(p, "inits"), pm.pick(p, "numofData"))
         print("++-------- : Post processing ")
-        # post.execute(False)
+        post.execute(False)
         print("++++------ : Encoding with SOINN")
-        # soinn.execute(pm.pick(p, "step"), soinnN=pm.pick(p, "soinn"), soinnE=pm.pick(p, "soinn"))
+        soinn.execute(pm.pick(p, "step"), soinnN=pm.pick(p, "soinn"), soinnE=pm.pick(p, "soinn"))
         print("++++++---- : Parsing with HPYLM")
         hpylm.execute(D=pm.pick(p, "D"), A=pm.pick(p, "A"), Theta=pm.pick(p, "Theta"), \
                         PAD=pm.pick(p, "PAD"), hpylm_iter=pm.pick(p, "hpylm_iter"), reverse=pm.pick(p, "reverse"))

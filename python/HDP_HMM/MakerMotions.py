@@ -65,6 +65,38 @@ def test2(maker, inits):
     maker.gotoGoal("hand", [0, 0], 100)
     maker.execute(100)
 
+def test2_1(maker, inits):
+    # test2 と同じ動作だが，最終位置は比でなく絶対値で配置する
+    # 初期化
+    maker.setXs("hand"  , [0, 0])
+    maker.setXs("red"   , inits["red"])
+    maker.setXs("blue"  , inits["blue"])
+    maker.setXs("yellow", inits["yellow"])
+    maker.setXs("green" , inits["green"])
+
+    # 0.
+    dist = maker.getXs("hand") - maker.getXs("red")
+    maker.gotoGoal("hand", maker.getXs("red") + dist/np.linalg.norm(dist) * 5, 100)
+    maker.execute(100)
+    maker.grab("red")
+    # 1.
+    dist = maker.getXs("hand") - maker.getXs("yellow")
+    maker.gotoGoal("hand", (maker.getXs("yellow") + dist/np.linalg.norm(dist) * 30, 100)
+    maker.execute(100)
+    maker.release()
+    # 2.
+    dist = maker.getXs("hand") - maker.getXs("blue")
+    maker.gotoGoal("hand", (maker.getXs("blue") + dist/np.linalg.norm(dist) * 5, 100)
+    maker.execute(100)
+    maker.grab("blue")
+    # 3.
+    maker.gotoGoal("hand", (2*maker.getXs("yellow") - maker.getXs("red")), 100)
+    maker.execute(100)
+    maker.release()
+    # 4.    
+    maker.gotoGoal("hand", [0, 0], 100)
+    maker.execute(100)
+
 def test3(maker, inits, num=0):
     # 初期化
     maker.setXs("hand"  , [0, 0])
@@ -118,6 +150,8 @@ def execute(testNumber, inits, numofData, detail=False):
         testMethod = test1
     elif testNumber == 2:
         testMethod = test2
+    elif testNumber == 21:
+        testMethod = test2_1
     elif testNumber == 3:
         testMethod = test3
     else:

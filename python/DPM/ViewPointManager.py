@@ -217,7 +217,7 @@ def predictwithViewPoint(state, viewPoint):
     return output 
 
 # 状態を引数に，描画する
-# 返還前の 軸の向きも一緒に描画する
+# 変換前の 軸の向きも一緒に描画する
 def show(state, title="show"):
     for st in state:
         color = ""
@@ -280,20 +280,20 @@ if __name__ == "__main__":
     stateDict["after"]  = []
     for d in datas:
         stateDict["before"].append(datas[d][0])
-        stateDict["after"].append(datas[d][100])
+        stateDict["after" ].append(datas[d][99])
     # 学習
     res = getViewPoint(stateDict)
     print("result:")
-    for r in res:
-        line = ""
-        line += "score:" + str(r["score"]) + "\t\t"
-        line += "base:" + str(r["base"]) + "\t\t"
-        line += "ref:" + str(r["ref"]) + "\t\t"
-        line += "mean:" + str(r["mean"]) + "\t\t"
-        print(line)
+    print("score:" + str(res["score"]) + "\t\t")
+    print("base:"  + str(res["base"])  + "\t\t")
+    print("ref:"   + str(res["ref"])   + "\t\t")
+    print("mean:"  + str(res["mean"])  + "\t\t")
     # 推定
-    test = datas["log000000000.csv"][0]
-    show(test, title="before")
-    test = predictwithViewPoint(test, res)
-    show(test, title="after")
+    for i in range(10):
+        test = datas["log00000000" + str(i) +".csv"][0]
+        show(test, title="before")
+        truth= datas["log00000000" + str(i) +".csv"][99]
+        show(truth,title="truth")
+        test = predictwithViewPoint(test, res)
+        show(test, title="after")
 
