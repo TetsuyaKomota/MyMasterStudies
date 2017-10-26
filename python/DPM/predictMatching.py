@@ -36,7 +36,6 @@ def getAdditionalIntermediate(stateList, step, viewPoint, detail=False):
             output = state
         # もし tempdiff + RANGE 以上になったなら，
         # もうその先で更新の見込みはないとして終了する
-        # elif curError >= tempdiff + 1500:
         elif curError >= 5*tempdiff:
             break
     return output
@@ -148,8 +147,28 @@ def DP_main(datas, interDict, sampleSize=0.5, n_iter=50, distError=0.005):
                 # print("EMPTY - " + fname)
                 stateDict["after" ].append(fdata[-1])
             stateDict["fname"].append(fname)
- 
+
+    # debug : 各 matching の平均と分散を計算する
+    for i, m in enumerate(output["matching"]):
+        mv = debug_calcMeanandVarianceofMatching(m)
+        line  = "matching ID:" + str(i)
+        line += "\t("  + str(mv["mean"])
+        line += "\t, " + str(mv["var"])
+        line += "\t)" 
+        print(line)
+
     return output
+
+def debug_calcMeanandVarianceofMatching(matching):
+    size = len(matching["before"])
+    mean = {}
+    Q    = {}
+    var  = {}
+    for ba in ["before", "after"]:
+        mean[ba] = sum(matching[ba])/size
+        Q[ba]    = sum([step**2 for step in matching[ba]])/size
+        var[ba]  = Q[ba] - mean[ba]**2
+    return {"mean":mean, "var":var}
 
 if __name__ == "__main__":
     filepaths = glob.glob("tmp/log_MakerMain/*")
