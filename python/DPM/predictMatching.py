@@ -87,6 +87,8 @@ def DP_main(datas, interDict, sampleSize=0.5, n_iter=5000, distError=0.005):
                 break
         if flg == True:
             break
+        # debug : stateDict を表示してみる
+        print("stateDict : " + debug_calcMeanandVarianceofMatching(stateDict))
 
         # サンプリングを用いて vp を取得
         vp = manager.getViewPointwithSampling(stateDict,sampleSize,n_iter)
@@ -113,6 +115,7 @@ def DP_main(datas, interDict, sampleSize=0.5, n_iter=5000, distError=0.005):
             matching["after" ].append(addInter) 
             matching["fname" ].append(fname) 
            
+            
             # pending の更新
             # 最初の条件は，「predict よりもほんのちょっと後ろの after を
             # 次の境界としない」為の条件
@@ -128,6 +131,9 @@ def DP_main(datas, interDict, sampleSize=0.5, n_iter=5000, distError=0.005):
         for fname in pending:
             rests[fname] = [pending[fname]] + rests[fname]
 
+        # debug : matching の平均と分散を確認する
+        print("matching : "+debug_calcMeanandVarianceofMatching(matching))
+        
         # output に matching と pending を追加
         output["matching"].append(matching)
         output["pending" ].append(pending)
@@ -148,20 +154,10 @@ def DP_main(datas, interDict, sampleSize=0.5, n_iter=5000, distError=0.005):
                 stateDict["after" ].append(fdata[-1])
             stateDict["fname"].append(fname)
 
-    # debug : 各 matching の平均と分散を計算する
-    for i, m in enumerate(output["matching"]):
-        mv = calcMeanandVarianceofMatching(m)
-        line  = "matching ID:" + str(i)
-        line += "\tmean("   + str(mv["mean"]["before"])
-        line += "\t--> "    + str(mv["mean"]["after"])
-        line += "\t), var(" + str(mv["var" ]["before"])
-        line += "\t--> "    + str(mv["var" ]["after"])
-        line += "\t)" 
-        print(line)
 
     return output
 
-def calcMeanandVarianceofMatching(matching):
+def debug_calcMeanandVarianceofMatching(matching):
     size = len(matching["before"])
     mean = {}
     Q    = {}
@@ -171,7 +167,12 @@ def calcMeanandVarianceofMatching(matching):
         mean[ba] = sum(stepList)/size
         Q[ba]    = sum([step**2 for step in stepList])/size
         var[ba]  = Q[ba] - mean[ba]**2
-    return {"mean":mean, "var":var}
+    line  = "\tmean("   + str(mean["before"])
+    line += "\t--> "    + str(mean["after"])
+    line += "\t), var(" + str(var["before"])
+    line += "\t--> "    + str(var["after"])
+    line += "\t)" 
+    return line
 
 if __name__ == "__main__":
     filepaths = glob.glob("tmp/log_MakerMain/*")
