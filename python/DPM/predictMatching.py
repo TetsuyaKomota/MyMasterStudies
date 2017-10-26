@@ -62,7 +62,7 @@ def getInterDict(dirname):
 
 # 全データと境界列から，マッチング群を推定して返す
 # interDict : dict : ファイル名をキー，境界のステップ数のリストを持つ辞書
-def DP_main(datas, interDict, sampleSize=0.5, n_iter=50, distError=0.005):
+def DP_main(datas, interDict, sampleSize=0.5, n_iter=5000, distError=0.005):
     output = {"matching":[], "pending":[]}
     rests = copy.deepcopy(interDict)
     # 境界が 0 番, 500番以外にないデータはここで除外する
@@ -90,7 +90,7 @@ def DP_main(datas, interDict, sampleSize=0.5, n_iter=50, distError=0.005):
 
         # サンプリングを用いて vp を取得
         vp = manager.getViewPointwithSampling(stateDict,sampleSize,n_iter)
-        # print("get vp:" + str(vp["base"]) + "," + str(vp["ref"]))
+        print("get vp:" + str(vp["base"]) + "," + str(vp["ref"]))
 
         pending  = {}
         matching = {"before":[], "after":[], "fname":[]}
@@ -112,7 +112,7 @@ def DP_main(datas, interDict, sampleSize=0.5, n_iter=50, distError=0.005):
             matching["before"].append(before) 
             matching["after" ].append(addInter) 
             matching["fname" ].append(fname) 
-            
+           
             # pending の更新
             # 最初の条件は，「predict よりもほんのちょっと後ろの after を
             # 次の境界としない」為の条件
@@ -121,7 +121,7 @@ def DP_main(datas, interDict, sampleSize=0.5, n_iter=50, distError=0.005):
             # predict からある程度以上離れていれば，次の境界とする
             d = manager.calcDifference(addInter, after, objs=moved)
             if d >= vp["score"] * distError \
-                    and addInter["step"] < after["step"]:
+                    and addInter["step"] < after["step"] :
                 pending[fname] = after["step"]
 
         # rests に pending を返却
@@ -150,23 +150,26 @@ def DP_main(datas, interDict, sampleSize=0.5, n_iter=50, distError=0.005):
 
     # debug : 各 matching の平均と分散を計算する
     for i, m in enumerate(output["matching"]):
-        mv = debug_calcMeanandVarianceofMatching(m)
+        mv = calcMeanandVarianceofMatching(m)
         line  = "matching ID:" + str(i)
-        line += "\t("  + str(mv["mean"])
-        line += "\t, " + str(mv["var"])
+        line += "\tmean("   + str(mv["mean"]["before"])
+        line += "\t--> "    + str(mv["mean"]["after"])
+        line += "\t), var(" + str(mv["var" ]["before"])
+        line += "\t--> "    + str(mv["var" ]["after"])
         line += "\t)" 
         print(line)
 
     return output
 
-def debug_calcMeanandVarianceofMatching(matching):
+def calcMeanandVarianceofMatching(matching):
     size = len(matching["before"])
     mean = {}
     Q    = {}
     var  = {}
     for ba in ["before", "after"]:
-        mean[ba] = sum(matching[ba])/size
-        Q[ba]    = sum([step**2 for step in matching[ba]])/size
+        stepList = [s["step"] for s in matching[ba]]
+        mean[ba] = sum(stepList)/size
+        Q[ba]    = sum([step**2 for step in stepList])/size
         var[ba]  = Q[ba] - mean[ba]**2
     return {"mean":mean, "var":var}
 
@@ -175,4 +178,4 @@ if __name__ == "__main__":
     # データ取得
     datas = manager.getStateswithViewPoint(filepaths, [], [])
     with open("tmp/log_MakerMain/dills/DP_main_results.dill", "wb") as f:
-        dill.dump(DP_main(datas, getInterDict("3-2500-2500-11-5-1")), f)
+        dill.dump(DP_main(datas, getInterDict("CHEATNANODA_results")), f)
