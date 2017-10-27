@@ -62,7 +62,7 @@ def getInterDict(dirname):
 
 # 全データと境界列から，マッチング群を推定して返す
 # interDict : dict : ファイル名をキー，境界のステップ数のリストを持つ辞書
-def DP_main(datas, interDict, sampleSize=0.5, n_iter=5000, distError=0.005):
+def DP_main(datas, interDict, sampleSize=0.5, n_iter=500, distError=0.005):
     output = {"matching":[], "pending":[]}
     rests = copy.deepcopy(interDict)
     # 境界が 0 番, 500番以外にないデータはここで除外する

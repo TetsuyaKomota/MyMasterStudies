@@ -89,7 +89,7 @@ def getVelocityList(datas, timeDelta=0.01):
     output.append(output[-1])
     return output
 
-def execute(isDO):
+def execute(isDO=True):
     if isDO == False:
         return 
     filepaths = glob.glob("tmp/log_MakerMain/*")

@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 
 def run(path = "tmp/summarize_DP_main/img.png"):
         if isinstance(path, list):
-            imgpath  = "tmp/MAINNOSYUUKEISURUNODA_results/"
-            imgpath += "-".join([str(d) for d in path])
+            imgpath  = path[0]
+            imgpath += "-".join([format(d, ".3f") for d in path[1:]])
             imgpath += ".png"
         else:
             imgpath = path

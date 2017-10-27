@@ -4,10 +4,15 @@ import DPM.ViewPointManager as manager
 import DPM.predictMatching as matching
 import DPM.summarize_DP_main as summarizer
 import glob
+import os
 from ParamManager import ParamManager
 from ParamManager import NOPARAMS
 
+DIR_PATH = "tmp/MAJIDEMAINNOSYUUKEISURUNODA_results/"
+
 def run():
+    if os.path.exists(DIR_PATH) == False:
+        os.mkdir(DIR_PATH)
     print("start MAINSYU")
     filepaths = glob.glob("tmp/log_MakerMain/*")
     # dirname   = "100-0-3-2000-0.01-0.11-0.02-5-False-500"
@@ -32,7 +37,7 @@ def run():
                 n_iter=pm.pick(p, "n_iter"),\
                 distError=pm.pick(p, "distError")), f)
         print("+++++----- : save Histogram as png")
-        summarizer.run([p[name] for name in pm.getParamNameList()])
+        summarizer.run([DIR_PATH] + [p[name] for name in pm.getParamNameList()])
         print("++++++++++ : Finished")
         p = pm.nextParams()
 

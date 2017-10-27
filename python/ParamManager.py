@@ -55,7 +55,7 @@ class ParamManager:
             fpath = "tmp/log_MakerMain/GettingIntermediated/README.txt"
             explanation = setting.HONKORE_EXPLANATION
         elif name == "MAINSYU":
-            fpath = "tmp/MAINNOSYUUKEISURUNODA_results/README.txt"
+            fpath = "tmp/MAJIDEMAINNOSYUUKEISURUNODA_results/README.txt"
             explanation = setting.MAINSYU_EXPLANATION
         with open(fpath, "w", encoding="utf-8") as f:
             f.write("ディレクトリのパラメータは以下の順に並んでいます\n")

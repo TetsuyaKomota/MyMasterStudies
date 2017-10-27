@@ -81,12 +81,12 @@ def test2_1(maker, inits):
     maker.grab("red")
     # 1.
     dist = maker.getXs("hand") - maker.getXs("yellow")
-    maker.gotoGoal("hand", (maker.getXs("yellow") + dist/np.linalg.norm(dist) * 30, 100)
+    maker.gotoGoal("hand", maker.getXs("yellow") + dist/np.linalg.norm(dist) * 30, 100)
     maker.execute(100)
     maker.release()
     # 2.
     dist = maker.getXs("hand") - maker.getXs("blue")
-    maker.gotoGoal("hand", (maker.getXs("blue") + dist/np.linalg.norm(dist) * 5, 100)
+    maker.gotoGoal("hand", maker.getXs("blue") + dist/np.linalg.norm(dist) * 5, 100)
     maker.execute(100)
     maker.grab("blue")
     # 3.
@@ -145,7 +145,16 @@ def test3(maker, inits, num=0):
         maker.executeCircle("hand", 100)
     maker.execute(100-rand)
 
-def execute(testNumber, inits, numofData, detail=False):
+# 初期状態を適当に作る
+def getInits():
+    inits = {}
+    inits["red"]    = [10000 * (random() - 0.5), 10000 * (random() - 0.5)]
+    inits["blue"]   = [10000 * (random() - 0.5), 10000 * (random() - 0.5)]
+    inits["yellow"] = [10000 * (random() - 0.5), 10000 * (random() - 0.5)]
+    inits["green"]  = [10000 * (random() - 0.5), 10000 * (random() - 0.5)]
+    return inits
+
+def execute(testNumber, isShuffleInits, numofData, detail=False):
     if testNumber == 1:
         testMethod = test1
     elif testNumber == 2:
@@ -159,7 +168,10 @@ def execute(testNumber, inits, numofData, detail=False):
             print("[MakerMotions]execute:invalid testNumber:", end="")
             peinr(str(testNumber))
         return 
+    inits = getInits()
     for i in range(numofData):
+        if isShuffleInits == True:
+            inits = getInits()
         filename = "000000"+"{0:03d}".format(i)
         maker = makerMain.Maker(filename)
         testMethod(maker, inits)
