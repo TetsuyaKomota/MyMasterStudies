@@ -14,21 +14,29 @@ from keras.optimizers import Adam
 import FriendsLoader
 import cv2
 
-IMG_SIZE = 100
-BATCH_SIZE = 100
+IMG_SIZE = 64
+BATCH_SIZE = 1000
 NUM_EPOCH = 1000
 GENERATED_IMAGE_PATH = "tmp/" # 生成画像の保存先
 
 def generator_model():
-    layerSize = int(IMG_SIZE/4)
+    layerSize = int(IMG_SIZE/16)
     model = Sequential()
-    model.add(Dense(2048, input_shape=(IMG_SIZE,)))
+    model.add(Dense(2048, input_shape=(100,)))
     model.add(BatchNormalization())
     model.add(Activation("relu"))
-    model.add(Dense(layerSize*layerSize*256))
+    model.add(Dense(layerSize*layerSize*1024))
     model.add(BatchNormalization())
     model.add(Activation("relu"))
-    model.add(Reshape((layerSize, layerSize, 256)))
+    model.add(Reshape((layerSize, layerSize, 1024)))
+    model.add(UpSampling2D((2, 2)))
+    model.add(Conv2D(512, (5, 5), padding="same"))
+    model.add(BatchNormalization())
+    model.add(Activation("relu"))
+    model.add(UpSampling2D((2, 2)))
+    model.add(Conv2D(256, (5, 5), padding="same"))
+    model.add(BatchNormalization())
+    model.add(Activation("relu"))
     model.add(UpSampling2D((2, 2)))
     model.add(Conv2D(128, (5, 5), padding="same"))
     model.add(BatchNormalization())
@@ -112,7 +120,7 @@ def train():
     for epoch in range(NUM_EPOCH):
 
         for index in range(num_batches):
-            noise = np.array([np.random.uniform(-1, 1, IMG_SIZE) for _ in range(BATCH_SIZE)])
+            noise = np.array([np.random.uniform(-1, 1, 100) for _ in range(BATCH_SIZE)])
             
             # メモ : noise.shape = (32(バッチサイズ), 100)
 
@@ -121,7 +129,7 @@ def train():
 
             # 生成画像を出力
             if index % 50 == 0:
-                image = combine_images(generated_images)
+                image = combine_images(generated_images[:12])
                 image = image*127.5 + 127.5
                 if not os.path.exists(GENERATED_IMAGE_PATH):
                     os.mkdir(GENERATED_IMAGE_PATH)
