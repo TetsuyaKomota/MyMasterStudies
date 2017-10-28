@@ -14,10 +14,10 @@ from keras.optimizers import Adam
 import FriendsLoader
 import cv2
 
-IMG_SIZE = 64
-BATCH_SIZE = 1000
-NUM_EPOCH = 1000
-GENERATED_IMAGE_PATH = "tmp/" # 生成画像の保存先
+from setting import IMG_SIZE
+from setting import BATCH_SIZE
+from setting import NUM_EPOCH
+from setting import GENERATED_IMAGE_PATH
 
 def generator_model():
     layerSize = int(IMG_SIZE/16)
