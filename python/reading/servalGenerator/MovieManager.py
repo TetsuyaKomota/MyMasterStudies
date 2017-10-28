@@ -45,7 +45,7 @@ def main(movieName):
             width = rect[2]
             height = rect[3]
             dst = frame[y:y+height, x:x+width]
-            new_image_path = 'tmp/fromMovies/' + movieName + "_" "{0:05d}".format(count) + "_" + "{0:02d}".format(i) + ".png"
+            new_image_path = 'tmp/dataset/fromMovies/' + movieName + "_" "{0:05d}".format(count) + "_" + "{0:02d}".format(i) + ".png"
             cv2.imwrite(new_image_path, dst)
             i += 1
         # 保存
@@ -56,5 +56,5 @@ def main(movieName):
 
 
 if __name__ == "__main__":
-    for i in range(1, 10):
+    for i in range(10, 14):
         main("{0:02d}".format(i))

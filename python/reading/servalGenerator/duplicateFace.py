@@ -5,7 +5,7 @@ import glob
 import os
 import numpy as np
 
-files = glob.glob("tmp/fromMovies/*")
+files = glob.glob("tmp/dataset/fromMovies/*")
 
 def kakeru(lis):
     output = 1
@@ -15,16 +15,18 @@ def kakeru(lis):
 
 for f in files:
     img    = cv2.imread(f)
-    """
     noize  = np.random.rand(kakeru([d for d in img.shape])).reshape(img.shape)
     noize -= 0.5
     noize *= 100
+    fname  = "noized/"
     """
     noize     = np.array(img, dtype = "float64")
     d         = int(img.shape[0]/30)
     noize[d:] = noize[:-d]
     noize    -= 200
     noize     / 10
+    fname  = "duplicated/"
+    """
 
 
     img    = np.array(img, dtype = "float64")
@@ -33,4 +35,4 @@ for f in files:
     img    = np.array(img, dtype="uint8")
     # cv2.imshow("noized img", img)
     # cv2.waitKey(0)
-    cv2.imwrite("tmp/duplicated/" + os.path.basename(f), img)
+    cv2.imwrite("tmp/dataset/"+fname + os.path.basename(f), img)
