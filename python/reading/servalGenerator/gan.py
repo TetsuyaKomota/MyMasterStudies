@@ -25,7 +25,7 @@ def generator_model():
 #    model.add(Dense(2048, input_shape=(100,)))
 #    model.add(BatchNormalization())
 #    model.add(Activation("relu"))
-    model.add(Dense(layerSize*layerSize*1024))
+    model.add(Dense(layerSize*layerSize*1024), input_shape=(100,))
     model.add(BatchNormalization())
     model.add(Activation("relu"))
     model.add(Reshape((layerSize, layerSize, 1024)))
