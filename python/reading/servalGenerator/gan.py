@@ -93,7 +93,8 @@ def train():
             discriminator = model_from_json(f.read())
     else:
         discriminator = discriminator_model()
-    d_opt = Adam(lr=1e-5, beta_1=0.1)
+    # d_opt = Adam(lr=1e-5, beta_1=0.1)
+    d_opt = Adam(lr=2e-4, beta_1=0.5)
     if os.path.exists("discriminator.h5"):
         discriminator.load_weights("discriminator.h5", by_name=False)
     discriminator.compile(loss="binary_crossentropy", optimizer=d_opt)
@@ -117,6 +118,10 @@ def train():
         f.write(generator.to_json())
     num_batches = int(X_train.shape[0] / BATCH_SIZE)
     print("Number of batches:", num_batches)
+
+    # 出力画像用のノイズを生成
+    # 画像の成長過程を見たいので，出力画像には常に同じノイズを使う
+    output_noise = np.array([np.random.uniform(-1, 1, 100) for _ in range(30)])
     for epoch in range(NUM_EPOCH):
 
         for index in range(num_batches):
@@ -129,7 +134,8 @@ def train():
 
             # 生成画像を出力
             if index % 350 == 0:
-                image = combine_images(generated_images[:12])
+                output_images = generator.predict(output_noise, verbose=0)
+                image = combine_images(output_images)
                 image = image*127.5 + 127.5
                 if not os.path.exists(GENERATED_IMAGE_PATH):
                     os.mkdir(GENERATED_IMAGE_PATH)
