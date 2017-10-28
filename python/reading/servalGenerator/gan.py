@@ -135,8 +135,7 @@ def train():
 
             # 生成画像を出力
             if index % 350 == 0:
-                output_images = generator.predict(output_noise, verbose=0)
-                image = combine_images(output_images)
+                image = combine_images(generated_images)
                 image = image*127.5 + 127.5
                 if not os.path.exists(GENERATED_IMAGE_PATH):
                     os.mkdir(GENERATED_IMAGE_PATH)
