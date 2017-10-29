@@ -111,7 +111,7 @@ def train():
         generator = generator_model()
     dcgan = Sequential([generator, discriminator])
     # g_opt = Adam(lr=2e-4, beta_1=0.5)
-    g_opt = Adam(lr=5e-5, beta_1=0.5)
+    g_opt = Adam(lr=1e-4, beta_1=0.5)
     if os.path.exists("generator.h5"):
         generator.load_weights("generator.h5", by_name=False)
     dcgan.compile(loss="binary_crossentropy", optimizer=g_opt)
