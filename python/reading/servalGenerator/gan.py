@@ -13,6 +13,7 @@ from keras.datasets import mnist
 from keras.optimizers import Adam
 import FriendsLoader
 import cv2
+import dill
 
 from setting import IMG_SIZE
 from setting import BATCH_SIZE
@@ -125,7 +126,13 @@ def train():
 
     # 出力画像用のノイズを生成
     # 画像の成長過程を見たいので，出力画像には常に同じノイズを使う
-    noise = np.array([np.random.uniform(-1, 1, 100) for _ in range(BATCH_SIZE)])
+    if os.path.exists("noize.dill"):
+        with open("noize.dill", "rb") as f:
+            noise = dill.load("f")
+    else:
+        noise = np.array([np.random.uniform(-1, 1, 100) for _ in range(BATCH_SIZE)])
+        with open("noize.dill", "wb") as f:
+            dill.dump(noise, f)
     for epoch in range(NUM_EPOCH):
 
         for index in range(num_batches):
