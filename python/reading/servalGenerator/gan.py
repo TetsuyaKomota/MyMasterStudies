@@ -19,6 +19,11 @@ from setting import BATCH_SIZE
 from setting import NUM_EPOCH
 from setting import GENERATED_IMAGE_PATH
 
+from setting import G_LR
+from setting import G_BETA
+from setting import D_LR
+from setting import D_BETA
+
 def generator_model():
     layerSize = int(IMG_SIZE/16)
     model = Sequential()
@@ -93,8 +98,7 @@ def train():
             discriminator = model_from_json(f.read())
     else:
         discriminator = discriminator_model()
-    d_opt = Adam(lr=1e-5, beta_1=0.1)
-    # d_opt = Adam(lr=2e-4, beta_1=0.5)
+    d_opt = Adam(lr=D_LR, beta_1=D_BETA)
     if os.path.exists("discriminator.h5"):
         discriminator.load_weights("discriminator.h5", by_name=False)
     discriminator.compile(loss="binary_crossentropy", optimizer=d_opt)
@@ -110,8 +114,7 @@ def train():
     else:
         generator = generator_model()
     dcgan = Sequential([generator, discriminator])
-    # g_opt = Adam(lr=2e-4, beta_1=0.5)
-    g_opt = Adam(lr=1e-4, beta_1=0.5)
+    g_opt = Adam(lr=G_LR, beta_1=G_BETA)
     if os.path.exists("generator.h5"):
         generator.load_weights("generator.h5", by_name=False)
     dcgan.compile(loss="binary_crossentropy", optimizer=g_opt)
