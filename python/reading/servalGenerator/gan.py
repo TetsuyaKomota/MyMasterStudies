@@ -128,7 +128,7 @@ def train():
     # 画像の成長過程を見たいので，出力画像には常に同じノイズを使う
     if os.path.exists("noize.dill"):
         with open("noize.dill", "rb") as f:
-            noise = dill.load("f")
+            noise = dill.load(f)
     else:
         noise = np.array([np.random.uniform(-1, 1, 100) for _ in range(BATCH_SIZE)])
         with open("noize.dill", "wb") as f:
