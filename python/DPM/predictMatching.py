@@ -63,7 +63,7 @@ def getInterDict(dirname):
 # 全データと境界列から，マッチング群を推定して返す
 # interDict : dict : ファイル名をキー，境界のステップ数のリストを持つ辞書
 def DP_main(datas, interDict, sampleSize=0.5, n_iter=500, distError=0.005):
-    output = {"matching":[], "pending":[]}
+    output = {"matching":[], "pending":[], "viewpoint", []}
     rests = copy.deepcopy(interDict)
     # 境界が 0 番, 500番以外にないデータはここで除外する
     temprests = {}
@@ -115,7 +115,6 @@ def DP_main(datas, interDict, sampleSize=0.5, n_iter=500, distError=0.005):
             matching["after" ].append(addInter) 
             matching["fname" ].append(fname) 
            
-            
             # pending の更新
             # 最初の条件は，「predict よりもほんのちょっと後ろの after を
             # 次の境界としない」為の条件
@@ -134,9 +133,10 @@ def DP_main(datas, interDict, sampleSize=0.5, n_iter=500, distError=0.005):
         # debug : matching の平均と分散を確認する
         print("matching : "+debug_calcMeanandVarianceofMatching(matching))
         
-        # output に matching と pending を追加
-        output["matching"].append(matching)
-        output["pending" ].append(pending)
+        # output に matching と pending と vp を追加
+        output["matching" ].append(matching)
+        output["pending"  ].append(pending)
+        output["viewpoint"].append(vp)
         with open("tmp/log_MakerMain/dills/DP_main_temp.dill", "wb") as f:
             dill.dump(output, f)
  
@@ -153,7 +153,6 @@ def DP_main(datas, interDict, sampleSize=0.5, n_iter=500, distError=0.005):
                 # print("EMPTY - " + fname)
                 stateDict["after" ].append(fdata[-1])
             stateDict["fname"].append(fname)
-
 
     return output
 
