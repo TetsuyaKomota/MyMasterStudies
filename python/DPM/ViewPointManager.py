@@ -218,7 +218,7 @@ def predictwithViewPoint(state, viewPoint):
 
 # 状態を引数に，描画する
 # 変換前の 軸の向きも一緒に描画する
-def show(state, title="show"):
+def show(state, title="show", xlim=(-5000, 5000), ylim=(-5000, 5000)):
     for st in state:
         color = ""
         if st == "hand":
@@ -229,6 +229,8 @@ def show(state, title="show"):
             continue
         plt.scatter(state[st][0], state[st][1], c=color, s=120)
     plt.title(title)
+    plt.xlim(xlim[0], xlim[1])
+    plt.ylim(ylim[0], ylim[1])
     plt.show()
     return True
 
