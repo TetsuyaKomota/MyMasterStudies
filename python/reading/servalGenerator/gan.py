@@ -54,15 +54,17 @@ def generator_model():
 
 def discriminator_model():
     model = Sequential()
-    model.add(Conv2D(64, (5, 5),
-                    strides=(2, 2),
-                    padding='same',
+    model.add(Conv2D(64, (5, 5), strides=(2, 2),
                     input_shape=(IMG_SIZE, IMG_SIZE, 3))) # ここ注意
     model.add(LeakyReLU(0.2))
     model.add(Conv2D(128, (5, 5), strides=(2, 2)))
     model.add(LeakyReLU(0.2))
+    model.add(Conv2D(256, (5, 5), strides=(2, 2)))
+    model.add(LeakyReLU(0.2))
+    model.add(Conv2D(512, (5, 5), strides=(2, 2)))
+    model.add(LeakyReLU(0.2))
     model.add(Flatten())
-    model.add(Dense(256))
+    model.add(Dense(100))
     model.add(LeakyReLU(0.2))
     model.add(Dropout(0.5))
     model.add(Dense(1))
