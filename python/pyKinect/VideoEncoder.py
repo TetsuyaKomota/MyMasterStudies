@@ -1,6 +1,7 @@
 # coding = utf-8
 import cv2
 import numpy as np
+import os
 
 def find_rect_of_target_color(image, color):
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV_FULL)
@@ -33,15 +34,31 @@ if __name__ == "__main__":
     colors["yellow"] = (0, 255, 255)
     colors["black"]  = (0, 0, 0)
     capture = cv2.VideoCapture(0)
+    if os.path.exists("tmp/VideoEncoder_results") == False:
+        os.mkdir("tmp/VideoEncoder_results")
+    count = 0
+    while True:
+        count += 1
+        if os.path.exists("tmp/VideoEncoder_results/"+"{0:06d}".format(count) + ".csv") == False:
+            break
+    f = open("tmp/VideoEncoder_results/"+"{0:06d}".format(count) + ".csv", "w", encoding="utf-8")
     while cv2.waitKey(30) < 0:
         _, frame = capture.read()
+        text = ""
         for c in colors.keys():
             rects = find_rect_of_target_color(frame, c)
             if len(rects) > 0:
                 rect = max(rects, key=(lambda x: x[2] * x[3]))
-                if rect[2] * rect[3] < 10000:
-                    continue
+            else:
+                rect = [0, 0, 0, 0]
+            if rect[2] * rect[3] > 10000:
                 cv2.rectangle(frame, tuple(rect[0:2]), tuple(rect[0:2] + rect[2:4]), colors[c], thickness=2)
+            else:
+                rect = [0, 0, 0, 0]
+            text += (str(rect[0]+rect[2]/2)+",")
+            text += (str(rect[1]+rect[3]/2)+",")
         cv2.imshow('red', frame)
+        f.write(text + "\n") 
     capture.release()
+    f.close()
     cv2.destroyAllWindows()
