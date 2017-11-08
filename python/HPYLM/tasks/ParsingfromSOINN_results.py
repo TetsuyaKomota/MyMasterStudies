@@ -19,7 +19,7 @@ def execute(D=1, A=5, Theta=1.0, PAD=1, hpylm_iter=1000, reverse=False):
         datas = dill.load(f)
         elis = []
         for d in datas:
-            if "000000" not in d:
+            if "000" not in d:
                 elis.append(d)
         for e in elis:
             del datas[e]
