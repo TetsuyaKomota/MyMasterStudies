@@ -183,14 +183,14 @@ if __name__ == "__main__":
     test1(maker)
     exit()
     """
-    for count in range(2):
+    for count in range(10):
         inits = {}
         inits["red"]    = [10000 * (random() - 0.5), 10000 * (random() - 0.5)]
         inits["blue"]   = [10000 * (random() - 0.5), 10000 * (random() - 0.5)]
         inits["yellow"] = [10000 * (random() - 0.5), 10000 * (random() - 0.5)]
         inits["green"]  = [10000 * (random() - 0.5), 10000 * (random() - 0.5)]
-        for i in range(30):
-            filename = "000"+"{0:03d}".format(4*count+5)+"{0:03d}".format(i)
+        for i in range(10):
+            filename = "000"+"{0:03d}".format(count)+"{0:03d}".format(i)
             maker = makerMain.Maker(filename)
             maker.debug_show()
             test2(maker, inits)
