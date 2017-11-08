@@ -46,7 +46,7 @@ def test2(maker, inits):
     maker.setXs("green" , inits["green"])
 
     # 0.
-    maker.gotoGoal("hand", (maker.getXs("hand") + 9*maker.getXs("red"))/10, 100)
+    maker.gotoGoal("hand", (maker.getXs("hand") + 99*maker.getXs("red"))/100, 100)
     maker.execute(100)
     maker.grab("red")
     # 1.
@@ -54,7 +54,7 @@ def test2(maker, inits):
     maker.execute(100)
     maker.release()
     # 2.
-    maker.gotoGoal("hand", (maker.getXs("hand") + 9*maker.getXs("blue"))/10, 100)
+    maker.gotoGoal("hand", (maker.getXs("hand") + 99*maker.getXs("blue"))/100, 100)
     maker.execute(100)
     maker.grab("blue")
     # 3.
@@ -183,14 +183,14 @@ if __name__ == "__main__":
     test1(maker)
     exit()
     """
-    for count in range(10):
+    for count in range(2):
         inits = {}
         inits["red"]    = [10000 * (random() - 0.5), 10000 * (random() - 0.5)]
         inits["blue"]   = [10000 * (random() - 0.5), 10000 * (random() - 0.5)]
         inits["yellow"] = [10000 * (random() - 0.5), 10000 * (random() - 0.5)]
         inits["green"]  = [10000 * (random() - 0.5), 10000 * (random() - 0.5)]
-        for i in range(20):
-            filename = "000"+"{0:03d}".format(count)+"{0:03d}".format(i)
+        for i in range(30):
+            filename = "000"+"{0:03d}".format(4*count+5)+"{0:03d}".format(i)
             maker = makerMain.Maker(filename)
             maker.debug_show()
             test2(maker, inits)
