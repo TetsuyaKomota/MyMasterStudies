@@ -18,13 +18,14 @@ def find_rect_of_target_color(image, color):
     if color == "red":
         mask[((h < 10) | (h > 210)) & (s > 128)] = 255
     elif color == "blue":
-        mask[((h > 160) & (h < 210)) & (s > 128)] = 255
+        mask[((h > 150) & (h < 200)) & (s > 128)] = 255
     elif color == "green":
         mask[((h > 60) & (h < 130)) & (s > 128)] = 255
     elif color == "yellow":
-        mask[((h > 10) & (h < 60)) & (s > 128)] = 255
+        mask[((h > 10) & (h < 60)) & (s > 200)] = 255
     elif color == "hand":
-        mask[(s < 10)] = 255
+        # mask[(s < 10)] = 255
+        mask[(s < 0)] = 255
     _, contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     rects = []
     for contour in contours:
@@ -73,7 +74,7 @@ if __name__ == "__main__":
                     rect = max(rects, key=(lambda x: x[2] * x[3]))
                 else:
                     rect = [0, 0, 0, 0]
-                if rect[2] * rect[3] > 10000:
+                if rect[2] * rect[3] > 3000:
                     cv2.rectangle(frame, tuple(rect[0:2]), tuple(rect[0:2] + rect[2:4]), colors[c], thickness=2)
                 else:
                     rect = [0, 0, 0, 0]
