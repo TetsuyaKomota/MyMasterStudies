@@ -16,13 +16,13 @@ def find_rect_of_target_color(image, color):
     s = hsv[:, :, 1]
     mask = np.zeros(h.shape, dtype=np.uint8)
     if color == "red":
-        mask[((h < 10) | (h > 210)) & (s > 128)] = 255
+        mask[((h < 5) | (h > 210)) & (s > 200)] = 255
     elif color == "blue":
         mask[((h > 150) & (h < 200)) & (s > 128)] = 255
     elif color == "green":
         mask[((h > 60) & (h < 130)) & (s > 128)] = 255
     elif color == "yellow":
-        mask[((h > 10) & (h < 60)) & (s > 200)] = 255
+        mask[((h > 30) & (h < 60)) & (s > 200)] = 255
     elif color == "hand":
         # mask[(s < 10)] = 255
         mask[(s < 0)] = 255
@@ -46,6 +46,10 @@ if __name__ == "__main__":
         os.mkdir("tmp/VideoEncoder_results")
     count = 0
     recFlag = False
+    debug   = False
+    # TODO この二つ要らない
+    red    = [0, 0, 0, 0]
+    yellow = [0, 0, 0, 0]
     while True:
         key = cv2.waitKey(30)
         if key == 27: # ESC
@@ -61,6 +65,9 @@ if __name__ == "__main__":
         elif key == ord("2") and recFlag == True:
             recFlag = False
             f.close()
+        elif key == ord("9"):
+            debug = not debug
+
 
         _, frame = capture.read()
         
@@ -74,10 +81,22 @@ if __name__ == "__main__":
                     rect = max(rects, key=(lambda x: x[2] * x[3]))
                 else:
                     rect = [0, 0, 0, 0]
-                if rect[2] * rect[3] > 3000:
+                if rect[2] * rect[3] > 1000:
                     cv2.rectangle(frame, tuple(rect[0:2]), tuple(rect[0:2] + rect[2:4]), colors[c], thickness=2)
                 else:
                     rect = [0, 0, 0, 0]
+                
+                # TODO ここからいらない
+                if debug == True:
+                    if c == "red":
+                        red = rect
+                    if c == "yellow":
+                        yellow = rect
+                    if np.linalg.norm(red) != 0 and np.linalg.norm(yellow) != 0:
+                        newblue = np.array([2*(yellow[0])-red[0], 2*(yellow[1])-red[1], red[2], red[3]])
+                        cv2.rectangle(frame, tuple(newblue[0:2]), tuple(newblue[0:2] + np.array([50, 50])), (255, 100, 100), thickness=2)
+                # TODO ここまでいらない
+ 
                 text += (str(rect[0]+rect[2]/2)+",")
                 text += (str(rect[1]+rect[3]/2)+",")
                 text += "0,0,0,0,"
