@@ -18,7 +18,7 @@ def find_rect_of_target_color(image, color):
     if color == "red":
         mask[((h < 5) | (h > 210)) & (s > 200)] = 255
     elif color == "blue":
-        mask[((h > 150) & (h < 200)) & (s > 128)] = 255
+        mask[((h > 150) & (h < 180)) & (s > 200)] = 255
     elif color == "green":
         mask[((h > 60) & (h < 130)) & (s > 128)] = 255
     elif color == "yellow":
