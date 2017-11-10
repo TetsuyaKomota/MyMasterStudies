@@ -21,8 +21,8 @@ def run():
         count += 1
         if p == NOPARAMS:
             break
-        print("---------- : Making datas")
-        makerMotions.execute(pm.pick(p, "testNumber"), pm.pick(p, "isShuffleInits"), pm.pick(p, "numofData"))
+        # print("---------- : Making datas")
+        # makerMotions.execute(pm.pick(p, "testNumber"), pm.pick(p, "isShuffleInits"), pm.pick(p, "numofData"))
         print("++-------- : Post processing ")
         post.execute()
         print("++++------ : Encoding with SOINN")
@@ -30,8 +30,8 @@ def run():
         print("++++++---- : Parsing with HPYLM")
         hpylm.execute(D=pm.pick(p, "D"), A=pm.pick(p, "A"), Theta=pm.pick(p, "Theta"), \
                         PAD=pm.pick(p, "PAD"), hpylm_iter=pm.pick(p, "hpylm_iter"), reverse=pm.pick(p, "reverse"))
-        print("++++++++-- : Getting intermmediates")
-        inter.execute([p[name] for name in pm.getParamNameList()])
+        # print("++++++++-- : Getting intermmediates")
+        # inter.execute([p[name] for name in pm.getParamNameList()])
         print("++++++++++ : Finished")
         p = pm.nextParams()
 

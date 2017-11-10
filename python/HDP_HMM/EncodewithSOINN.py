@@ -1,9 +1,24 @@
 from SOINN.SOINN_for_python import SOINN
 import glob
 import dill
-
+import os
 
 def execute(step = 3, soinnN = 5000, soinnE = 5000, dillpath = ""):
+    params = "_".join([str(step), str(soinnN), str(soinnE)])
+    # もしそのパラメータで以前学習済みなら，学習済みのモデルを使う
+    if os.path.exists("tmp/log_MakerMain/dills/SOINN_results_" + params + ".dill"):
+        with open("tmp/log_MakerMain/dills/SOINN_results_" + params + ".dill", "rb")  as f:
+            results = dill.load(f)
+        with open("tmp/log_MakerMain/dills/SOINN_results_" + params + "_naive.dill", "rb")  as f:
+            results_naive = dill.load(f)
+        with open("tmp/log_MakerMain/dills/SOINN_results" + dillpath + ".dill", "wb")  as f:
+            dill.dump(results, f)
+            print("Successfully dumping : results")
+        with open("tmp/log_MakerMain/dills/SOINN_results" + dillpath + "_naive.dill", "wb")  as f:
+            dill.dump(results_naive, f)
+            print("Successfully dumping : results_naive")
+        return
+       
     # step = 3
 
     # soinn = SOINN(step * 2, 99999999999999999, 99999999999999999)
@@ -81,6 +96,14 @@ def execute(step = 3, soinnN = 5000, soinnE = 5000, dillpath = ""):
     with open("tmp/log_MakerMain/dills/SOINN_results" + dillpath + "_naive.dill", "wb")  as f:
         dill.dump(results_naive, f)
         print("Successfully dumping : results_naive")
+
+    # パラメータごとにセーブしておく
+    with open("tmp/log_MakerMain/dills/SOINN_results_" + params + ".dill", "wb")  as f:
+        dill.dump(results, f)
+    with open("tmp/log_MakerMain/dills/SOINN_results_" + params + "_naive.dill", "wb")  as f:
+        dill.dump(results_naive, f)
+
+
 
 if __name__ == "__main__":
     execute()
