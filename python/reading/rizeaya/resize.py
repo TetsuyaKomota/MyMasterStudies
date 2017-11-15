@@ -4,8 +4,10 @@ import cv2
 import glob
 import os
 
+from setting import RESIZE_SIZE
+
 fpaths = glob.glob("tmp/face/*")
-resizeTo = 64
+resizeTo = RESIZE_SIZE
 
 xmax = 0
 ymax = 0
