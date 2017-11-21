@@ -89,6 +89,14 @@ def getVelocityList(datas, timeDelta=0.01):
     output.append(output[-1])
     return output
 
+# 速度列を速さに変換
+def getSpeedList(datas):
+    output = []
+    for d in datas:
+        s = np.sqrt(d[0]**2 + d[1]**2)
+        output.append([s, s])
+    return output
+
 def execute(isDO=True):
     if isDO == False:
         return 
@@ -100,6 +108,7 @@ def execute(isDO=True):
         output = getHandData(output)
         output = getTMAList(output)
         output = getVelocityList(output)
+        output = getSpeedList(output)
         outputData(output, p)
 
 
