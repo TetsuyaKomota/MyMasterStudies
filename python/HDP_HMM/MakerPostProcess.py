@@ -89,6 +89,33 @@ def getVelocityList(datas, timeDelta=0.01):
     output.append(output[-1])
     return output
 
+# 速度列を，速度方向に回転した加速度列に変換
+def getAccelerationList(datas, timeDelta=0.01):
+    output = []
+    prev = np.array(datas[0])
+    for d in datas[1:]:
+        output.append((np.array(d)-prev)/timeDelta)
+
+        # prev の偏角を求め，output[-1]を回転する
+        if prev[0] == 0:
+            theta = np.pi/2
+        else:
+            theta = np.arctan(prev[1]/prev[0])
+        cos = np.cos(theta)
+        sin = np.sin(theta)
+        rot = [[cos, sin], [-1*sin, cos]]
+        rot = np.array(rot)
+
+        # output[-1]に回転行列 rot をかける
+        output[-1] = rot.dot(output[-1])
+        
+        # 次のステップの prev は今の d        
+        prev = d
+
+    # 長さを datas と合わせる
+    output.append(output[-1])
+    return output
+
 # 速度列を速さに変換
 def getSpeedList(datas):
     output = []
@@ -117,6 +144,7 @@ def execute(isDO=True):
         output = getHandData(output)
         output = getTMAList(output)
         output = getVelocityList(output)
+        # output = getAccelerationList(output)
         output = getSpeedList(output)
         # output = getNormalList(output)
         outputData(output, p)
