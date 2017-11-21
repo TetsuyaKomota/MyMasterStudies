@@ -36,6 +36,8 @@ with open(root_in + dirs[0] + files[0], "r", encoding = "utf-8") as f:
         if line == "":
             break
         maxstep = int(line)
+# TODO なんかうまくいってないので手打ち
+maxstep = 499
 print("maxstep:" + str(maxstep))
 
 # 集計をとる

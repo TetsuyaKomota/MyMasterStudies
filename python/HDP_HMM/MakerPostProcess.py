@@ -97,6 +97,15 @@ def getSpeedList(datas):
         output.append([s, s])
     return output
 
+# 速さ列を[0, 1] に正規化
+# min を引いた後に max-min(範囲)で割る
+def getNormalList(datas):
+    m = min(datas)
+    M = max(datas)
+    output = [(d-m)/(M-m) for d in datas] 
+    return output
+
+
 def execute(isDO=True):
     if isDO == False:
         return 
@@ -109,6 +118,7 @@ def execute(isDO=True):
         output = getTMAList(output)
         output = getVelocityList(output)
         output = getSpeedList(output)
+        # output = getNormalList(output)
         outputData(output, p)
 
 

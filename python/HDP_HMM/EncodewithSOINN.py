@@ -49,7 +49,9 @@ def execute(step = 3, soinnN = 5000, soinnE = 5000, dillpath = ""):
                 X.append(x)
     for d in range(5):
         print(X[d])
-    
+
+    print("input for SOINN:" + str(len(X)))   
+ 
     soinn.fit(X)
     print(soinn.getClassNum())
 

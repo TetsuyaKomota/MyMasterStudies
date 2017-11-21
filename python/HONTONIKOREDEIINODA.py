@@ -30,8 +30,8 @@ def run():
         print("++++++---- : Parsing with HPYLM")
         hpylm.execute(D=pm.pick(p, "D"), A=pm.pick(p, "A"), Theta=pm.pick(p, "Theta"), \
                         PAD=pm.pick(p, "PAD"), hpylm_iter=pm.pick(p, "hpylm_iter"), reverse=pm.pick(p, "reverse"))
-        # print("++++++++-- : Getting intermmediates")
-        # inter.execute([p[name] for name in pm.getParamNameList()])
+        print("++++++++-- : Getting intermmediates")
+        inter.execute([p[name] for name in pm.getParamNameList()])
         print("++++++++++ : Finished")
         p = pm.nextParams()
 
