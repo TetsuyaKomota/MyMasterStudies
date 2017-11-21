@@ -301,7 +301,7 @@ class Franchise:
             if i % (int(n_iter/10)) == 0:
                 print("[RefactedRest]executeParsing:iteration:"+str(i))
                 print("[RefactedRest]executeParsing:currentSentences:")
-                for c in current:
+                for c in sorted(list(current.keys())):
                     print(c + ":" + str(current[c]))
         for c in current:
             current[c] = [w for w in current[c] if w != PADWORD] 
