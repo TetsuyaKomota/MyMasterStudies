@@ -219,8 +219,9 @@ class Franchise:
         return term1 + term2
 
     # 基底測度は単語長さの正規分布
+    # 短すぎる単語を無視する項を追加
     def calcProbabilityofBaseMeasure(self, w):
-        return np.exp(-len(w) * self.A)
+        return np.exp(-len(w) * self.A) * int(len(w)<2)
 
     # 指定した文章の生成確率
     # 終始端単語は含まれている前提

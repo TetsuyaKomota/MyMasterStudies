@@ -127,11 +127,21 @@ def getSpeedList(datas):
 # 速さ列を[0, 1] に正規化
 # min を引いた後に max-min(範囲)で割る
 def getNormalList(datas):
-    m = min(datas)
-    M = max(datas)
-    output = [(d-m)/(M-m) for d in datas] 
+    m = np.array([min(l) for l in np.array(datas).T])
+    M = np.array([max(l) for l in np.array(datas).T])
+    output = [(np.array(d)-m)/(M-m) for d in datas] 
     return output
 
+# 速さ列を各段階ごと[0, 1] に正規化
+# min を引いた後に max-min(範囲)で割る
+def getNormalListHard(datas):
+    output = []
+    for i in range(5):
+        s = i*100
+        m = np.array([min(l) for l in np.array(datas[s:s+100]).T])
+        M = np.array([max(l) for l in np.array(datas[s:s+100]).T])
+        output += [(np.array(d)-m)/(M-m) for d in datas[s:s+100]]
+    return output
 
 def execute(isDO=True):
     if isDO == False:
@@ -146,7 +156,8 @@ def execute(isDO=True):
         output = getVelocityList(output)
         # output = getAccelerationList(output)
         output = getSpeedList(output)
-        # output = getNormalList(output)
+        output = getNormalList(output)
+        # output = getNormalListHard(output)
         outputData(output, p)
 
 

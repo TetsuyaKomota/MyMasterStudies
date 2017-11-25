@@ -6,7 +6,7 @@ from datetime import datetime
 import copy
 
 DIMENSION = 2
-NOIZE_X = 0.5 
+NOIZE_X = 3.0 
 NOIZE_V = 0.0 
 NOIZE_A = 0.0 
 # grab の可能範囲
