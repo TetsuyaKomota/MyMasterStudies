@@ -29,7 +29,7 @@ def run():
         soinn.execute(pm.pick(p, "step"), soinnN=pm.pick(p, "soinn"), soinnE=pm.pick(p, "soinn"))
         print("++++++---- : Parsing with HPYLM")
         hpylm.execute(D=pm.pick(p, "D"), A=pm.pick(p, "A"), Theta=pm.pick(p, "Theta"), \
-                        PAD=pm.pick(p, "PAD"), hpylm_iter=pm.pick(p, "hpylm_iter"), reverse=pm.pick(p, "reverse"))
+                        PAD=pm.pick(p, "PAD"), MIN_W=pm.pick(p, "MIN_W"), hpylm_iter=pm.pick(p, "hpylm_iter"), reverse=pm.pick(p, "reverse"))
         print("++++++++-- : Getting intermmediates")
         inter.execute([p[name] for name in pm.getParamNameList()])
         print("++++++++++ : Finished")
