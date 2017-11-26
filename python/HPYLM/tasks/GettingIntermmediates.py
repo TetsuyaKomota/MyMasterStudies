@@ -1,7 +1,8 @@
 #-*- coding: utf-8 -*-
 
 import dill
-import Restaurant
+import RefactedRestaurant
+# import Restaurant
 import os
 
 # HPYLM_results.dill と ENC_results_naive.dill から，
@@ -23,7 +24,8 @@ def execute(dirNameList = ["gomi"]):
         # ENC_results_naive.dill は数字列のままなので
         # Restaurant の translate を使って符号化する
 
-        rest = Restaurant.Restaurant(None, [])
+        # rest = Restaurant.Restaurant(None, [])
+        rest = RefactedRestaurant.Franchise(0, 0, 0, 0, 0)
         u = {}
         for d in datas_ENC_naive:
             line = ""
@@ -74,7 +76,7 @@ def execute(dirNameList = ["gomi"]):
                             line = f.readline().split("\n")[0]
                             if line == "":
                                 break
-                            if line.split(",")[0] == str(s):
+                            if line.split(",")[0] in [str(s), "499"]:
                                 g.write(line + "\n")
                                 break
 
