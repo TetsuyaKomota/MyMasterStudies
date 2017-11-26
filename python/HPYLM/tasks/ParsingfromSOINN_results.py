@@ -7,12 +7,12 @@ import sys, io
 
 
 # def execute(paramA=5, paramTheta=1.0, paramNumS=0, paramNumT=1, reverse=False):
-def execute(D=1, A=5, Theta=1.0, PAD=1, hpylm_iter=1000, reverse=False):
+def execute(D=1, A=5, Theta=1.0, PAD=1, MIN_W=9, hpylm_iter=1000, reverse=False):
     # sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
     print("Start Parsing Test (from tmp/SOINN_results.dill)")
 
     # rest = Restaurant.Restaurant(None, [], paramA = paramA, paramTheta = paramTheta, paramNumS=paramNumS, paramNumT=paramNumT)
-    rest =RefactedRestaurant.Franchise(D, A, Theta, PAD, 2)
+    rest =RefactedRestaurant.Franchise(D, A, Theta, PAD, MIN_W, 2)
 
     # with open("tmp/HMM_results.dill", "rb") as f:
     with open("tmp/log_MakerMain/dills/SOINN_results.dill", "rb") as f:

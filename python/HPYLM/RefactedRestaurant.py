@@ -34,12 +34,14 @@ class Franchise:
     # THETA  : 強度
     # PAD    : 終始端単語の数
     # LEN    : 文脈長さ
-    def __init__(self, D, A, THETA, PAD, LEN):
+    # MIN_W  : 単語の最短長さ
+    def __init__(self, D, A, THETA, PAD, LEN, MIN_W):
         self.D           = D
         self.A           = A
         self.THETA       = THETA
         self.PAD         = PAD
         self.LEN         = LEN
+        self.MIN_W       = MIN_W
         # フィールド
         self.restaurants = {():[[], []]}
         self.clean       = 0
@@ -221,7 +223,7 @@ class Franchise:
     # 基底測度は単語長さの正規分布
     # 短すぎる単語を無視する項を追加
     def calcProbabilityofBaseMeasure(self, w):
-        return np.exp(-len(w) * self.A) * int(len(w)>2)
+        return np.exp(-len(w) * self.A) * int(len(w)>self.MIN_W)
 
     # 指定した文章の生成確率
     # 終始端単語は含まれている前提
