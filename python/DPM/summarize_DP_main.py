@@ -50,7 +50,7 @@ def run(path = "tmp/summarize_DP_main/img.png"):
         # 誤差はとりあえず適当に決める
         meanList = []
         for m in matchList:
-            tempList = [a["step" for a in m["after"]]]
+            tempList = [a["step"] for a in m["after"]]
             meanList.append(sum(tempList)/len(tempList))
 
         stepRange = 30
@@ -59,7 +59,7 @@ def run(path = "tmp/summarize_DP_main/img.png"):
         temp_r    = [False, False, False, False] # 一致した 100n のリスト
         for m in meanList:
             for r in range(len(temp_r)):
-                if np.abs(m-100*r) <= stepRange:
+                if np.abs(m-100*(r+1)) <= stepRange:
                     succ_p += 1
                     temp_r[r] = True
         succ_r = sum([1 for t in temp_r if t==True])
