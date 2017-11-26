@@ -101,6 +101,8 @@ def getAccelerationList(datas, timeDelta=0.01):
             theta = np.pi/2
         else:
             theta = np.arctan(prev[1]/prev[0])
+        if prev[0] < 0:
+            theta = theta + np.pi
         cos = np.cos(theta)
         sin = np.sin(theta)
         rot = [[cos, sin], [-1*sin, cos]]
@@ -154,9 +156,9 @@ def execute(isDO=True):
         output = getHandData(output)
         output = getTMAList(output)
         output = getVelocityList(output)
-        # output = getAccelerationList(output)
-        output = getSpeedList(output)
-        output = getNormalList(output)
+        output = getAccelerationList(output)
+        # output = getSpeedList(output)
+        # output = getNormalList(output)
         # output = getNormalListHard(output)
         outputData(output, p)
 
@@ -172,5 +174,6 @@ if __name__ == "__main__":
         output = getHandData(output)
         output = getTMAList(output)
         output = getVelocityList(output)
+        output = getAccelerationList(output)
         outputData(output, p)
     print("Successfuly PostProcessed")
