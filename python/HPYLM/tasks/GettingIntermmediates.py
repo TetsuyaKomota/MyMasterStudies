@@ -25,7 +25,7 @@ def execute(dirNameList = ["gomi"]):
         # Restaurant の translate を使って符号化する
 
         # rest = Restaurant.Restaurant(None, [])
-        rest = RefactedRestaurant.Franchise(0, 0, 0, 0, 0)
+        rest = RefactedRestaurant.Franchise(0, 0, 0, 0, 0, 0)
         u = {}
         for d in datas_ENC_naive:
             line = ""
