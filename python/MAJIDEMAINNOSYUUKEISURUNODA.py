@@ -31,6 +31,7 @@ def run():
             break
         print("---------- : make DP_main_results.dill")
         with open("tmp/log_MakerMain/dills/DP_main_results.dill", "wb") as f:
+            # 指定したディレクトリの境界情報を取得
             interdict = matching.getInterDict(dirname)
             dill.dump(matching.DP_main(datas, interdict, \
                 sampleSize=pm.pick(p, "sampleSize"), \
