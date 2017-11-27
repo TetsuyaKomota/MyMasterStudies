@@ -3,6 +3,7 @@ import dill
 import DPM.ViewPointManager as manager
 import DPM.predictMatching as matching
 import DPM.summarize_DP_main as summarizer
+import DPM.result_kireinisuruyatsu as kirei_
 import glob
 import os
 from ParamManager import ParamManager
@@ -42,6 +43,8 @@ def run():
         summarizer.run([DIR_PATH] + [p[name] for name in pm.getParamNameList()])
         print("++++++++++ : Finished")
         p = pm.nextParams()
+    # kirei で result.csv を p, r, f に集計
+    kirei.execute()
 
 if __name__=="__main__":
     run()
