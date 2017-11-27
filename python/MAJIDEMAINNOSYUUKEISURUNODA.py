@@ -3,7 +3,7 @@ import dill
 import DPM.ViewPointManager as manager
 import DPM.predictMatching as matching
 import DPM.summarize_DP_main as summarizer
-import DPM.result_kireinisuruyatsu as kirei_
+import DPM.result_kireinisuruyatsu as kirei
 import glob
 import os
 from ParamManager import ParamManager
