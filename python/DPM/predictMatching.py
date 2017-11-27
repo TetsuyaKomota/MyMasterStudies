@@ -44,7 +44,10 @@ def getAdditionalIntermediate(stateList, step, viewPoint, detail=False):
 # 境界のidx リストを値とする辞書を作る
 def getInterDict(dirname):
     output  = {}
-    dirpath = "tmp/log_MakerMain/GettingIntermediated/"+dirname+"/*"
+    if dirname == "CHEATNANODA_results":
+        dirpath = "tmp/CHEATNANODA_results/*"
+    else:
+        dirpath = "tmp/log_MakerMain/GettingIntermediated/"+dirname+"/*"
     fpaths = glob.glob(dirpath)
     for fpath in fpaths:
         if os.path.isdir(fpath) == True:
@@ -58,6 +61,19 @@ def getInterDict(dirname):
                 if line == "":
                     break
                 output[fname].append(int(line.split(",")[0]))
+    return output
+
+# 境界情報をならす
+# 10ステップ以上近すぎる境界は一つにまとめる
+def pruningInterDict(interdict):
+    output = {}
+    for fname in interdict.keys():
+        temp = []
+        for s in interdict[fname]:
+            temp.append(s)
+            if len(temp)>1 and np.abs(temp[-1]-temp[-2])<20:
+                temp.append(int((temp.pop()+temp.pop())/2))
+        output[fname] = temp
     return output
 
 # 全データと境界列から，マッチング群を推定して返す

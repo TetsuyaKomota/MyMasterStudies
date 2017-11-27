@@ -21,7 +21,7 @@ for fpath in fpaths:
         with open(result + "inter" + os.path.basename(fpath)[3:], "w", encoding="utf-8") as g:
             count = 0
             dev  = 0
-            rand = int(random.random()*10)-5
+            rand = int(random.random()*4)-2
             while True:
                 line = f.readline()
                 if line == "":
