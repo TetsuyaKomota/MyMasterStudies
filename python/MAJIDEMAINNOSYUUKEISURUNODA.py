@@ -23,6 +23,7 @@ def run():
     pm = ParamManager("MAINSYU")
     pm.printREADME("MAINSYU")
     p  = pm.firstParams()
+    paramNum = len(p)
 
     count = 0
     while True:
@@ -44,7 +45,9 @@ def run():
         print("++++++++++ : Finished")
         p = pm.nextParams()
     # kirei で result.csv を p, r, f に集計
-    kirei.execute()
+    for y in range(paramNum):
+        for x in range(y):
+            kirei.execute(x, y)
 
 if __name__=="__main__":
     run()
