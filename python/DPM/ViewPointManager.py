@@ -151,7 +151,7 @@ def getViewPoint(stateDict, detail=False):
                         better["mean"]  = score[0]
                         output = [better] + output
                         tempmin = score[1]
-    # 再考の結果のみ返す
+    # 最高の結果のみ返す
     return output[0]
 
 # 前後組を引数に，サンプリング->vp 学習を繰り返して
@@ -177,10 +177,11 @@ def getViewPointwithSampling(stateDict, sampleSize=0.5, n_iter=50):
         key = (vp["base"], vp["ref"])
 
         # サンプリング結果を vpdict に保存する
+        # 分散の逆数を追加することで，高精度の観点に重みづけできる
         if key in vpdict.keys():
-            vpdict[key] += 1
+            vpdict[key] += 1.0/vp["score"]
         else:
-            vpdict[key] =  1
+            vpdict[key] =  1.0/vp["score"]
 
     # 多数決で最大の観点を取得
     points = sorted(vpdict.items(), key=lambda x: x[1])[0][0]

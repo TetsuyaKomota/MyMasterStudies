@@ -28,6 +28,10 @@ for fpath in fpaths:
                     break
                 count += 1
                 if dev == 0 or count == 499 or count == dev*100 + rand:
-                    rand = int(random.random()*10)-5
-                    dev += 1
-                    g.write(line) 
+                    # 境界が検出されない状態を生成
+                    if random.random() < 0.3:
+                        dev += 1
+                    else:
+                            rand = int(random.random()*10)-5
+                            dev += 1
+                            g.write(line) 

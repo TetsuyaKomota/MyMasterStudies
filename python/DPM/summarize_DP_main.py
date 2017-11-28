@@ -66,7 +66,10 @@ def run(path = "tmp/summarize_DP_main/img.png"):
 
         precision = (1.0*succ_p)/len(meanList) 
         recall    = (1.0*succ_r)/len(temp_r)
-        f_score   = 2.0/((1.0/precision) + (1.0/recall))
+        if precision + recall == 0:
+            f_score = 0
+        else:
+            f_score   = 2.0/((1.0/precision) + (1.0/recall))
 
         # csv に追記
         with open(path[0] + "result.csv", "a", encoding="utf-8") as f:

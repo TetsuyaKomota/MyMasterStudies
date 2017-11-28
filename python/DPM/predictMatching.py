@@ -83,13 +83,13 @@ def DP_main(datas, interDict, sampleSize=0.7, n_iter=50, distError=50):
     rests = copy.deepcopy(interDict)
     # 境界が 0 番, 500番以外にないデータはここで除外する
     temprests = {}
-    for r in rests:
-        if len(rests[r]) > 2:
-            temprests[r] = rests[r]
+    for fname in rests.keys():
+        if len(rests[fname]) > 2:
+            temprests[fname] = rests[fname]
     rests = temprests
     # 最初の stateDict を作る
     stateDict = {"before":[], "after":[], "fname":[]}
-    for fname in rests:
+    for fname in rests.keys():
         fdata = datas[fname]
         stateDict["before"].append(fdata[rests[fname].pop(0)])
         stateDict["after" ].append(fdata[rests[fname].pop(0)])
@@ -97,7 +97,7 @@ def DP_main(datas, interDict, sampleSize=0.7, n_iter=50, distError=50):
     while True:
         # rests が空なら終了
         flg = True
-        for fname in rests:
+        for fname in rests.keys():
             if len(rests[fname]) != 0:
                 flg = False
                 break
