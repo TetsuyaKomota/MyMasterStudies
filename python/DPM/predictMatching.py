@@ -78,22 +78,18 @@ def pruningInterDict(interdict):
 
 # 全データと境界列から，マッチング群を推定して返す
 # interDict : dict : ファイル名をキー，境界のステップ数のリストを持つ辞書
+# あまりに実装がダサいので作り直した
 def DP_main(datas, interDict, sampleSize=0.7, n_iter=50, distError=50):
-    output = {"matching":[], "pending":[], "viewpoint":[]}
+    output = {"matching":[], "viewpoint":[]}
     rests = copy.deepcopy(interDict)
-    # 境界が 0 番, 500番以外にないデータはここで除外する
-    temprests = {}
-    for fname in rests.keys():
-        if len(rests[fname]) > 2:
-            temprests[fname] = rests[fname]
-    rests = temprests
     # 最初の stateDict を作る
-    stateDict = {"before":[], "after":[], "fname":[]}
+    stateDict = {}
     for fname in rests.keys():
         fdata = datas[fname]
-        stateDict["before"].append(fdata[rests[fname].pop(0)])
-        stateDict["after" ].append(fdata[rests[fname].pop(0)])
-        stateDict["fname" ].append(fname)
+        stateDict[fname] = fdata[rests[fname].pop(0)]
+    # matching に登録する
+    output["matching" ].append(stateDict)
+    output["viewpoint"].append(None)
     while True:
         # rests が空なら終了
         flg = True
@@ -103,74 +99,49 @@ def DP_main(datas, interDict, sampleSize=0.7, n_iter=50, distError=50):
                 break
         if flg == True:
             break
-        # debug : stateDict を表示してみる
-        print("stateDict : " + debug_calcMeanandVarianceofMatching(stateDict))
-
-        # サンプリングを用いて vp を取得
-        vp = manager.getViewPointwithSampling(stateDict,sampleSize,n_iter)
-        print("get vp:" + str(vp["base"]) + "," + str(vp["ref"]))
-
-        pending  = {}
-        matching = {"before":[], "after":[], "fname":[]}
-        moved = manager.getMovedObject(stateDict)
-        
-        for i in range(len(stateDict["before"])):
-            # この i は「各ファイルの」という意味である
-            # ファイル名は fname に i のインデックスで入っているので
-            # 分かりやすいようにここで取得しておく
-            fname  = stateDict["fname" ][i]
-            before = stateDict["before"][i]
-            after  = stateDict["after" ][i]
-            
-            # vp を用いて，境界の推定をやり直す
-            bStep  = before["step"]
-            addInter = getAdditionalIntermediate(datas[fname], bStep, vp)
-
-            # matching の更新
-            matching["before"].append(before) 
-            matching["after" ].append(addInter) 
-            matching["fname" ].append(fname) 
-           
-            # pending の更新
-            # 最初の条件は，「predict よりもほんのちょっと後ろの after を
-            # 次の境界としない」為の条件
-            # または「正しい after だった」場合に
-            # ちゃんと動くようにするためのもの
-            # predict からある程度以上離れていれば，次の境界とする
-            d = manager.calcDifference(addInter, after, objs=moved)
-            if d >= vp["score"] * distError \
-                    and addInter["step"] < after["step"] :
-                pending[fname] = after["step"]
-
-        # rests に pending を返却
-        for fname in pending:
-            rests[fname] = [pending[fname]] + rests[fname]
-
-        # debug : matching の平均と分散を確認する
-        print("matching : "+debug_calcMeanandVarianceofMatching(matching))
-        
-        # output に matching と pending と vp を追加
-        output["matching" ].append(matching)
-        output["pending"  ].append(pending)
-        output["viewpoint"].append(vp)
-        with open("tmp/log_MakerMain/dills/DP_main_temp.dill", "wb") as f:
-            dill.dump(output, f)
- 
-       # 次の stateDict を作る
-        stateDict = {"before":[], "after":[], "fname":[]}
-        for fname in rests:
+        # 次の stateDict を作る
+        stateDict = {}
+        for fname in rests.keys():
             fdata = datas[fname]
-            # 次の before は今の matching の after
-            idx   = matching["fname"].index(fname)
-            stateDict["before"].append(matching["after"][idx])
+            while True:
+                if len(rests[fname])>0 and rests[fname][0] < output["matching"][-1][fname]["step"]+10:
+                    rests[fname].pop(0) 
+                else:
+                    break
             if len(rests[fname]) > 0:
-                stateDict["after"].append(fdata[rests[fname].pop(0)])
+                stateDict[fname] = fdata[rests[fname].pop(0)]
             else:
                 # print("EMPTY - " + fname)
-                stateDict["after" ].append(fdata[-1])
-            stateDict["fname"].append(fname)
+                stateDict[fname] = fdata[-1]
 
+        # サンプリングを用いて vp を取得
+        fnameList  = sorted(list(stateDict.keys()))
+        beforeDict = output["matching"][-1]
+        beforeList = [beforeDict[fn] for fn in fnameList]
+        afterList  = [stateDict[fn]  for fn in fnameList]
+        tempDict   = {"before":beforeList, "after":afterList, "fname":fnameList}
+
+        vp = manager.getViewPointwithSampling(tempDict,sampleSize,n_iter)
+        print("get vp:" + str(vp["base"]) + "," + str(vp["ref"]))
+
+        matching = {}
+        moved = manager.getMovedObject(tempDict)
+        
+        for fname in stateDict.keys():
+            # vp を用いて，境界の推定をやり直す
+            bStep  = output["matching"][-1][fname]["step"]
+            addInter = getAdditionalIntermediate(datas[fname], bStep, vp)
+            # matching の更新
+            matching[fname] = addInter
+
+        # output に matching と pending と vp を追加
+        output["matching" ].append(matching)
+        output["viewpoint"].append(vp)
+
+    with open("tmp/log_MakerMain/dills/DP_main_temp.dill", "wb") as f:
+        dill.dump(output, f)
     return output
+
 
 def debug_calcMeanandVarianceofMatching(matching):
     size = len(matching["before"])

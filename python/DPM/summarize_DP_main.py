@@ -51,7 +51,7 @@ def run(path = "tmp/summarize_DP_main/img.png"):
         """
         alist = []
         for m in matchList:
-            alist.append([a["step"] for a in m["after"]])
+            alist.append([a["step"] for a in m.values()])
             l = len(alist[-1])
             s = sum(alist[-1])
             alist[-1] = s/l
@@ -66,7 +66,7 @@ def run(path = "tmp/summarize_DP_main/img.png"):
         # 誤差はとりあえず適当に決める
         meanList = []
         for m in matchList:
-            tempList = [a["step"] for a in m["after"]]
+            tempList = [a["step"] for a in m.values()]
             meanList.append(sum(tempList)/len(tempList))
 
         stepRange = 30
