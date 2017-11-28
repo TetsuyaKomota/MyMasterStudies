@@ -16,8 +16,8 @@ def run():
         os.mkdir(DIR_PATH)
     print("start MAINSYU")
     filepaths = glob.glob("tmp/log_MakerMain/*")
-    # dirname   = "100-0-3-2000-0.01-0.11-0.02-5-False-500"
-    dirname   = "CHEATNANODA_results"
+    dirname   = "3-2000-10-0.11-200-5-5-False-100"
+    # dirname   = "CHEATNANODA_results"
     # データ取得
     datas = manager.getStateswithViewPoint(filepaths, [], [])
     pm = ParamManager("MAINSYU")

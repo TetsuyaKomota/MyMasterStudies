@@ -35,17 +35,21 @@ class Franchise:
     # PAD    : 終始端単語の数
     # LEN    : 文脈長さ
     # MIN_W  : 単語の最短長さ
-    def __init__(self, D, A, THETA, PAD, LEN, MIN_W):
+    def __init__(self, D, A, THETA, PAD, LEN, MIN_W, isBase=False):
         self.D           = D
         self.A           = A
         self.THETA       = THETA
         self.PAD         = PAD
         self.LEN         = LEN
         self.MIN_W       = MIN_W
+        self.isBase      = isBase
         # フィールド
         self.restaurants = {():[[], []]}
         self.clean       = 0
         self.timeScore   = {}
+        if isBase == False:
+            # 単語HPYLM なら，文字HPYLM を持つ
+            self.base    = Franchise(D, A, THETA, 3, 2, 1, True)
 
     def getTheta(self, u):
         return self.THETA * (len(u) + 1.0)
@@ -181,6 +185,11 @@ class Franchise:
     # 新実装は全客に対して代理客を生成するので，
     # LEN の長さに分割してそのまま代入するだけでいい
     def addSentence(self, sentence):
+        # 単語HPYLM なら,文字HPYLM を更新
+        if self.isBase == False:
+            for w in [s for s in sentence if s != PADWORD]:
+                self.base.addSentence(self.forBase(w))
+
         part = [PADWORD for _ in range(self.LEN)]
         for word in sentence:
             part = part[1:] + [word]
@@ -195,6 +204,11 @@ class Franchise:
     # 削除に関しては Pitman-Yor 過程する必要なく，
     # また add されている前提なので文脈生成も必要なし
     def eliminateSentence(self, sentence):
+        # 単語HPYLM なら,文字HPYLM を更新
+        if self.isBase == False:
+            for w in [s for s in sentence if s != PADWORD]:
+                self.base.eliminateSentence(self.forBase(w))
+
         part = [PADWORD for _ in range(self.LEN)]
         for word in sentence:
             part = part[1:] + [word]
@@ -223,7 +237,16 @@ class Franchise:
     # 基底測度は単語長さの正規分布
     # 短すぎる単語を無視する項を追加
     def calcProbabilityofBaseMeasure(self, w):
-        return np.exp(-len(w) * self.A) * int(len(w)>self.MIN_W)
+        # return np.exp(-len(w) * self.A) * int(len(w)>self.MIN_W)
+        if self.isBase == False:
+            # 単語HPYLM なら，文字HPYLM から取得してくる
+            return self.base.calcProbability(self.forBase(w))
+        else:
+            # 文字HPYLM なら，各文字の一様分布
+            # 根店のテーブルに配置されているのが全文字のはず
+            charset = set([t[1] for t in self.getRestaurant(())[TABLE]])
+            # PADWORD が含まれているので 1 引く
+            return 1.0/(len(charset)-1)
 
     # 指定した文章の生成確率
     # 終始端単語は含まれている前提
@@ -274,8 +297,8 @@ class Franchise:
             newSentence_a = self.changeBoundary(newSentence, idx+padlen)
             p_b = self.calcProbability(newSentence)
             p_a = self.calcProbability(newSentence_a)
-            if random.random() < p_a / (p_a + p_b):
-                newSentence = newSentence_a
+        if random.random() < p_a / (p_a + p_b):
+            newSentence = newSentence_a
         # 新しい文章を挿入
         self.addSentence(newSentence)
         return newSentence
@@ -366,6 +389,12 @@ class Franchise:
         if ord(alphabet) - ord("A") >= 97:
             return ord(alphabet) - ord("A") - 35
         return ord(alphabet) - ord("A")
+
+    # 単語を引数に，文字HPYLM に渡すためのリストに変換する
+    def forBase(self, word):
+        output = list(word)
+        pads   = [PADWORD for _ in range(self.base.PAD)]
+        return pads + output + pads
 
 if __name__ == "__main__":
     f = Franchise(1, 1, 1, 3, 3)

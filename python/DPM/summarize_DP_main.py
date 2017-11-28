@@ -57,7 +57,7 @@ def run(path = "tmp/summarize_DP_main/img.png"):
             alist[-1] = s/l
 
         plt.xlim(0,500)
-        plt.hist(alist, bins = 250)
+        plt.hist(alist, bins = 125)
         plt.savefig(imgpath)
         plt.close()
 
