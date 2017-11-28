@@ -21,7 +21,10 @@ def run(path = "tmp/summarize_DP_main/img.png"):
         # ヒストグラムを求める
         matchList = d["matching"]
         print("[summarize_DP_main]num of matching:" + str(len(matchList)))       
- 
+
+        # after の step のヒストグラムを求めてたが，
+        # matching ごとの after の step の平均でいいのでは？ 
+        """
         alist = []
         for m in matchList:
             alist.append([a["step"] for a in m["after"]])
@@ -45,6 +48,19 @@ def run(path = "tmp/summarize_DP_main/img.png"):
         plt.savefig(imgpath)
         plt.close()
        
+        """
+        alist = []
+        for m in matchList:
+            alist.append([a["step"] for a in m["after"]])
+            l = len(alist[-1])
+            s = sum(alist[-1])
+            alist[-1] = s/l
+
+        plt.xlim(0,500)
+        plt.hist(alist, bins = 250)
+        plt.savefig(imgpath)
+        plt.close()
+
         # F 値を求める
         # 各マッチングの step の平均を求め，100n と一致しているか判定する
         # 誤差はとりあえず適当に決める
