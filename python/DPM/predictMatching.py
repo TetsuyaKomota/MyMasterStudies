@@ -93,6 +93,7 @@ def pruningInterDict_2(datas, interDict):
             if len(output[filename]) == 0 or manager.calcDifference(before, after) > 4500:
                 output[filename].append(step)
                 before = datas[filename][step]
+    return output
                 
 
 # interDict : dict : ファイル名をキー，境界のステップ数のリストを持つ辞書
