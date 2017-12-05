@@ -80,7 +80,7 @@ def pruningInterDict(interdict):
 # よく考えれば 100 と 300 と 500 付近の境界は「hand 以外の環境に変化がない」
 # ので，0-100, 200-300, 400-500 の動作はそもそも学習し得ない
 # 境界の前後で環境がほとんど変化しない場合，あとの境界を interDict から削除する
-def pruningInterDict(datas, interDict):
+def pruningInterDict_2(datas, interDict):
     output = {}
     print(interDict)
     for filename in interDict.keys():
@@ -98,7 +98,7 @@ def pruningInterDict(datas, interDict):
 # interDict : dict : ファイル名をキー，境界のステップ数のリストを持つ辞書
 # あまりに実装がダサいので作り直した
 def DP_main(datas, interDict_, sampleSize=0.7, n_iter=50, distError=50):
-    interDict = pruningInterDict(datas, interDict_)
+    interDict = pruningInterDict_2(datas, interDict_)
     output = {"matching":[], "viewpoint":[]}
     rests = copy.deepcopy(interDict)
     # 最初の stateDict を作る
