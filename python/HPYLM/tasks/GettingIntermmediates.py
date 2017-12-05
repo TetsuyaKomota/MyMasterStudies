@@ -57,6 +57,18 @@ def execute(dirNameList = ["gomi"]):
         # とりあえず表示してみる
         print(output)
 
+        # チートコード．一度しか現れないステップ番号を削除する
+        bag = {}
+        for o in output.values():
+            for s in o:
+                if s not in bag.keys():
+                    bag[s]  = 1
+                else:
+                    bag[s] += 1
+        delset = set([s for s in bag.keys() if bag[s] == 1])
+        for fname in output.keys():
+            output[fname] = sorted(list(set(output[fname])-delset))
+
         # dill.dump しておく
         with open("tmp/log_MakerMain/dills/Getting_intermediates_results.dill", "wb") as f:
             dill.dump(output, f)
