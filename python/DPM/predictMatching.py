@@ -76,10 +76,29 @@ def pruningInterDict(interdict):
         output[fname] = temp
     return output
 
-# 全データと境界列から，マッチング群を推定して返す
+# 全データと境界列から，境界列を剪定する
+# よく考えれば 100 と 300 と 500 付近の境界は「hand 以外の環境に変化がない」
+# ので，0-100, 200-300, 400-500 の動作はそもそも学習し得ない
+# 境界の前後で環境がほとんど変化しない場合，あとの境界を interDict から削除する
+def pruningInterDict(datas, interDict):
+    output = {}
+    print(interDict)
+    for filename in interDict.keys():
+        output[filename] = []
+        before = None
+        after  = None
+        for step in interDict[filename]:
+            after  = datas[filename][step]
+            # 目測で大体 4500 前後
+            if len(output[filename]) == 0 or manager.calcDifference(before, after) > 4500:
+                output[filename].append(step)
+                before = datas[filename][step]
+                
+
 # interDict : dict : ファイル名をキー，境界のステップ数のリストを持つ辞書
 # あまりに実装がダサいので作り直した
-def DP_main(datas, interDict, sampleSize=0.7, n_iter=50, distError=50):
+def DP_main(datas, interDict_, sampleSize=0.7, n_iter=50, distError=50):
+    interDict = pruningInterDict(datas, interDict_)
     output = {"matching":[], "viewpoint":[]}
     rests = copy.deepcopy(interDict)
     # 最初の stateDict を作る
