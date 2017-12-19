@@ -64,6 +64,8 @@ def generate():
                     text  = str(step) + ","
                     text += str(inits["hand"][0])+","
                     text += str(inits["hand"][1])+","
+                    text += str(v[0])+","
+                    text += str(v[1])+","
                     for o in objList:
                         text += str(inits[o][0])+","+str(inits[o][1])+","
                     f.write(text+"\n") 

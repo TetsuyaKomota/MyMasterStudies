@@ -25,11 +25,12 @@ soinnE = 2500
 
 def fit():
     filepaths = glob.glob("tmp/log/*.csv")
-    datas = []
     
+    X = []
     for filepath in filepaths:
         # step ステップ幅を切り出す
-        temp = [0 for _ in range(step*2)]
+        dummy = len(X)
+        X.append([0 for _ in range(step*2)])
         with open(filepath, "r", encoding="utf-8") as f:
             while True:
                 line = f.readline()
@@ -39,8 +40,7 @@ def fit():
                 # str なので float にキャスト
                 pos = [float(p) for p in line.split(",")[3:5]]
                 # temp を更新
-                temp = temp[2:] + pos
-                datas.append(temp)
+                X.append(X[-1][2:] + pos)
 
     # SOINN を学習
     soinn = SOINN(step * 2, soinnN, soinnE, n_iter=1, noise_var=0)
