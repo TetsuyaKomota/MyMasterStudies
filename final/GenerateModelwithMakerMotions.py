@@ -34,9 +34,10 @@ def generate():
         # 取りに行く物体，動かす先をランダムに決定する
         # choice の False は「重複不可」
         moves = []
-        moves.append(choice(objList, 1, False))
+        moved = choice(objList, 2, False)
+        moves.append(np.array(moved[0]))
         moves.append(choice(objList, max(1, choice(objNum+1)), False))
-        moves.append(choice(objList, 1, False))
+        moves.append(np.array(moved[1]))
         moves.append(choice(objList, max(1, choice(objNum+1)), False))
         moves.append(choice(objList, 0, False))
  
