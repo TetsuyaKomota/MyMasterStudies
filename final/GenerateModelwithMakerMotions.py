@@ -35,9 +35,9 @@ def generate():
         # choice の False は「重複不可」
         moves = []
         moved = choice(objList, 2, False)
-        moves.append(np.array(moved[0]))
+        moves.append(np.array([moved[0]]))
         moves.append(choice(objList, max(1, choice(objNum+1)), False))
-        moves.append(np.array(moved[1]))
+        moves.append(np.array([moved[1]]))
         moves.append(choice(objList, max(1, choice(objNum+1)), False))
         moves.append(choice(objList, 0, False))
  
