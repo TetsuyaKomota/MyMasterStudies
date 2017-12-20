@@ -31,6 +31,8 @@ def fit():
     soinn = SOINN(step * 2, soinnN, soinnE, n_iter=1, noise_var=0)
     
     for filepath in filepaths:
+        print("[EncodeModel] input : " + os.path.basename(filepath))
+        print("[EncodeModel] current class num : " + str(soinn.getClassNum()))
         # step ステップ幅を切り出す
         X = []
         X.append([0 for _ in range(step*2)])
