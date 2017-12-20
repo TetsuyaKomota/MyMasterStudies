@@ -30,7 +30,8 @@ def fit():
         os.mkdir("tmp/dills")
     filepaths = glob.glob("tmp/log/*.csv")
     soinn = SOINN(step * 2, soinnN, soinnE, n_iter=1, noise_var=0)
-    
+
+    batch = []    
     for i, filepath in enumerate(filepaths):
         print("[EncodeModel] input : " + os.path.basename(filepath))
         print("[EncodeModel] current class num : " + str(soinn.getClassNum()))
@@ -54,9 +55,12 @@ def fit():
         # np.array に変換
         X = [np.array(x) for x in X]
 
+        batch += X
+
         # SOINN を学習
-        soinn.fit(X)
         if i!=0 and i%200==0:
+            soinn.fit(batch)
+            batch = []
             with open("tmp/dills/soinn.dill", "wb") as f:
                 dill.dump(soinn, f)
 
