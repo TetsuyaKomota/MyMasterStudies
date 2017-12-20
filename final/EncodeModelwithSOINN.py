@@ -31,7 +31,7 @@ def fit():
     filepaths = glob.glob("tmp/log/*.csv")
     soinn = SOINN(step * 2, soinnN, soinnE, n_iter=1, noise_var=0)
     
-    for filepath in filepaths:
+    for i, filepath in enumerate(filepaths):
         print("[EncodeModel] input : " + os.path.basename(filepath))
         print("[EncodeModel] current class num : " + str(soinn.getClassNum()))
         # step ステップ幅を切り出す
@@ -56,8 +56,9 @@ def fit():
 
         # SOINN を学習
         soinn.fit(X)
-        with open("tmp/dills/soinn.dill", "wb") as f:
-            dill.dump(soinn, f)
+        if i!=0 and i%100==0:
+            with open("tmp/dills/soinn.dill", "wb") as f:
+                dill.dump(soinn, f)
 
     return soinn
 
