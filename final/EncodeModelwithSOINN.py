@@ -15,6 +15,7 @@
 #   それを dill.dump
 
 from SOINN.SOINN_for_python import SOINN
+import numpy as np
 import dill
 import os
 import glob
