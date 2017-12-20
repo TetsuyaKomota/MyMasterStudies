@@ -56,7 +56,7 @@ def fit():
 
         # SOINN を学習
         soinn.fit(X)
-        if i!=0 and i%100==0:
+        if i!=0 and i%200==0:
             with open("tmp/dills/soinn.dill", "wb") as f:
                 dill.dump(soinn, f)
 
@@ -101,5 +101,5 @@ def predict():
 
 if __name__ == "__main__":
     # dill.dump の再帰し過ぎで怒られるので設定
-    sys.setrecursionlimit(10000)
+    # sys.setrecursionlimit(10000)
     predict()
