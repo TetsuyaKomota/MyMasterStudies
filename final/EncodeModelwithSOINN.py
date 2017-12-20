@@ -14,7 +14,8 @@
 #   できた符号列を，ファイル名キーの dict にする
 #   それを dill.dump
 
-from SOINN.SOINN_for_python import SOINN
+# from SOINN.SOINN_for_python import SOINN
+from SOINN.FastSOINN import SOINN
 import numpy as np
 import dill
 import os
@@ -29,12 +30,12 @@ def fit():
     if os.path.exists("tmp/dills") == False:
         os.mkdir("tmp/dills")
     filepaths = glob.glob("tmp/log/*.csv")
-    soinn = SOINN(step * 2, soinnN, soinnE, n_iter=1, noise_var=0)
+    # soinn = SOINN(step * 2, soinnN, soinnE, n_iter=1, noise_var=0)
+    soinn = SOINN(step * 2, soinnN, soinnE)
 
-    batch = []    
     for i, filepath in enumerate(filepaths):
         print("[EncodeModel] input : " + os.path.basename(filepath))
-        print("[EncodeModel] current class num : " + str(soinn.getClassNum()))
+        print("[EncodeModel] current class num : " + str(soinn.classifier()))
         # step ステップ幅を切り出す
         X = []
         X.append([0 for _ in range(step*2)])
@@ -55,21 +56,18 @@ def fit():
         # np.array に変換
         X = [np.array(x) for x in X]
 
-        batch += X
-
         # SOINN を学習
-        if i!=0 and i%200==0:
-            soinn.fit(batch)
-            batch = []
-            with open("tmp/dills/soinn.dill", "wb") as f:
-                dill.dump(soinn, f)
+        soinn.fit(X)
+        
+        if i%200==0:
+            soinn.saveModel(path="tmp/dills/")
 
     return soinn
 
 def predict():
     if os.path.exists("tmp/dills/soinn.dill") == True:
-        with open("tmp/dills/soinn.dill", "rb") as f:
-            soinn = dill.load(f)
+        soinn = SOINN(step * 2, soinnN, soinnE)
+        soinn.loadModel(path="tmp/dills/")
     else:
         soinn = fit()
 
