@@ -19,6 +19,7 @@ import numpy as np
 import dill
 import os
 import glob
+import sys
 
 step = 3
 soinnN = 2500
@@ -98,4 +99,6 @@ def predict():
     return output
 
 if __name__ == "__main__":
+    # dill.dump の再帰し過ぎで怒られるので設定
+    sys.setrecursionlimit(10000)
     predict()
