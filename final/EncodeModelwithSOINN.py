@@ -24,12 +24,14 @@ soinnN = 2500
 soinnE = 2500
 
 def fit():
+    if os.path.exists("tmp/dills") == False:
+        os.mkdir("tmp/dills")
     filepaths = glob.glob("tmp/log/*.csv")
+    soinn = SOINN(step * 2, soinnN, soinnE, n_iter=1, noise_var=0)
     
-    X = []
     for filepath in filepaths:
         # step ステップ幅を切り出す
-        dummy = len(X)
+        X = []
         X.append([0 for _ in range(step*2)])
         with open(filepath, "r", encoding="utf-8") as f:
             while True:
@@ -41,14 +43,17 @@ def fit():
                 pos = [float(p) for p in line.split(",")[3:5]]
                 # temp を更新
                 X.append(X[-1][2:] + pos)
+        
+        # X[0] はダミーなので消しておく
+        X.pop(0)
 
-    # SOINN を学習
-    soinn = SOINN(step * 2, soinnN, soinnE, n_iter=1, noise_var=0)
-    soinn.fit(X)
-    if os.path.exists("tmp/dills") == False:
-        os.mkdir("tmp/dills")
-    with open("tmp/dills/soinn.dill", "wb") as f:
-        dill.dump(soinn, f)
+        # np.array に変換
+        X = [np.array(x) for x in X]
+
+        # SOINN を学習
+        soinn.fit(X)
+        with open("tmp/dills/soinn.dill", "wb") as f:
+            dill.dump(soinn, f)
 
     return soinn
 
@@ -77,6 +82,9 @@ def predict():
         
         # Z[0] はダミーなので消しておく
         Z.pop(0)
+
+        # np.array に変換
+        Z = [np.array(z) for z in Z]
 
         # 推定
         output[os.path.basename(filepath)[:-4]] = soinn.classifier(Z)
