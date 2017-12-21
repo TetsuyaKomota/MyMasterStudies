@@ -22,9 +22,9 @@ import os
 import glob
 import sys
 
-step = 3
-soinnN = 2500
-soinnE = 2500
+step = 5
+soinnN = 5000000
+soinnE = 100
 
 def fit():
     if os.path.exists("tmp/dills") == False:
@@ -72,6 +72,7 @@ def predict():
         soinn = fit()
 
     output = {}
+    filepaths = glob.glob("tmp/log/*.csv")
     for filepath in filepaths:
         # step ステップ幅を切り出す
         Z = []
@@ -94,7 +95,7 @@ def predict():
         Z = [np.array(z) for z in Z]
 
         # 推定
-        output[os.path.basename(filepath)[:-4]] = soinn.classifier(Z)
+        output[os.path.basename(filepath)[:-4]] = soinn.predict(Z)
 
     with open("tmp/dills/encoded.dill", "wb") as f:
         dill.dump(output, f)
