@@ -52,6 +52,8 @@ def fit():
         strDictZip[filename] = \
             ["".join(strDictZip[filename])]
 
+    # 調整
+    # 短すぎる文があるとまずいっぽい
     rm = []
     for s in strDictZip.keys():
         if len(strDictZip[s][0]) < 3:
@@ -96,6 +98,15 @@ def parsing():
         # [char] -> str -> [str]
         strDictZip[filename] = \
             ["".join(strDictZip[filename])]
+
+    # 調整
+    # 短すぎる文があるとまずいっぽい
+    rm = []
+    for s in strDictZip.keys():
+        if len(strDictZip[s][0]) < 3:
+            rm.append(s)
+    for s in rm:
+        del strDictZip[s]
 
     # 分割をサンプリング
     result = rest.executeParsing(strDictZip, n_iter, fit=False)
