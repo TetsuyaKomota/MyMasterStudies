@@ -22,15 +22,16 @@ from models import RefactedRestaurant
 D      = 1
 A      = 5
 Theta  = 1
-PAD    = 1
-MIN_W  = 9
+PAD    = 3
+LEN    = 2
+MIN_W  = 2
 n_iter = 200
 
 def fit():
     with open("tmp/dills/encoded.dill", "rb") as f:
         encoded = dill.load(f)
 
-    rest =RefactedRestaurant.Franchise(D, A, Theta, PAD, MIN_W, 2)
+    rest =RefactedRestaurant.Franchise(D, A, Theta, PAD, LEN, MIN_W)
     
     # 文字列化
     strDict = {}
@@ -50,6 +51,13 @@ def fit():
         # [char] -> str -> [str]
         strDictZip[filename] = \
             ["".join(strDictZip[filename])]
+
+    rm = []
+    for s in strDictZip.keys():
+        if len(strDictZip[s][0]) < 3:
+            rm.append(s)
+    for s in rm:
+        del strDictZip[s]
 
     # 学習
     result = rest.executeParsing(strDictZip, n_iter)
