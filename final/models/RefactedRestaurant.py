@@ -297,6 +297,8 @@ class Franchise:
         random.shuffle(idxList)
         # 始端単語を無視するためのオフセット
         padlen = len(PADWORD)*self.PAD+1
+        p_a = 1.0
+        p_b = 1.0
         for idx in idxList:
             newSentence_a = self.changeBoundary(newSentence, idx+padlen)
             p_b = self.calcProbability(newSentence)
