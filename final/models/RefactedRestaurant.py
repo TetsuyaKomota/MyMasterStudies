@@ -282,10 +282,14 @@ class Franchise:
         return o 
 
     # サンプリング
-    def sampling(self, sentence):
+    # fit : boolean : モデルの更新をするか
+    #                 学習時には True, 分割の推定時には False
+    #                 executeParsing の引数で指定する
+    def sampling(self, sentence, fit):
         timeScore = []
         # 古い文章を削除
-        self.eliminateSentence(sentence)
+        if fit == True:
+            self.eliminateSentence(sentence)
         newSentence = deepcopy(sentence)
         # 終始端単語を無視
         length = sum([len(w) for w in sentence if w!=PADWORD])-1
@@ -300,7 +304,8 @@ class Franchise:
         if random.random() < p_a / (p_a + p_b):
             newSentence = newSentence_a
         # 新しい文章を挿入
-        self.addSentence(newSentence)
+        if fit == True:
+            self.addSentence(newSentence)
         return newSentence
 
     # 辞書内の全文章を反転(各単語を反転し，単語の並び自体も反転)
@@ -313,17 +318,24 @@ class Franchise:
         return output
 
     # 実行
-    def executeParsing(self, sentenceDict, n_iter, reverse=False):
+    # rev : boolean : 逆向きにした文字列の分割を併用して行うか
+    #                 True にした場合，reverseSentences した文字列も
+    #                 対象に加えて解析を行う
+    #
+    # fit : boolean : モデルの更新を行うか
+    #                 学習時には True, 分割の推定時には False を指定する
+    def executeParsing(self, sentenceDict, n_iter, rev=False, fit=True):
         current = deepcopy(sentenceDict)
-        if reverse == True:
+        if rev == True:
             current = self.reverseSentences(current)
         PADS = [PADWORD for _ in range(self.PAD)]
         for c in current:
             current[c] = deepcopy(PADS)+current[c]+deepcopy(PADS)
-            self.addSentence(current[c])
+            if fit == True:
+                self.addSentence(current[c])
         for i in range(n_iter):
             for c in current:
-                current[c] = self.sampling(current[c])
+                current[c] = self.sampling(current[c], fit)
             if i % (int(n_iter/10)) == 0:
                 print("[RefactedRest]executeParsing:iteration:"+str(i))
                 print("[RefactedRest]executeParsing:currentSentences:")
@@ -331,7 +343,7 @@ class Franchise:
                     print(c + ":" + str(current[c]))
         for c in current:
             current[c] = [w for w in current[c] if w != PADWORD] 
-        if reverse == True:
+        if rev == True:
             current = self.reverseSentences(current)
         print("[RefactedRest]executeParsing:results:")
         for c in current:
@@ -398,17 +410,6 @@ class Franchise:
 
 if __name__ == "__main__":
     f = Franchise(1, 1, 1, 3, 3)
-    """
-    f.addSentence(["今日", "も", "また", "人", "が", "死んだよ"])
-    f.addSentence(["今日", "も", "また", "雨", "が", "降ったよ"])
-    f.toPrint()
-    f.eliminateSentence(["今日", "も", "また", "雨", "が", "降ったよ"])
-    f.toPrint()
-
-    test = ["今日", "も", "また", "雨", "が", "降ったよ"]
-    for i in range(1, 11):
-        print(f.changeBoundary(test, i))
-    """
 
     data = {}
     data["1"] = ["りんごぶどうみかんばななもも"]
