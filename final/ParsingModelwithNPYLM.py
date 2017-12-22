@@ -113,7 +113,7 @@ def parsing():
 
     # 境界列に変換
     output = {}
-    for i, d in enumerate(strDict.keys()):
+    for i, d in enumerate(strDictZip.keys()):
         print(d)
         m = [0]
         naive = strDict[d]
