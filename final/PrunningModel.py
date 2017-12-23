@@ -32,7 +32,7 @@ def prunning():
                 if len(line) < 2:
                     break
                 # [0:4] は hand の位置と速度なので無視
-                logList.append(line[4:])
+                logList.append([float(l) for l in line[4:-1]])
 
         # 有意な境界のみ取得
         output[filename] = []
