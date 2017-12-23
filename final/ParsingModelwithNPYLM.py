@@ -127,6 +127,9 @@ def parsing():
                     else:
                         break
             m.append(step)
+        # 最後の境界が 500 になるっぽいので，
+        # 499 に変更
+        m[-1] -= 1
         output[d] = m
     
     # return 
