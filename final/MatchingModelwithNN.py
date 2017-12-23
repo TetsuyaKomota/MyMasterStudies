@@ -22,6 +22,7 @@ from keras import Sequential
 from keras.layers import Dense, Activation
 import dill
 import numpy as np
+from functools import reduce
 
 e          = 30  # 許容誤差
 n_iter     = 100 # サンプリング学習の回数
@@ -43,6 +44,7 @@ def matching():
         prunned = dill.load(f)
     keys = prunned.keys()
     size = 0   # データの次元． 2*オブジェクト数
+    goal = 0   # 終了状態のステップ数
     datas = {}
     for filename in keys:
         datas[filename] = []
@@ -53,12 +55,14 @@ def matching():
                     break
                 if size == 0:
                     size = len(line[5:-1])
+                    goal = float(line[-2])
                 datas[filename].append([float(l) for l in line[5:-1]])
 
     # 共通境界推定
     output = {}
     before = {}
     for filename in keys:
+        output[filename] = []
         before[filename] = prunned[filename][0]
     while True:
         after = {}
@@ -100,11 +104,27 @@ def matching():
                 predict[filename][-1] *= np.exp(-1.0*m[1])/sumexp
             predict[filename] = sum(predict[filename])
 
+        # before を output に追加
         # 推定結果に最も近い状態を datas から取得
         selected = {}
         for filename in keys:
-            # TODO ここ頑張れ
+            output[filename].append(before[filename])
+            # TODO datas から取得頑張れ
             pass
-        # before を output に追加
+    
         # before <- selected
+        before = selected
+
         # 終了条件
+        flagList = [b == goal for b in before.values()]
+        flag = reduce(lambda x, y : x and y, flagList)
+        if flag == True:
+            break
+   
+    with open("tmp/dills/matching.dill", "wb")  as f:
+        dill.dump(output, f)
+
+    return output
+
+if __name__ ==  "__main__":
+    matching() 
