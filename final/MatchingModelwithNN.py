@@ -25,7 +25,7 @@ import numpy as np
 from functools import reduce
 
 e          = 30  # 許容誤差
-n_iter     = 100 # サンプリング学習の回数
+n_iter     = 10  # サンプリング学習の回数
 
 # パーセプトロンを生成
 def build(numofInput):
@@ -39,7 +39,6 @@ def build(numofInput):
 
 
 def matching():
-    print("1")
     # データのロード
     with open("tmp/dills/prunned.dill", "rb") as f:
         prunned = dill.load(f)
@@ -58,7 +57,6 @@ def matching():
                     size = len(line[5:-1])
                     goal = float(line[-2])
                 datas[filename].append([float(l) for l in line[5:-1]])
-    print("2")
 
     # 共通境界推定
     output = {}
@@ -83,14 +81,15 @@ def matching():
             for sample in sampleList:
                 X.append(np.array(datas[sample][before[sample]]))
                 y.append(np.array(datas[sample][after[sample]]))
-            
-            print("3")
+           
+            X = np.array(X)
+            y = np.array(y)
+
             # 学習
             model.fit(X, y)
-            print("4")
 
             # 評価
-            w = model.evaluate(X, y)[0]
+            w = model.evaluate(X, y)
 
             # 保存
             modelList.append((model, w))
@@ -104,7 +103,8 @@ def matching():
             predict[filename] = []
             for m in modelList:
                 beforeData = datas[filename][before[filename]]
-                predict[filename].append(m[0].predict([beforeData])[0])
+                beforeData = np.array([beforeData])
+                predict[filename].append(m[0].predict(beforeData))
                 predict[filename][-1] *= np.exp(-1.0*m[1])/sumexp
             predict[filename] = sum(predict[filename])
 
@@ -114,7 +114,7 @@ def matching():
         for filename in keys:
             output[filename].append(before[filename])
             # 各ステップの状態との距離を計算する
-            p = np.array(predicted[filename])
+            p = np.array(predict[filename])
             d = datas[filename]
             distList = [np.linalg.norm(np.array(l)-p) for l in d]
             # before ステップ以降のみを対象にする
