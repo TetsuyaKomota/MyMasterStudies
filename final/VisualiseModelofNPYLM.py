@@ -50,32 +50,6 @@ def evaluate(resultName="result", mode="a"):
                 temp = [np.abs(step-100*n)<e for step in parsed[filename]]
                 temp = reduce(lambda x, y : x or y, temp)
                 succDict[filename] += int(temp)
-    """
-    pDict = {}
-    rDict = {}
-    fDict = {}
-    for filename in succDict.keys():
-        pDict[filename] = succDict[filename]/len(parsed[filename])
-        rDict[filename] = succDict[filename]/(numofSucc)
-        if pDict[filename] + rDict[filename] == 0:
-            fDict[filename] = 0
-            continue
-        fDict[filename] = 2.0/(1.0/pDict[filename] + 1.0/rDict[filename])
-   
-    # csv 書き出し
-    if os.path.exists("tmp/results/") == False:
-        os.mkdir("tmp/results/")
-    with open("tmp/results/results_NPYLM.csv", "w", encoding="utf-8") as f:
-        filenameList = sorted(list(parsed.keys()))
-        f.write("filename,precision,recall,f_score\n")
-        for filename in filenameList:
-            text  = str(filename) + ","
-            text += str(pDict[filename]) + ","
-            text += str(rDict[filename]) + ","
-            text += str(fDict[filename]) + "\n"
-            f.write(text)
-    return (pDict, rDict, fDict)
-    """
     succ      = sum(succDict.values())
     precision = succ / sum([len(sList) for sList in parsed.values()])
     recall    = succ / (len(parsed.keys()) * numofSucc)
