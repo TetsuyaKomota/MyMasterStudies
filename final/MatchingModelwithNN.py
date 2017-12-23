@@ -18,7 +18,7 @@
 # 5. before <- predict
 # 6.1. に戻る
 
-from keras import Sequential
+from keras.models import Sequential
 from keras.layers import Dense, Activation
 import dill
 import numpy as np
@@ -39,6 +39,7 @@ def build(numofInput):
 
 
 def matching():
+    print("1")
     # データのロード
     with open("tmp/dills/prunned.dill", "rb") as f:
         prunned = dill.load(f)
@@ -48,7 +49,7 @@ def matching():
     datas = {}
     for filename in keys:
         datas[filename] = []
-        with open("rnp/log/"+filename+".csv", "r", encoding="utf-8") as f:
+        with open("tmp/log/"+filename+".csv", "r", encoding="utf-8") as f:
             while True:
                 line = f.readline().split(",")
                 if len(line) < 2:
@@ -57,6 +58,7 @@ def matching():
                     size = len(line[5:-1])
                     goal = float(line[-2])
                 datas[filename].append([float(l) for l in line[5:-1]])
+    print("2")
 
     # 共通境界推定
     output = {}
@@ -82,8 +84,10 @@ def matching():
                 X.append(np.array(datas[sample][before[sample]]))
                 y.append(np.array(datas[sample][after[sample]]))
             
+            print("3")
             # 学習
             model.fit(X, y)
+            print("4")
 
             # 評価
             w = model.evaluate(X, y)[0]
