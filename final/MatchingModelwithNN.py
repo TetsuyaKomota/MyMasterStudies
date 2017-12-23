@@ -109,8 +109,13 @@ def matching():
         selected = {}
         for filename in keys:
             output[filename].append(before[filename])
-            # TODO datas から取得頑張れ
-            pass
+            # 各ステップの状態との距離を計算する
+            p = np.array(predicted[filename])
+            d = datas[filename]
+            distList = [np.linalg.norm(np.array(l)-p) for l in d]
+            # before ステップ以降のみを対象にする
+            distList = distList[before[filename]:]
+            selected[filename] = distList.index(min(distList))
     
         # before <- selected
         before = selected
