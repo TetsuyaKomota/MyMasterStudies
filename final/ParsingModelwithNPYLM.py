@@ -108,13 +108,12 @@ def parsing(dillname):
     for s in rm:
         del strDictZip[s]
 
-    # 分割をサンプリング
-    result = rest.executeParsing(strDictZip, n_iter, fit=False)
+    # 分割を推定
+    result = rest.predict(strDictZip)
 
     # 境界列に変換
     output = {}
     for i, d in enumerate(strDictZip.keys()):
-        print(d)
         m = [0]
         naive = strDict[d]
         sentence = result[d]

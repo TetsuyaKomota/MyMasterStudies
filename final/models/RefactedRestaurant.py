@@ -6,6 +6,7 @@ import dill
 import time
 from datetime import datetime
 from copy import deepcopy
+from functools import reduce
 
 # restaurants は各要素 [[テーブル配列], [客配列]]
 # それを識別するための定数
@@ -353,6 +354,70 @@ class Franchise:
         # 最後に掃除する
         self.cleanEmptyRestaurant()
         return current
+
+    # 学習済みのモデルを使って，文の分割を推定する
+    def predict(self, sentences):
+        output = {}
+
+        # 単語の集合は根店のテーブル配列を使えばいいはず
+        baseTableList = self.restaurants[()][TABLE]
+        wordSet = set([t[T_WORD] for t in baseTableList])
+
+        for filename in sentences.keys():
+            # 対象に含まれる単語のみのサブセットを取得
+            code = sentences[filename][0]
+            wordSubSet = set([w for w in wordSet if w in code])
+
+            # 可能な分割を取得
+            segList = self.predict_sub(wordSubSet, code)
+
+            # PAD つける
+            p       = [PADWORD for _ in range(self.PAD)]
+            segList = [p+s+p for s in segList]
+
+            # 各分割の確率を求める
+            probList = [self.calcProbability(s) for s in segList]
+
+            # 最も高確率である分割を取得
+            idx = probList.index(max(probList))
+            output[filename] = segList[idx]
+
+            # PAD 外す
+            output[filename] = output[filename][self.PAD:-1*(self.PAD+1)]
+
+        return output
+
+    # 可能な単語分割を取得する再帰関数
+    def predict_sub(self, wordSet, code):
+        # 単語が一つも含まれていないなら code は未知語
+        check = reduce(lambda x,y:x or y, [w in code for w in wordSet])
+        if check == False:
+            return [[code]]
+        
+        # 左端に単語があるなら，その単語を分割して再帰
+        # 最終的に配列の配列が返ってくるはずなので，分割した単語を
+        # 左端に append して return 
+        check = [w for w in wordSet if code[:len(w)]==w]
+        if len(check) > 0:
+            output = []
+            for w in check:
+                temp = self.predict_sub(wordSet, code[len(w):])
+                output += [[w]+r for r in temp]
+            return output 
+
+        # 左端に単語がないなら，単語が現れるまでを未知語として分割
+        else:
+            unknown = ""
+            nextcode = code
+            while True:
+                check = [w for w in wordSet if nextcode[:len(w)]==w]
+                if len(check) > 0:
+                    break
+                unknown += nextcode[0]
+                nextcode = nextcode[1:]
+            temp = self.predict_sub(wordSet, nextcode)
+            output = [[unknown]+r for r in temp]           
+            return output
 
     def debug_start(self, idx):
         if idx not in self.timeScore.keys():
