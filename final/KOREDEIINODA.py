@@ -5,11 +5,29 @@ import PrunningModel as prunner
 import MatchingModelwithNN as matcher
 
 if __name__ == "__main__":
-    generator.generate("tmp/log/", numTrain)
-    generator.generate("tmp/log_test/", numTest)
-    encoder.predict("test/", "tmp/log/", 5, 5000000, 100)
-    encoder.predict("test/", "tmp/log_test/", 5, 5000000, 100)
-    parser.parsing("test/", "encoded.dill", 2, 200)
-    parser.parsing("test/", "encoded_test.dill", 2, 200)
-    prunner.prunning("test/")
-    matcher.matching("test/") 
+
+    dillpath = "test/"
+    step = 5
+    soinnN = 5000000
+    soinnE = 100
+    LEN = 2
+    PAR_n_iter = 200
+    MAT_n_iter = 10
+ 
+    print("+--------")
+    generator.generate("tmp/log/", 1000)
+    print("++-------")
+    generator.generate("tmp/log_test/", 100)
+    print("+++------")
+    encoder.predict(dillpath, "tmp/log/"step, soinnN, soinnE)
+    print("++++-----")
+    encoder.predict(dillpath, "tmp/log_test/", step, soinnN, soinnE)
+    print("+++++----")
+    parser.parsing(dillpath, "encoded.dill"LEN, PAR_n_iter)
+    print("++++++---")
+    parser.parsing(dillpath, "encoded_test.dill", LEN, PAR_n_iter)
+    print("+++++++--")
+    prunner.prunning(dillpath)
+    print("++++++++-")
+    matcher.matching(dillpath, MAT_n_iter) 
+    print("+++++++++")
