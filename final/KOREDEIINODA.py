@@ -28,7 +28,7 @@ if __name__ == "__main__":
         for pName in p.keys():
             dillpath += pName + "="
             dillpath += str(p[pName]) + ","
-        dillpath = dillpath[:-1]
+        dillpath = dillpath[:-1] + "/"
 
         step        = p["step"]
         soinnN      = p["soinnN"]
@@ -38,9 +38,9 @@ if __name__ == "__main__":
         MAT_iter  = p["MAT_iter"]
      
         print("+--------")
-        generator.generate("tmp/log/", 1000)
+        # generator.generate("tmp/log/", 1000)
         print("++-------")
-        generator.generate("tmp/log_test/", 100)
+        # generator.generate("tmp/log_test/", 100)
         print("+++------")
         encoder.predict(dillpath, "tmp/log/", step, soinnN, soinnE)
         print("++++-----")
