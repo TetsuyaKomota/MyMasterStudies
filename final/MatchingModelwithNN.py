@@ -68,7 +68,12 @@ def matching():
         after = {}
         for fn in keys:
             # before+e より大きい最小の step 
-            after[fn] = [s for s in prunned[fn] if s > before[fn]+e][0]
+            # before+e 以降に境界がないなら終了状態にする
+            later = [s for s in prunned[fn] if s > before[fn]+e]
+            if len(later) > 0:
+                after[fn] = later[0]
+            else:
+                after[fn] = prunned[fn][-1]
 
         # サンプリング学習を n_iter 回行う
         modelList = []
