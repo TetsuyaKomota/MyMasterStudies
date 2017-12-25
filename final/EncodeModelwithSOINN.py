@@ -15,7 +15,7 @@
 #   それを dill.dump
 
 # from SOINN.SOINN_for_python import SOINN
-from SOINN.FastSOINN import SOINN
+from models.FastSOINN import SOINN
 import numpy as np
 import dill
 import os
