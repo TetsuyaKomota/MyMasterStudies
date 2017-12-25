@@ -25,7 +25,6 @@ import numpy as np
 from functools import reduce
 
 e          = 30  # 許容誤差
-n_iter     = 10  # サンプリング学習の回数
 
 # パーセプトロンを生成
 def build(numofInput):
@@ -38,9 +37,9 @@ def build(numofInput):
     return model
 
 
-def matching():
+def matching(dillpath, n_iter):
     # データのロード
-    with open("tmp/dills/prunned.dill", "rb") as f:
+    with open("tmp/dills/"+dillpath+"prunned.dill", "rb") as f:
         prunned = dill.load(f)
     keys = prunned.keys()
     size = 0   # データの次元． 2*オブジェクト数
@@ -135,10 +134,10 @@ def matching():
         if flag == True:
             break
    
-    with open("tmp/dills/matching.dill", "wb")  as f:
+    with open("tmp/dills/"+dillpath+"matching.dill", "wb")  as f:
         dill.dump(output, f)
 
     return output
 
 if __name__ ==  "__main__":
-    matching() 
+    matching("", 10) 

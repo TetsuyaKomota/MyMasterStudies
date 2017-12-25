@@ -22,13 +22,11 @@ import os
 import glob
 import sys
 
-step = 5
-soinnN = 5000000
-soinnE = 100
-
-def fit():
-    if os.path.exists("tmp/dills") == False:
-        os.mkdir("tmp/dills")
+def fit(dillpath, step, soinnN, soinnE):
+    if os.path.exists("tmp/dills/") == False:
+        os.mkdir("tmp/dills/")
+    if os.path.exists("tmp/dills/"+dillpath) == False:
+        os.mkdir("tmp/dills/"+dillpath)
     filepaths = glob.glob("tmp/log/*.csv")
     # soinn = SOINN(step * 2, soinnN, soinnE, n_iter=1, noise_var=0)
     soinn = SOINN(step * 2, soinnN, soinnE)
@@ -60,16 +58,16 @@ def fit():
         soinn.fit(X)
         
         if i%200==0:
-            soinn.saveModel(path="tmp/dills/")
+            soinn.saveModel(path="tmp/dills/"+dillpath)
 
     return soinn
 
-def predict(logpath):
-    if os.path.exists("tmp/dills/soinn.dill") == True:
+def predict(dillpath, logpath, step, soinnN, soinnE):
+    if os.path.exists("tmp/dills/"+dillpath+"soinn.dill") == True:
         soinn = SOINN(step * 2, soinnN, soinnE)
-        soinn.loadModel(path="tmp/dills/")
+        soinn.loadModel(path="tmp/dills/"+dillpath)
     else:
-        soinn = fit()
+        soinn = fit(dillpath, step, soinnN, soinnE)
 
     output = {}
     filepaths = glob.glob(logpath + "*.csv")
@@ -98,10 +96,10 @@ def predict(logpath):
         output[os.path.basename(filepath)[:-4]] = soinn.predict(Z)
 
     if "test" in logpath:
-        with open("tmp/dills/encoded_test.dill", "wb") as f:
+        with open("tmp/dills/"+dillpath+"encoded_test.dill", "wb") as f:
             dill.dump(output, f)
     else:
-        with open("tmp/dills/encoded.dill", "wb") as f:
+        with open("tmp/dills/"+dillpath+"encoded.dill", "wb") as f:
             dill.dump(output, f)
 
     return output
@@ -109,7 +107,7 @@ def predict(logpath):
 if __name__ == "__main__":
     # train データによる学習と推定
     # train データも推定するのは NPYLM の学習に使うため
-    predict("tmp/log/")
+    predict("", "tmp/log/", 5, 5000000, 100)
 
     # test データによる推定
-    predict("tmp/log_test/")
+    predict("", "tmp/log_test/", 5, 5000000, 100)

@@ -16,8 +16,8 @@ from functools import reduce
 
 threshold = 10
 
-def prunning():
-    with open("tmp/dills/parsed_test.dill", "rb") as f:
+def prunning(dillpath):
+    with open("tmp/dills/"+dillpath+"parsed_test.dill", "rb") as f:
         parsed = dill.load(f)
 
     output = {}
@@ -53,11 +53,11 @@ def prunning():
             if flag == True:
                 output[filename].append(step)
 
-    with open("tmp/dills/prunned.dill", "wb") as f:
+    with open("tmp/dills/"+dillpath+"prunned.dill", "wb") as f:
         dill.dump(output, f)
 
     return output
 
 if __name__ == "__main__":
-    prunning()
+    prunning("")
 

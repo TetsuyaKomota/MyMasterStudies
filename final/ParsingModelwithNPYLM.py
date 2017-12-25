@@ -23,12 +23,11 @@ D      = 1
 A      = 5
 Theta  = 1
 PAD    = 3
-LEN    = 2
 MIN_W  = 2
-n_iter = 200
 
-def fit():
-    with open("tmp/dills/encoded.dill", "rb") as f:
+
+def fit(dillpath, LEN, n_iter):
+    with open("tmp/dills/"+dillpath+"encoded.dill", "rb") as f:
         encoded = dill.load(f)
 
     rest =RefactedRestaurant.Franchise(D, A, Theta, PAD, LEN, MIN_W)
@@ -65,19 +64,19 @@ def fit():
     result = rest.executeParsing(strDictZip, n_iter)
     
     # return
-    with open("tmp/dills/npylm.dill", "wb") as f:
+    with open("tmp/dills/"+dillpath+"npylm.dill", "wb") as f:
         dill.dump(rest, f)
     
     return rest
 
-def parsing(dillname):
-    if os.path.exists("tmp/dills/npylm.dill") == True:
-        with open("tmp/dills/npylm.dill", "rb") as f:
+def parsing(dillpath, dillname, LEN, n_iter):
+    if os.path.exists("tmp/dills/"+dillpath+"npylm.dill") == True:
+        with open("tmp/dills/"+dillpath+"npylm.dill", "rb") as f:
             rest = dill.load(f)
     else:
-        rest = fit()
+        rest = fit(dillpath, LEN, n_iter)
 
-    with open("tmp/dills/"+dillname, "rb") as f:
+    with open("tmp/dills/"+dillpath+dillname, "rb") as f:
         encoded = dill.load(f)
 
     # 文字列化
@@ -133,10 +132,10 @@ def parsing(dillname):
     
     # return 
     if "test" in dillname:
-        with open("tmp/dills/parsed_test.dill", "wb") as f:
+        with open("tmp/dills/"+dillpath+"parsed_test.dill", "wb") as f:
             dill.dump(output, f)
     else:
-        with open("tmp/dills/parsed.dill", "wb") as f:
+        with open("tmp/dills/"+dillpath+"parsed.dill", "wb") as f:
             dill.dump(output, f)
     
     return output
@@ -144,7 +143,7 @@ def parsing(dillname):
 if __name__ == "__main__":
     # train による学習
     # これ以降 train の推定結果は使用しないため，predict ではなく fit     
-    parsing("encoded.dill")
+    parsing("", "encoded.dill", 2, 200)
     # test による推定
-    parsing("encoded_test.dill")
+    parsing("", "encoded_test.dill", 2, 200)
 
