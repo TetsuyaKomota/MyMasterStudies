@@ -27,7 +27,7 @@ if __name__ == "__main__":
         dillpath = ""
         for pName in p.keys():
             dillpath += pName + "="
-            dillpath += p[pName] + ","
+            dillpath += str(p[pName]) + ","
         dillpath = dillpath[:-1]
 
         step        = p["step"]
