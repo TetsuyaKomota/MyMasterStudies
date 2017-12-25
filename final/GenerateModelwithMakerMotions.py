@@ -12,14 +12,17 @@ from numpy.random import choice
 from random import random
 import os
 
-def generate():
+numTrain = 1000
+numTest  = 100
 
-    if os.path.exists("tmp/log") == False:
-        os.mkdir("tmp/log")
+def generate(path, num):
 
-    # ファイルを 5000 データ作成する
-    for i in range(5000):
-        filename = "tmp/log/"+"{0:05d}".format(i)+".csv"
+    if os.path.exists(path) == False:
+        os.mkdir(path)
+
+    # データを作成する
+    for i in range(num):
+        filename = path+"{0:05d}".format(i)+".csv"
         objList = ["red", "blue", "green", "yellow"]
         objNum  = len(objList)
 
@@ -87,4 +90,7 @@ def generate():
                     pick = "none"
 
 if __name__ == "__main__":
-    generate()
+    # train (SOINN, NPYLM 学習用)
+    generate("tmp/log/", numTrain)
+    # test  (Matching 学習用)
+    generate("tmp/log_test/", numTest)

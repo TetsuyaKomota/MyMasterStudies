@@ -17,7 +17,7 @@ from functools import reduce
 threshold = 10
 
 def prunning():
-    with open("tmp/dills/parsed.dill", "rb") as f:
+    with open("tmp/dills/parsed_test.dill", "rb") as f:
         parsed = dill.load(f)
 
     output = {}

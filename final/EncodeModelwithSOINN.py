@@ -64,7 +64,7 @@ def fit():
 
     return soinn
 
-def predict():
+def predict(logpath):
     if os.path.exists("tmp/dills/soinn.dill") == True:
         soinn = SOINN(step * 2, soinnN, soinnE)
         soinn.loadModel(path="tmp/dills/")
@@ -72,7 +72,7 @@ def predict():
         soinn = fit()
 
     output = {}
-    filepaths = glob.glob("tmp/log/*.csv")
+    filepaths = glob.glob(logpath + "*.csv")
     for filepath in filepaths:
         # step ステップ幅を切り出す
         Z = []
@@ -97,12 +97,19 @@ def predict():
         # 推定
         output[os.path.basename(filepath)[:-4]] = soinn.predict(Z)
 
-    with open("tmp/dills/encoded.dill", "wb") as f:
-        dill.dump(output, f)
+    if "test" in logpath:
+        with open("tmp/dills/encoded_test.dill", "wb") as f:
+            dill.dump(output, f)
+    else:
+        with open("tmp/dills/encoded.dill", "wb") as f:
+            dill.dump(output, f)
 
     return output
 
 if __name__ == "__main__":
-    # dill.dump の再帰し過ぎで怒られるので設定
-    # sys.setrecursionlimit(10000)
-    predict()
+    # train データによる学習と推定
+    # train データも推定するのは NPYLM の学習に使うため
+    predict("tmp/log/")
+
+    # test データによる推定
+    predict("tmp/log_test/")

@@ -70,14 +70,14 @@ def fit():
     
     return rest
 
-def parsing():
+def parsing(dillname):
     if os.path.exists("tmp/dills/npylm.dill") == True:
         with open("tmp/dills/npylm.dill", "rb") as f:
             rest = dill.load(f)
     else:
         rest = fit()
 
-    with open("tmp/dills/encoded.dill", "rb") as f:
+    with open("tmp/dills/"+dillname, "rb") as f:
         encoded = dill.load(f)
 
     # 文字列化
@@ -133,11 +133,19 @@ def parsing():
         output[d] = m
     
     # return 
-    with open("tmp/dills/parsed.dill", "wb") as f:
-        dill.dump(output, f)
+    if "test" in dillname:
+        with open("tmp/dills/parsed_test.dill", "wb") as f:
+            dill.dump(output, f)
+    else:
+        with open("tmp/dills/parsed.dill", "wb") as f:
+            dill.dump(output, f)
     
     return output
 
 if __name__ == "__main__":
-    parsing()
+    # train による学習
+    # これ以降 train の推定結果は使用しないため，predict ではなく fit     
+    fit()
+    # test による推定
+    parsing("encoded_test.dill")
 
