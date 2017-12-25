@@ -5,11 +5,20 @@ import PrunningModel as prunner
 import MatchingModelwithNN as matcher
 
 if __name__ == "__main__":
-    generator.generate("tmp/log/", numTrain)
-    generator.generate("tmp/log_test/", numTest)
+    print("+--------")
+    generator.generate("tmp/log/", 1000)
+    print("++-------")
+    generator.generate("tmp/log_test/", 100)
+    print("+++------")
     encoder.predict("tmp/log/")
+    print("++++-----")
     encoder.predict("tmp/log_test/")
+    print("+++++----")
     parser.parsing("encoded.dill")
+    print("++++++---")
     parser.parsing("encoded_test.dill")
+    print("+++++++--")
     prunner.prunning()
+    print("++++++++-")
     matcher.matching() 
+    print("+++++++++")
