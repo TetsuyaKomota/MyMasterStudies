@@ -20,6 +20,9 @@ def generate(path, num):
     if os.path.exists(path) == False:
         os.mkdir(path)
 
+    
+    isMoveChangable = True
+    
     # データを作成する
     for i in range(num):
         filename = path+"{0:05d}".format(i)+".csv"
@@ -36,13 +39,18 @@ def generate(path, num):
         # いずれも「取りに行く→動かす→取りに行く→動かす→戻る」なので
         # 取りに行く物体，動かす先をランダムに決定する
         # choice の False は「重複不可」
-        moves = []
-        moved = choice(objList, 2, False)
-        moves.append(np.array([moved[0]]))
-        moves.append(choice(objList, max(1, choice(objNum+1)), False))
-        moves.append(np.array([moved[1]]))
-        moves.append(choice(objList, max(1, choice(objNum+1)), False))
-        moves.append(choice(objList, 0, False))
+        if isMoveChangable == True:
+            moves = []
+            moved = choice(objList, 2, False)
+            moves.append(np.array([moved[0]]))
+            moves.append(choice(objList, max(1, choice(objNum+1)), False))
+            moves.append(np.array([moved[1]]))
+            moves.append(choice(objList, max(1, choice(objNum+1)), False))
+            moves.append(choice(objList, 0, False))
+
+        # test データ生成の場合，moves は初期化以降変更できなくする
+        if "test" in path:
+            isMoveChangable = False
  
         step = 0
         pick = "none"
