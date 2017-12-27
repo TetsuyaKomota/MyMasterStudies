@@ -2,14 +2,14 @@ import GenerateModelwithMakerMotions as generator
 import EncodeModelwithSOINN as encoder
 import ParsingModelwithNPYLM as parser
 import PrunningModel as prunner
-import MatchingModelwithNN as matcher
+# import MatchingModelwithNN as matcher
 
 if __name__ == "__main__":
 
     params = {}
     params["step"]     = [3, 5, 7]
-    params["soinnN"]   = [100, 3000, 5000000]
-    params["soinnE"]   = [100, 3000, 5000000]
+    params["soinnN"]   = [3000, 5000000]
+    params["soinnE"]   = [3000, 5000000]
     params["LEN"]      = [2, 5, 100]
     params["PAR_iter"] = [20, 200, 2000]
     params["MAT_iter"] = [1, 10, 100]
@@ -38,9 +38,9 @@ if __name__ == "__main__":
         MAT_iter  = p["MAT_iter"]
      
         print("+--------")
-        # generator.generate("tmp/log/", 1000)
+        # generator.generate("tmp/log/", 100)
         print("++-------")
-        # generator.generate("tmp/log_test/", 100)
+        # generator.generate("tmp/log_test/", 10)
         print("+++------")
         encoder.predict(dillpath, "tmp/log/", step, soinnN, soinnE)
         print("++++-----")
@@ -52,7 +52,7 @@ if __name__ == "__main__":
         print("+++++++--")
         prunner.prunning(dillpath)
         print("++++++++-")
-        matcher.matching(dillpath, MAT_iter) 
+        # matcher.matching(dillpath, MAT_iter) 
         print("+++++++++")
 
         flg = True
