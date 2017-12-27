@@ -25,7 +25,7 @@ if __name__ == "__main__":
             p[pName] = params[pName][idxs[pName]]
 
         dillpath = ""
-        for pName in p.keys():
+        for pName in sorted(list(p.keys())):
             dillpath += pName + "="
             dillpath += str(p[pName]) + ","
         dillpath = dillpath[:-1] + "/"
