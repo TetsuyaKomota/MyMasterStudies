@@ -20,6 +20,8 @@
 
 from keras.models import Sequential
 from keras.layers import Dense, Activation
+from keras.layers import BatchNormalization
+from keras.optimizers import Adam
 import dill
 import numpy as np
 from functools import reduce
@@ -33,8 +35,10 @@ def build(numofInput):
     model.add(Dense(numofInput, input_shape=(numofInput, )))
     # model.add(Activation("relu"))
     # model.add(Dense(numofInput))
+    model.add(BatchNormalization())
     model.add(Activation("linear"))
-    model.compile(optimizer="adam", loss="mean_squared_error")
+    adam = Adam(lr=0.1)
+    model.compile(optimizer="sgd", loss="mean_squared_error")
     return model
 
 
