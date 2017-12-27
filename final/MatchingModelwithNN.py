@@ -58,7 +58,7 @@ def matching(dillpath, n_iter):
         datas[filename] = []
         # goal = prunned[filename][-1]
         goal = 499
-        with open("tmp/log/"+filename+".csv", "r", encoding="utf-8") as f:
+        with open("tmp/log_test/"+filename+".csv", "r", encoding="utf-8") as f:
             while True:
                 line = f.readline().split(",")
                 if len(line) < 2:
