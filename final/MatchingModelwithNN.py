@@ -124,7 +124,12 @@ def matching(dillpath, n_iter):
             modelList.append((model, w))
 
         # 重みをソフトマックスで付けるために，総和を求めておく
-        sumexp = sum([np.exp(-1.0*m[1]) for m in modelList])
+        
+        print("modelList")
+        tempList = [1.0/m[1] for m in modelList]
+        print(tempList)
+        sleep(10)
+        sumexp = sum(tempList)
 
         # 次を推定する
         predict = {}
@@ -134,7 +139,7 @@ def matching(dillpath, n_iter):
                 beforeData = datas[filename][before[filename]]
                 beforeData = np.array([beforeData])
                 predict[filename].append(m[0].predict(beforeData))
-                predict[filename][-1] *= np.exp(-1.0*m[1])/sumexp
+                predict[filename][-1] *= (1.0/m[1])/sumexp
             predict[filename] = sum(predict[filename])
 
         # before を output に追加
@@ -148,7 +153,7 @@ def matching(dillpath, n_iter):
             distList = [np.linalg.norm(np.array(l)-p) for l in d]
             # 遠いステップにはペナルティをつける
             for i in range(len(distList)):
-                distList[i] *= 1+i*0.001
+                distList[i] *= 1#+i*0.0001
             # before ステップ以降のみを対象にする
             distList = distList[before[filename]+e:]
             # after を選ぶ段階で else によって 499 になっている場合
