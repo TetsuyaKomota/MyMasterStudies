@@ -66,6 +66,9 @@ def predict(dillpath, logpath, step, soinnN, soinnE):
     if os.path.exists("tmp/dills/"+dillpath+"soinn.dill") == True:
         soinn = SOINN(step * 2, soinnN, soinnE)
         soinn.loadModel(path="tmp/dills/"+dillpath)
+        soinn.removeUnnecessaryNode()
+        soinn.classifier()
+        soinn.prunning()
     else:
         soinn = fit(dillpath, step, soinnN, soinnE)
 
