@@ -48,6 +48,7 @@ def matching(dillpath, n_iter):
     datas = {}
     for filename in keys:
         datas[filename] = []
+        goal = prunned[filename][-1]
         with open("tmp/log/"+filename+".csv", "r", encoding="utf-8") as f:
             while True:
                 line = f.readline().split(",")
@@ -55,7 +56,6 @@ def matching(dillpath, n_iter):
                     break
                 if size == 0:
                     size = len(line[5:-1])
-                    goal = float(line[-2])
                 datas[filename].append([float(l) for l in line[5:-1]])
 
     # 共通境界推定
