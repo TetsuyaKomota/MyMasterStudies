@@ -23,6 +23,7 @@ from keras.layers import Dense, Activation
 import dill
 import numpy as np
 from functools import reduce
+from time import sleep
 
 e          = 30  # 許容誤差
 
@@ -30,8 +31,8 @@ e          = 30  # 許容誤差
 def build(numofInput):
     model = Sequential()
     model.add(Dense(numofInput, input_shape=(numofInput, )))
-    model.add(Activation("relu"))
-    model.add(Dense(numofInput))
+    # model.add(Activation("relu"))
+    # model.add(Dense(numofInput))
     model.add(Activation("linear"))
     model.compile(optimizer="adam", loss="mean_squared_error")
     return model
@@ -74,6 +75,16 @@ def matching(dillpath, n_iter):
             else:
                 after[fn] = prunned[fn][-1]
 
+        for filename in before.keys():
+            print(str(before[filename])+"\t--> "+str(after[filename]))
+        sleep(10)
+ 
+        # 終了条件
+        flagList = [a == goal for a in after.values()]
+        flag = reduce(lambda x, y : x and y, flagList)
+        if flag == True:
+            break
+ 
         # サンプリング学習を n_iter 回行う
         modelList = []
         for _ in range(n_iter):
@@ -90,7 +101,7 @@ def matching(dillpath, n_iter):
             y = np.array(y)
 
             # 学習
-            model.fit(X, y)
+            model.fit(X, y, epochs=10000)
 
             # 評価
             w = model.evaluate(X, y)
@@ -122,22 +133,19 @@ def matching(dillpath, n_iter):
             d = datas[filename]
             distList = [np.linalg.norm(np.array(l)-p) for l in d]
             # before ステップ以降のみを対象にする
-            distList = distList[before[filename]:]
-            selected[filename] = distList.index(min(distList))
-    
+            distList = distList[before[filename]+e:]
+            selected[filename]  = distList.index(min(distList))
+            # before+e ステップ分抜かしているので足しておく
+            selected[filename] += before[filename]+e
+ 
         # before <- selected
         before = selected
 
-        # 終了条件
-        flagList = [b == goal for b in before.values()]
-        flag = reduce(lambda x, y : x and y, flagList)
-        if flag == True:
-            break
-   
+  
     with open("tmp/dills/"+dillpath+"matching.dill", "wb")  as f:
         dill.dump(output, f)
 
     return output
 
 if __name__ ==  "__main__":
-    matching("", 10) 
+    matching("CHEAT/", 10) 
