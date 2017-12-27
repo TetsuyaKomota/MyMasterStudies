@@ -143,7 +143,7 @@ def parsing(dillpath, dillname, LEN, n_iter):
 if __name__ == "__main__":
     # train による学習
     # これ以降 train の推定結果は使用しないため，predict ではなく fit     
-    parsing("", "encoded.dill", 2, 200)
+    parsing("CHEAT/", "encoded.dill", 2, 200)
     # test による推定
     parsing("", "encoded_test.dill", 2, 200)
 

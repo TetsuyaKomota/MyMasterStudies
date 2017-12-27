@@ -22,6 +22,7 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation
 from keras.layers import BatchNormalization
 from keras.optimizers import Adam
+from keras.constraints import unit_norm
 import dill
 import numpy as np
 from functools import reduce
@@ -32,15 +33,18 @@ e          = 30  # 許容誤差
 # パーセプトロンを生成
 def build(numofInput):
     model = Sequential()
-    model.add(Dense(numofInput, input_shape=(numofInput, )))
+    model.add(Dense(numofInput, kernel_constraint=unit_norm(), input_shape=(numofInput, )))
     # model.add(Activation("relu"))
     # model.add(Dense(numofInput))
-    model.add(BatchNormalization())
+    # model.add(BatchNormalization())
     model.add(Activation("linear"))
     adam = Adam(lr=0.1)
     model.compile(optimizer="sgd", loss="mean_squared_error")
     return model
 
+def isDefferentStatus(b, a):
+    d = max([(b[i]-a[i])**2 for i in range(len(b))])
+    return d>10
 
 def matching(dillpath, n_iter):
     # データのロード
@@ -52,7 +56,8 @@ def matching(dillpath, n_iter):
     datas = {}
     for filename in keys:
         datas[filename] = []
-        goal = prunned[filename][-1]
+        # goal = prunned[filename][-1]
+        goal = 499
         with open("tmp/log/"+filename+".csv", "r", encoding="utf-8") as f:
             while True:
                 line = f.readline().split(",")
@@ -72,12 +77,15 @@ def matching(dillpath, n_iter):
         after = {}
         for fn in keys:
             # before+e より大きい最小の step 
+            # かつ，「hand のみ動いてる」という場合があるので，
+            # 「before から変化のある step」に限定する
             # before+e 以降に境界がないなら終了状態にする
-            later = [s for s in prunned[fn] if s > before[fn]+e]
+            later = [s for s in prunned[fn] if s > before[fn]+e and isDefferentStatus(datas[fn][before[fn]], datas[fn][s])]
             if len(later) > 0:
                 after[fn] = later[0]
             else:
-                after[fn] = prunned[fn][-1]
+                # after[fn] = prunned[fn][-1]
+                after[fn] = 499
 
         for filename in before.keys():
             print(str(before[filename])+"\t--> "+str(after[filename]))
@@ -105,7 +113,7 @@ def matching(dillpath, n_iter):
             y = np.array(y)
 
             # 学習
-            model.fit(X, y, epochs=10000)
+            model.fit(X, y, epochs=20000)
 
             # 評価
             # 評価はサンプリング前のデータを含めて行う
@@ -153,7 +161,7 @@ def matching(dillpath, n_iter):
             distList = [np.linalg.norm(np.array(l)-p) for l in d]
             # 遠いステップにはペナルティをつける
             for i in range(len(distList)):
-                distList[i] *= 1#+i*0.0001
+                distList[i] *= 1# +i*0.001
             # before ステップ以降のみを対象にする
             distList = distList[before[filename]+e:]
             # after を選ぶ段階で else によって 499 になっている場合

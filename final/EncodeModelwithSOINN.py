@@ -68,7 +68,7 @@ def predict(dillpath, logpath, step, soinnN, soinnE):
         soinn.loadModel(path="tmp/dills/"+dillpath)
         soinn.removeUnnecessaryNode()
         soinn.classifier()
-        soinn.prunning()
+        # soinn.prunning()
     else:
         soinn = fit(dillpath, step, soinnN, soinnE)
 
