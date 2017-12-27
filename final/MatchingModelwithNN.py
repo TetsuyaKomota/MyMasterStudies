@@ -115,6 +115,9 @@ def matching(dillpath, n_iter):
                 X.append(np.array(datas[sample][before[sample]]))
                 y.append(np.array(datas[sample][after[sample]]))
  
+            X = np.array(X)
+            y = np.array(y)
+
             w = model.evaluate(X, y)
 
             # 保存
@@ -145,7 +148,7 @@ def matching(dillpath, n_iter):
             distList = [np.linalg.norm(np.array(l)-p) for l in d]
             # 遠いステップにはペナルティをつける
             for i in range(len(distList)):
-                distList[i] *= 1+i*0.01
+                distList[i] *= 1+i*0.001
             # before ステップ以降のみを対象にする
             distList = distList[before[filename]+e:]
             # after を選ぶ段階で else によって 499 になっている場合
