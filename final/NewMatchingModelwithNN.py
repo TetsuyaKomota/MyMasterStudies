@@ -20,8 +20,6 @@
 
 from keras.models import Sequential
 from keras.layers import Dense, Activation
-from keras.layers import BatchNormalization
-from keras.optimizers import Adam
 import dill
 import numpy as np
 from functools import reduce
@@ -35,10 +33,8 @@ def build(numofInput):
     model.add(Dense(numofInput, input_shape=(numofInput, )))
     # model.add(Activation("relu"))
     # model.add(Dense(numofInput))
-    model.add(BatchNormalization())
     model.add(Activation("linear"))
-    adam = Adam(lr=0.1)
-    model.compile(optimizer="sgd", loss="mean_squared_error")
+    model.compile(optimizer="adam", loss="mean_squared_error")
     return model
 
 
@@ -100,21 +96,11 @@ def matching(dillpath, n_iter):
             for sample in sampleList:
                 X.append(np.array(datas[sample][before[sample]]))
                 y.append(np.array(datas[sample][after[sample]]))
+
+            # 移動物体を多数決でチェック
+            # 移動物体の連立方程式を立てる
+            # 解く:
            
-            X = np.array(X)
-            y = np.array(y)
-
-            # 学習
-            model.fit(X, y, epochs=10000)
-
-            # 評価
-            w = model.evaluate(X, y)
-
-            # 保存
-            modelList.append((model, w))
-
-        # 重みをソフトマックスで付けるために，総和を求めておく
-        sumexp = sum([np.exp(-1.0*m[1]) for m in modelList])
 
         # 次を推定する
         predict = {}
@@ -136,9 +122,6 @@ def matching(dillpath, n_iter):
             p = np.array(predict[filename])
             d = datas[filename]
             distList = [np.linalg.norm(np.array(l)-p) for l in d]
-            # 遠いステップにはペナルティをつける
-            for i in range(len(distList)):
-                distList[i] *= 1+i*0.01
             # before ステップ以降のみを対象にする
             distList = distList[before[filename]+e:]
             # after を選ぶ段階で else によって 499 になっている場合
