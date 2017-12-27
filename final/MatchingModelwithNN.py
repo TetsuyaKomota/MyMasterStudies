@@ -134,6 +134,12 @@ def matching(dillpath, n_iter):
             distList = [np.linalg.norm(np.array(l)-p) for l in d]
             # before ステップ以降のみを対象にする
             distList = distList[before[filename]+e:]
+            # after を選ぶ段階で else によって 499 になっている場合
+            # [before+e:] に要素が存在しない．その時は
+            # そのまま nefore を返す 
+            if len(distList) == 0:
+                selected[filename] = before[filename]
+                continue
             selected[filename]  = distList.index(min(distList))
             # before+e ステップ分抜かしているので足しておく
             selected[filename] += before[filename]+e
