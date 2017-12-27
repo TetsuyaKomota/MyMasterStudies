@@ -118,5 +118,5 @@ if __name__ == "__main__":
     """
     for N in [3000, 5000000]:
         for E in [100, 3000, 5000000]:
-            predict("SOINN_N="+str(N)+",E="+str(E), "tmp/log/",5,N,E)
-            predict("SOINN_N="+str(N)+",E="+str(E), "tmp/log_test/",5,N,E)
+            predict("SOINN_N="+str(N)+",E="+str(E)+"/", "tmp/log/",5,N,E)
+            predict("SOINN_N="+str(N)+",E="+str(E)+"/", "tmp/log_test/",5,N,E)
