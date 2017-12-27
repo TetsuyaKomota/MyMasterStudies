@@ -108,6 +108,13 @@ def matching(dillpath, n_iter):
             model.fit(X, y, epochs=10000)
 
             # 評価
+            # 評価はサンプリング前のデータを含めて行う
+            X = []
+            y = []
+            for sample in keys:
+                X.append(np.array(datas[sample][before[sample]]))
+                y.append(np.array(datas[sample][after[sample]]))
+ 
             w = model.evaluate(X, y)
 
             # 保存
