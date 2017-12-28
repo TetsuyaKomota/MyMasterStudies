@@ -159,7 +159,7 @@ if __name__ == "__main__":
                 dirpath += ", soinnN="+str(soinnN)
                 dirpath += ", soinnE="+str(soinnE)
                 dirpath += "/"
-                os.mkdir(dirpath)
+                os.mkdir("tmp/dills/"+dirpath)
                 shutil.copyfile(soinnpath+"encoded.dill",      "tmp/dills/"+dirpath+"encoded.dill")
                 shutil.copyfile(soinnpath+"encoded_test.dill", "tmp/dills/"+dirpath+"encoded_test.dill")
                 # train による学習
