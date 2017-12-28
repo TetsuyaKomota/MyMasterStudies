@@ -89,13 +89,14 @@ def matching(dillpath, n_iter):
                 X.append(datas[k][before[k]]) 
                 y.append(datas[k][after[k]]) 
 
-            X    = np.array(X) 
-            y    = np.array(y) 
+            # ここの転置忘れてた
+    
+            X    = np.array(X).T 
+            y    = np.array(y).T
 
             Xinv = np.linalg.inv(X)
             A    = y.dot(Xinv)
-        
-
+ 
             # 解いた結果の A で全データに対して再現精度を求める
             res = 0
             for k in keys:
@@ -115,7 +116,7 @@ def matching(dillpath, n_iter):
                 beforeData = datas[filename][before[filename]]
                 beforeData = np.array(beforeData)
                 predict[filename].append(m[0].dot(beforeData))
-                predict[filename][-1] *= (1.0/m[1])/sumexp
+                predict[filename][-1] *= m[1]/sumexp
             predict[filename] = sum(predict[filename])
 
         # before を output に追加
