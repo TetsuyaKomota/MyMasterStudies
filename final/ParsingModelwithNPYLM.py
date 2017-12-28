@@ -17,6 +17,8 @@
 
 import dill
 import os
+import glob
+import shutil
 from models import RefactedRestaurant
 
 D      = 1
@@ -141,9 +143,29 @@ def parsing(dillpath, dillname, LEN, n_iter):
     return output
 
 if __name__ == "__main__":
-    # train による学習
-    # これ以降 train の推定結果は使用しないため，predict ではなく fit     
-    parsing("CHEAT/", "encoded.dill", 2, 200)
-    # test による推定
-    parsing("", "encoded_test.dill", 2, 200)
+    filepaths = glob.glob("tmp/dills/*")
+    filepaths = [p for p in filepaths if "SOINN_" in p]
+    for p in filepaths:
+        if p[-1] == "/":
+            soinnpath = p
+        else:
+            soinnpath = p + "/"
+        # 力わざでディレクトリ名からSOINNのパラメータを取得する
+        soinnN = soinnpath[:-1].split("_")[1].split(",")[0].split("=")[1]
+        soinnE = soinnpath[:-1].split("_")[1].split(",")[1].split("=")[1]
+        print(soinnN)
+        print(soinnE)
+        continue
+        for LEN in []:
+            for ITER in []:
+                dirpath  = "tmp/dills/"
+                dirpath += "NPYLM_LEN="+str(LEN)+",ITER="+str(ITER)
+                dirpath += ", soinnN="
+                os.mkdir(dirpath)
+                shutil.copyfile(soinnpath+"encoded.dill",      dirpath+"encoded.dill")
+                shutil.copyfile(soinnpath+"encoded_test.dill", dirpath+"encoded_test.dill")
+                # train による学習
+                parsing(dirpath, "encoded.dill", 2, 200)
+                # test による推定
+                parsing(dirpath, "encoded_test.dill", 2, 200)
 
