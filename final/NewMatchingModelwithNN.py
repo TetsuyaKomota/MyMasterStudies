@@ -18,8 +18,6 @@
 # 5. before <- predict
 # 6.1. に戻る
 
-from keras.models import Sequential
-from keras.layers import Dense, Activation
 import dill
 import numpy as np
 from functools import reduce
@@ -27,29 +25,22 @@ from time import sleep
 
 e          = 30  # 許容誤差
 
-# パーセプトロンを生成
-def build(numofInput):
-    model = Sequential()
-    model.add(Dense(numofInput, input_shape=(numofInput, )))
-    # model.add(Activation("relu"))
-    # model.add(Dense(numofInput))
-    model.add(Activation("linear"))
-    model.compile(optimizer="adam", loss="mean_squared_error")
-    return model
-
+def isDefferent(b, a):
+    d = max([(b[i]-a[i])**2 for i in range(len(b))])
+    return d>10
 
 def matching(dillpath, n_iter):
     # データのロード
     with open("tmp/dills/"+dillpath+"prunned.dill", "rb") as f:
         prunned = dill.load(f)
     keys = prunned.keys()
-    size = 0   # データの次元． 2*オブジェクト数
-    goal = 0   # 終了状態のステップ数
+    size      = 0   # データの次元． 2*オブジェクト数
+    goal      = 0   # 終了状態のステップ数
     datas = {}
     for filename in keys:
         datas[filename] = []
         goal = prunned[filename][-1]
-        with open("tmp/log/"+filename+".csv", "r", encoding="utf-8") as f:
+        with open("tmp/log_test/"+filename+".csv", "r", encoding="utf-8") as f:
             while True:
                 line = f.readline().split(",")
                 if len(line) < 2:
@@ -69,7 +60,7 @@ def matching(dillpath, n_iter):
         for fn in keys:
             # before+e より大きい最小の step 
             # before+e 以降に境界がないなら終了状態にする
-            later = [s for s in prunned[fn] if s > before[fn]+e]
+            later = [s for s in prunned[fn] if s > before[fn]+e and isDefferent(datas[fn][before[fn]], datas[fn][s])]
             if len(later) > 0:
                 after[fn] = later[0]
             else:
@@ -88,19 +79,33 @@ def matching(dillpath, n_iter):
         # サンプリング学習を n_iter 回行う
         modelList = []
         for _ in range(n_iter):
-            # サンプリング
-            model = build(size)
-            sampleList = np.random.choice(list(keys), len(keys))
+
+            # size 個サンプリングして連立方程式を解く
+            keyList = list(keys)
+            np.random.shuffle(keyList)
             X = []
             y = []
-            for sample in sampleList:
-                X.append(np.array(datas[sample][before[sample]]))
-                y.append(np.array(datas[sample][after[sample]]))
+            for k in keyList[:size]:
+                X.append(datas[k][before[k]]) 
+                y.append(datas[k][after[k]]) 
 
-            # 移動物体を多数決でチェック
-            # 移動物体の連立方程式を立てる
-            # 解く:
-           
+            X    = np.array(X) 
+            y    = np.array(y) 
+
+            Xinv = np.linalg.inv(X)
+            A    = y.dot(Xinv)
+        
+
+            # 解いた結果の A で全データに対して再現精度を求める
+            res = 0
+            for k in keys:
+                b = np.array(datas[k][before[k]])
+                a = np.array(datas[k][after[k]])
+                r = A.dot(b)
+                res += np.linalg.norm(r-a)
+            modelList.append((A, 1.0/res))
+
+        sumexp = sum([m[1] for m in modelList])
 
         # 次を推定する
         predict = {}
@@ -108,9 +113,9 @@ def matching(dillpath, n_iter):
             predict[filename] = []
             for m in modelList:
                 beforeData = datas[filename][before[filename]]
-                beforeData = np.array([beforeData])
-                predict[filename].append(m[0].predict(beforeData))
-                predict[filename][-1] *= np.exp(-1.0*m[1])/sumexp
+                beforeData = np.array(beforeData)
+                predict[filename].append(m[0].dot(beforeData))
+                predict[filename][-1] *= (1.0/m[1])/sumexp
             predict[filename] = sum(predict[filename])
 
         # before を output に追加
