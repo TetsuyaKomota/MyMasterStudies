@@ -34,7 +34,8 @@ def visualize(dirname="", isSaveImg=False):
     if isSaveImg == True:
         if os.path.exists(dirpath + "img/") == False:
             os.mkdir(dirpath + "img/")
-        plt.savefig(dirpath + "img/img_" + dirname[:-1] + ".jpg")
+        imgname = "img_" + dillname.split(".")[0] + "_"
+        plt.savefig(dirpath + "img/" + imgname + dirname[:-1] + ".jpg")
     plt.show()
 
 def evaluate(resultName="result", dirname="", mode="a", isSaveImg=False):
@@ -58,7 +59,10 @@ def evaluate(resultName="result", dirname="", mode="a", isSaveImg=False):
     for filename in parsed.keys():
             succDict[filename] = 0
             for n in range(1, numofSucc+1):
-                temp = [np.abs(step-200*n)<e for step in parsed[filename]]
+                # temp = [np.abs(step-200*n)<e for step in parsed[filename]]
+                # 例えば 200 に対して，299 までは正解とみなすべきで，
+                # 299+e までを許容誤差とするべき
+                temp = [step>200*n and (step-200*n)<100+e for step in parsed[filename]]
                 temp = reduce(lambda x, y : x or y, temp)
                 succDict[filename] += int(temp)
     succ      = sum(succDict.values())
