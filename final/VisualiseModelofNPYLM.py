@@ -12,13 +12,16 @@
 #   F値求める
 
 import os
+import glob
 import dill
 import numpy as np
 from functools import reduce
 import matplotlib.pyplot as plt
 
-def visualize():
-    with open("tmp/dills/parsed.dill", "rb") as f:
+dirpath = "tmp/results/"
+
+def visualize(dirname="", isSaveImg=False):
+    with open("tmp/dills/" + dirname + "parsed.dill", "rb") as f:
         parsed = dill.load(f)
 
     bag = []
@@ -26,10 +29,14 @@ def visualize():
         bag += parsed[filename]
 
     plt.hist(bag, bins=max(bag)+1)
+    if isSaveImg == True:
+        if os.path.exists(dirpath + "img/") == False:
+            os.mkdir(dirpath + "img/")
+        plt.savefig(dirpath + "img/img_" + dirname[:-1] + ".jpg")
     plt.show()
 
-def evaluate(resultName="result", dirname="", mode="a"):
-    visualize()
+def evaluate(resultName="result", dirname="", mode="a", isSaveImg=False):
+    visualize(dirname, isSaveImg)
     with open("tmp/dills/" + dirname + "parsed.dill", "rb") as f:
         parsed = dill.load(f)
    
@@ -58,7 +65,6 @@ def evaluate(resultName="result", dirname="", mode="a"):
     else:
         fScore = 2.0/(1.0/precision + 1.0/recall)
     # csv 書き出し
-    dirpath = "tmp/results/"
     
     if os.path.exists(dirpath) == False:
         os.mkdir(dirpath)
@@ -74,4 +80,11 @@ def evaluate(resultName="result", dirname="", mode="a"):
     print("%4f, %4f, %4f" % (precision, recall, fScore))
 
 if __name__ == "__main__":
-    evaluate()
+    # evaluate()
+    filepaths = glob.glob("tmp/dills/*")
+    for filepath in filepaths:
+        if os.path.isdir(filepath) == False:
+            continue
+        if os.path.exists(filepath + "/parsed.dill") == True:
+            dn = os.path.basename(filepath) + "/"
+            evaluate(dn, dn, mode="a", isSaveImg=True)
