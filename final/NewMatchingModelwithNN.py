@@ -77,71 +77,87 @@ def matching(dillpath, n_iter):
         flag = reduce(lambda x, y : x and y, flagList)
         if flag == True:
             break
+
+        # ---------------------------------------------------
+        # 要するに，この部分を一回しかやらないのが間違ってる
+        # ・サンプリングにより predict を取得
+        # ・predict を after にしてもう一度サンプリング
+        # ・predict = after になるまで繰り返す
+        # ・predict を output に追加
+        # ・before <- predict
+
+        while True:
+            # サンプリング学習を n_iter 回行う
+            modelList = []
+            for _ in range(n_iter):
+
+                # size 個サンプリングして連立方程式を解く
+                keyList = list(keys)
+                np.random.shuffle(keyList)
+                X = []
+                y = []
+                for k in keyList[:size]:
+                    X.append(datas[k][before[k]]) 
+                    y.append(datas[k][after[k]]) 
+
+                # ここの転置忘れてた
+        
+                X    = np.array(X).T 
+                y    = np.array(y).T
+
+                Xinv = np.linalg.inv(X)
+                A    = y.dot(Xinv)
+     
+                # 解いた結果の A で全データに対して再現精度を求める
+                res = 0
+                for k in keys:
+                    b = np.array(datas[k][before[k]])
+                    a = np.array(datas[k][after[k]])
+                    r = A.dot(b)
+                    res += np.linalg.norm(r-a)
+                modelList.append((A, 1.0/res))
+
+            sumexp = sum([m[1] for m in modelList])
+
+            # 次を推定する
+            predict = {}
+            for filename in keys:
+                predict[filename] = []
+                for m in modelList:
+                    beforeData = datas[filename][before[filename]]
+                    beforeData = np.array(beforeData)
+                    predict[filename].append(m[0].dot(beforeData))
+                    predict[filename][-1] *= m[1]/sumexp
+                predict[filename] = sum(predict[filename])
+        
+            # 推定結果に最も近い状態を datas から取得
+            selected = {}
+            for filename in keys:
+                output[filename].append(before[filename])
+                # 各ステップの状態との距離を計算する
+                p = np.array(predict[filename])
+                d = datas[filename]
+                distList = [np.linalg.norm(np.array(l)-p) for l in d]
+                # before ステップ以降のみを対象にする
+                distList = distList[before[filename]+e:]
+                # after を選ぶ段階で else によって 499 になっている場合
+                # [before+e:] に要素が存在しない．その時は
+                # そのまま before を返す 
+                if len(distList) == 0:
+                    selected[filename] = before[filename]
+                    continue
+                selected[filename]  = distList.index(min(distList))
+                # before+e ステップ分抜かしているので足しておく
+                selected[filename] += before[filename]+e
  
-        # サンプリング学習を n_iter 回行う
-        modelList = []
-        for _ in range(n_iter):
+            # after == selected なら break
+            if after == selected:
+                break
+            # after = predict にして元に戻す
+            after = selected
 
-            # size 個サンプリングして連立方程式を解く
-            keyList = list(keys)
-            np.random.shuffle(keyList)
-            X = []
-            y = []
-            for k in keyList[:size]:
-                X.append(datas[k][before[k]]) 
-                y.append(datas[k][after[k]]) 
+        # ---------------------------------------------------
 
-            # ここの転置忘れてた
-    
-            X    = np.array(X).T 
-            y    = np.array(y).T
-
-            Xinv = np.linalg.inv(X)
-            A    = y.dot(Xinv)
- 
-            # 解いた結果の A で全データに対して再現精度を求める
-            res = 0
-            for k in keys:
-                b = np.array(datas[k][before[k]])
-                a = np.array(datas[k][after[k]])
-                r = A.dot(b)
-                res += np.linalg.norm(r-a)
-            modelList.append((A, 1.0/res))
-
-        sumexp = sum([m[1] for m in modelList])
-
-        # 次を推定する
-        predict = {}
-        for filename in keys:
-            predict[filename] = []
-            for m in modelList:
-                beforeData = datas[filename][before[filename]]
-                beforeData = np.array(beforeData)
-                predict[filename].append(m[0].dot(beforeData))
-                predict[filename][-1] *= m[1]/sumexp
-            predict[filename] = sum(predict[filename])
-
-        # before を output に追加
-        # 推定結果に最も近い状態を datas から取得
-        selected = {}
-        for filename in keys:
-            output[filename].append(before[filename])
-            # 各ステップの状態との距離を計算する
-            p = np.array(predict[filename])
-            d = datas[filename]
-            distList = [np.linalg.norm(np.array(l)-p) for l in d]
-            # before ステップ以降のみを対象にする
-            distList = distList[before[filename]+e:]
-            # after を選ぶ段階で else によって 499 になっている場合
-            # [before+e:] に要素が存在しない．その時は
-            # そのまま before を返す 
-            if len(distList) == 0:
-                selected[filename] = before[filename]
-                continue
-            selected[filename]  = distList.index(min(distList))
-            # before+e ステップ分抜かしているので足しておく
-            selected[filename] += before[filename]+e
- 
         # before <- selected
         before = selected
 
