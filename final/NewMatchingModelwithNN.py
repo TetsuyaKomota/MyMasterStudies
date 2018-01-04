@@ -57,6 +57,9 @@ def matching(dillpath, n_iter):
         output[filename] = []
         before[filename] = prunned[filename][0]
     while True:
+        # 現段階の before を保存
+        for filename in keys:
+            output[filename].append(before[filename])
         after = {}
         for fn in keys:
             # before+e より大きい最小の step 
@@ -70,12 +73,15 @@ def matching(dillpath, n_iter):
 
         for filename in before.keys():
             print(str(before[filename])+"\t--> "+str(after[filename]))
-        sleep(10)
+        # sleep(10)
  
         # 終了条件
         flagList = [a == goal for a in after.values()]
         flag = reduce(lambda x, y : x and y, flagList)
         if flag == True:
+            # 最終結果を出力する
+            for filename in keys:
+                output[filename].append(after[filename])
             break
 
         # ---------------------------------------------------
@@ -133,7 +139,6 @@ def matching(dillpath, n_iter):
             # 推定結果に最も近い状態を datas から取得
             selected = {}
             for filename in keys:
-                output[filename].append(before[filename])
                 # 各ステップの状態との距離を計算する
                 p = np.array(predict[filename])
                 d = datas[filename]

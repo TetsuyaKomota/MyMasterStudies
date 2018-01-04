@@ -45,22 +45,25 @@ def evaluate(resultName="result", dirname="", mode="a", isSaveImg=False):
     # precision : 境界と推定したもののうち，正解の割合
     # recall    : 正解のうち，境界と推定したものの割合
     # ↓
-    # precision は単純に100n+l 内の境界の数を数え，推定境界全体数 で割る
+    # precision は単純に200n+l 内の境界の数を数え，推定境界全体数 で割る
     # recall は上記の数を，データ数×正解の境界数 で割る
     # どちらにしても，正解の境界の数え方に注意
-    # 一つの 100n に対し．一つまでしか計上しない
+    # 一つの 200n に対し．一つまでしか計上しない
+    # 動作自体は 100 ステップずつだが．環境的に重要なのは 200, 400 なので，
+    # 正解対象を 200n とする
 
     succDict  = {}
-    numofSucc = 4
+    numofSucc = 2
     e         = 10 # 許容ステップ誤差
     for filename in parsed.keys():
             succDict[filename] = 0
             for n in range(1, numofSucc+1):
-                temp = [np.abs(step-100*n)<e for step in parsed[filename]]
+                temp = [np.abs(step-200*n)<e for step in parsed[filename]]
                 temp = reduce(lambda x, y : x or y, temp)
                 succDict[filename] += int(temp)
     succ      = sum(succDict.values())
-    precision = succ / sum([len(sList) for sList in parsed.values()])
+    # precision の -2 は終始端を無視する為
+    precision = succ / sum([len(sList)-2 for sList in parsed.values()])
     recall    = succ / (len(parsed.keys()) * numofSucc)
     if precision + recall == 0:
         fScore = 0
