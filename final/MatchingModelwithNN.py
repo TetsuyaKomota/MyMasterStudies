@@ -80,7 +80,8 @@ def matching(dillpath, n_iter):
             # かつ，「hand のみ動いてる」という場合があるので，
             # 「before から変化のある step」に限定する
             # before+e 以降に境界がないなら終了状態にする
-            later = [s for s in prunned[fn] if s > before[fn]+e and isDefferentStatus(datas[fn][before[fn]], datas[fn][s])]
+            later = [s for s in prunned[fn] if s > before[fn]+e \
+                and isDefferentStatus(datas[fn][before[fn]],datas[fn][s])]
             if len(later) > 0:
                 after[fn] = later[0]
             else:
@@ -166,7 +167,7 @@ def matching(dillpath, n_iter):
             distList = distList[before[filename]+e:]
             # after を選ぶ段階で else によって 499 になっている場合
             # [before+e:] に要素が存在しない．その時は
-            # そのまま nefore を返す 
+            # そのまま before を返す 
             if len(distList) == 0:
                 selected[filename] = before[filename]
                 continue

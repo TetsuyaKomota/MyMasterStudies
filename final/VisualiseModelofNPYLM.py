@@ -28,9 +28,9 @@ def visualize():
     plt.hist(bag, bins=max(bag)+1)
     plt.show()
 
-def evaluate(resultName="result", mode="a"):
+def evaluate(resultName="result", dirname="", mode="a"):
     visualize()
-    with open("tmp/dills/parsed.dill", "rb") as f:
+    with open("tmp/dills/" + dirname + "parsed.dill", "rb") as f:
         parsed = dill.load(f)
    
     # precision : 境界と推定したもののうち，正解の割合

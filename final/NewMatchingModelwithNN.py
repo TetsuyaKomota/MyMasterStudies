@@ -40,7 +40,8 @@ def matching(dillpath, n_iter):
     for filename in keys:
         datas[filename] = []
         goal = prunned[filename][-1]
-        with open("tmp/log_test/"+filename+".csv", "r", encoding="utf-8") as f:
+        filepath = "tmp/log_test/" + filename + ".csv"
+        with open(filepath, "r", encoding="utf-8") as f:
             while True:
                 line = f.readline().split(",")
                 if len(line) < 2:
@@ -60,7 +61,8 @@ def matching(dillpath, n_iter):
         for fn in keys:
             # before+e より大きい最小の step 
             # before+e 以降に境界がないなら終了状態にする
-            later = [s for s in prunned[fn] if s > before[fn]+e and isDefferent(datas[fn][before[fn]], datas[fn][s])]
+            later = [s for s in prunned[fn] if s > before[fn]+e \
+                and isDefferent(datas[fn][before[fn]], datas[fn][s])]
             if len(later) > 0:
                 after[fn] = later[0]
             else:
@@ -132,7 +134,7 @@ def matching(dillpath, n_iter):
             distList = distList[before[filename]+e:]
             # after を選ぶ段階で else によって 499 になっている場合
             # [before+e:] に要素が存在しない．その時は
-            # そのまま nefore を返す 
+            # そのまま before を返す 
             if len(distList) == 0:
                 selected[filename] = before[filename]
                 continue
