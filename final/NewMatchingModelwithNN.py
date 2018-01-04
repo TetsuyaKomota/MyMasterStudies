@@ -18,7 +18,9 @@
 # 5. before <- predict
 # 6.1. に戻る
 
+import os
 import dill
+import glob
 import numpy as np
 from functools import reduce
 from time import sleep
@@ -173,4 +175,11 @@ def matching(dillpath, n_iter):
     return output
 
 if __name__ ==  "__main__":
-    matching("CHEAT/", 10) 
+    # matching("CHEAT/", 10) 
+    filepaths = glob.glob("tmp/dills/*")
+    for filepath in filepaths:
+        if os.path.isdir(filepath) == False:
+            continue
+        if os.path.exists(filepath + "/prunned.dill") == True:
+            dirname = os.path.basename(filepath)
+            matching(dirname+"/", 10)

@@ -10,7 +10,9 @@
 #   hand 以外に変化がない境界は削除
 #   剪定し終わった境界列は状態列に
 
+import os
 import dill
+import glob
 import numpy as np
 from functools import reduce
 
@@ -59,5 +61,11 @@ def prunning(dillpath):
     return output
 
 if __name__ == "__main__":
-    prunning("CHEAT/")
-
+    # prunning("CHEAT/")
+    filepaths = glob.glob("tmp/dills/*")
+    for filepath in filepaths:
+        if os.path.isdir(filepath) == False:
+            continue
+        if os.path.exists(filepath + "/parsed_test.dill") == True:
+            dirname = os.path.basename(filepath)
+            prunning(dirname+"/")
