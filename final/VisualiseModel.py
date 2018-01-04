@@ -18,10 +18,12 @@ import numpy as np
 from functools import reduce
 import matplotlib.pyplot as plt
 
-dirpath = "tmp/results/"
+dirpath  = "tmp/results/"
+# dillname = "parsed.dill"
+dillname = "matching.dill"
 
 def visualize(dirname="", isSaveImg=False):
-    with open("tmp/dills/" + dirname + "parsed.dill", "rb") as f:
+    with open("tmp/dills/" + dirname + dillname, "rb") as f:
         parsed = dill.load(f)
 
     bag = []
@@ -37,7 +39,7 @@ def visualize(dirname="", isSaveImg=False):
 
 def evaluate(resultName="result", dirname="", mode="a", isSaveImg=False):
     visualize(dirname, isSaveImg)
-    with open("tmp/dills/" + dirname + "parsed.dill", "rb") as f:
+    with open("tmp/dills/" + dirname + dillname, "rb") as f:
         parsed = dill.load(f)
    
     # precision : 境界と推定したもののうち，正解の割合
@@ -68,7 +70,9 @@ def evaluate(resultName="result", dirname="", mode="a", isSaveImg=False):
     
     if os.path.exists(dirpath) == False:
         os.mkdir(dirpath)
-    with open(dirpath+"results_NPYLM.csv", mode, encoding="utf-8") as f:
+    csvName = dillname.split(".")[0]
+    filepath = dirpath + "results_" + csvName + ".csv"
+    with open(filepath, mode, encoding="utf-8") as f:
         if mode == "w":
             f.write("resultname,precision,recall,f_score\n")
         text  = str(resultName) + ","
@@ -85,6 +89,6 @@ if __name__ == "__main__":
     for filepath in filepaths:
         if os.path.isdir(filepath) == False:
             continue
-        if os.path.exists(filepath + "/parsed.dill") == True:
+        if os.path.exists(filepath + "/" + dillname) == True:
             dn = os.path.basename(filepath) + "/"
             evaluate(dn, dn, mode="a", isSaveImg=True)
