@@ -33,7 +33,7 @@ def isDefferent(b, a):
 
 def matching(dillpath, n_iter):
     # データのロード
-    with open("tmp/dills/"+dillpath+"prunned.dill", "rb") as f:
+    with open("tmp/dills/"+dillpath+"parsed_test.dill", "rb") as f:
         prunned = dill.load(f)
     keys = prunned.keys()
     size      = 0   # データの次元． 2*オブジェクト数
@@ -180,6 +180,6 @@ if __name__ ==  "__main__":
     for filepath in filepaths:
         if os.path.isdir(filepath) == False:
             continue
-        if os.path.exists(filepath + "/prunned.dill") == True:
+        if os.path.exists(filepath + "/parsed_test.dill") == True:
             dirname = os.path.basename(filepath)
             matching(dirname+"/", 10)
