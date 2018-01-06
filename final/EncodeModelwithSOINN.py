@@ -116,7 +116,7 @@ if __name__ == "__main__":
     # test データによる推定
     predict("", "tmp/log_test/", 5, 5000000, 100)
     """
-    for N in [3000, 5000000]:
-        for E in [100, 3000, 5000000]:
+    for N in [100, 3000, 5000000]:
+        for E in [2, 10, 5000000]: # 100以上はみんな同じだった
             predict("SOINN_N="+str(N)+",E="+str(E)+"/", "tmp/log/",5,N,E)
             predict("SOINN_N="+str(N)+",E="+str(E)+"/", "tmp/log_test/",5,N,E)

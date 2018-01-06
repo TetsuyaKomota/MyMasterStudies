@@ -49,6 +49,7 @@ class SOINN:
 
                 # 入力回数が nodeAge になったとき．孤立ノードを除去
                 if self.inputCount % self.nodeAge == 0:
+                    print("あらよっと")
                     self.removeUnnecessaryNode()
                     self.classifier()
             
@@ -124,6 +125,7 @@ class SOINN:
             self.edgeDict[key] += 1
             # edgeAge を超えたエッジは削除
             if self.edgeDict[key] > self.edgeAge:
+                print("は～いよっと")
                 del self.edgeDict[key]
 
     # 指定したノードとその隣接ノードを更新
