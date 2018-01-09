@@ -319,8 +319,29 @@ class Node:
         self.classID  = -1  
  
     # ユークリッド距離 
-    def distance(self, signal):
+    def _distance(self, signal):
         return np.linalg.norm(self.signal - signal)
+
+    # 軌道類似度
+    # 2次元ベクトルのコサイン類似度を畳み込む
+    # お互いの各ステップに最も近い値を探して足す
+    def distance(self, sig):
+        output = 0
+        b = []
+        a = []
+        for i in range(int(len(self.signal)/2)):
+            b.append(self.signal[i*2:(i+1)*2])
+            a.append(sig[i*2:(i+1)*2])
+        b = np.array(b)
+        a = np.array(a)
+
+        for bi in b:
+            bd = [1 - bi.dot(ai)/(np.linalg.norm(bi)*np.linalg.norm(ai)) for ai in a]
+            output += min(bd)
+        for ai in a:
+            ad = [1 - ai.dot(bi)/(np.linalg.norm(ai)*np.linalg.norm(bi)) for bi in b]
+            output += min(ad)
+        return output
 
 
 if __name__ == "__main__":
