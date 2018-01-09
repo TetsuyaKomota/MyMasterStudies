@@ -12,7 +12,7 @@ from numpy.random import choice
 from random import random
 import os
 
-numTrain = 1000
+numTrain = 100
 numTest  = 100
 
 def generate(path, num):
@@ -41,10 +41,12 @@ def generate(path, num):
         # choice の False は「重複不可」
         if isMoveChangable == True:
             moves = []
-            moved = choice(objList, 2, False)
+            moved = choice(objList, 3, False)
             moves.append(np.array([moved[0]]))
             moves.append(choice(objList, max(1, choice(objNum+1)), False))
             moves.append(np.array([moved[1]]))
+            moves.append(choice(objList, max(1, choice(objNum+1)), False))
+            moves.append(np.array([moved[2]]))
             moves.append(choice(objList, max(1, choice(objNum+1)), False))
             moves.append(choice(objList, 0, False))
 
@@ -91,8 +93,8 @@ def generate(path, num):
                         inits[pick] += v
                     v += a
 
-                # step = 100, 300 なら掴み，200, 400 なら離す
-                if step in [100, 300]:
+                # step = 100, 300, 500 なら掴み，200, 400, 600 なら離す
+                if step in [100, 300, 500]:
                     pick = moves[s][0]
                 else:
                     pick = "none"
