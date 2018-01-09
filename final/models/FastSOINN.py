@@ -335,12 +335,16 @@ class Node:
         b = np.array(b)
         a = np.array(a)
 
+        """
         for bi in b:
             bd = [1 - bi.dot(ai)/(np.linalg.norm(bi)*np.linalg.norm(ai)+1e-8) for ai in a]
             output += min(bd)
         for ai in a:
             ad = [1 - ai.dot(bi)/(np.linalg.norm(ai)*np.linalg.norm(bi)+1e-8) for bi in b]
             output += min(ad)
+        """
+        d = [1-b[i].dot(a[i])/(np.linalg.norm(b[i])*np.linalg.norm(a[i])+1e-16) for i in range(len(b))]
+        output += sum(d)
         return output
 
 
