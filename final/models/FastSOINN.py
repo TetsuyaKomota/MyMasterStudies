@@ -336,10 +336,10 @@ class Node:
         a = np.array(a)
 
         for bi in b:
-            bd = [1 - bi.dot(ai)/(np.linalg.norm(bi)*np.linalg.norm(ai)) for ai in a]
+            bd = [1 - bi.dot(ai)/(np.linalg.norm(bi)*np.linalg.norm(ai)+1e-8) for ai in a]
             output += min(bd)
         for ai in a:
-            ad = [1 - ai.dot(bi)/(np.linalg.norm(ai)*np.linalg.norm(bi)) for bi in b]
+            ad = [1 - ai.dot(bi)/(np.linalg.norm(ai)*np.linalg.norm(bi)+1e-8) for bi in b]
             output += min(ad)
         return output
 
