@@ -176,6 +176,7 @@ def matching(dillpath, n_iter):
 
 if __name__ ==  "__main__":
     # matching("CHEAT/", 10) 
+    # exit()
     filepaths = glob.glob("tmp/dills/*")
     for filepath in filepaths:
         if os.path.isdir(filepath) == False:

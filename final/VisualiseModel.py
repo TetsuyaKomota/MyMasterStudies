@@ -54,15 +54,19 @@ def evaluate(resultName="result", dirname="", mode="a", isSaveImg=False):
     # 正解対象を 200n とする
 
     succDict  = {}
+    # 700 モードなら 3, 500 モードなら 2
+    # numofSucc = 3
     numofSucc = 2
     e         = 10 # 許容ステップ誤差
     for filename in parsed.keys():
             succDict[filename] = 0
+            print("filename:" + str(filename) + ":" + str(parsed[filename]))
             for n in range(1, numofSucc+1):
                 # temp = [np.abs(step-200*n)<e for step in parsed[filename]]
                 # 例えば 200 に対して，299 までは正解とみなすべきで，
                 # 299+e までを許容誤差とするべき
-                temp = [step>200*n and (step-200*n)<100+e for step in parsed[filename]]
+                temp = [step>200*n-e and (step-200*n)<100+e for step in parsed[filename]]
+                print("step:" + str(200*n) + ":" + str(temp))
                 temp = reduce(lambda x, y : x or y, temp)
                 succDict[filename] += int(temp)
     succ      = sum(succDict.values())
@@ -91,7 +95,8 @@ def evaluate(resultName="result", dirname="", mode="a", isSaveImg=False):
     print("%4f, %4f, %4f" % (precision, recall, fScore))
 
 if __name__ == "__main__":
-    # evaluate()
+    # evaluate("CHEAT/", "CHEAT/", mode="w", isSaveImg=True)
+    # exit()
     filepaths = glob.glob("tmp/dills/*")
     for filepath in filepaths:
         if os.path.isdir(filepath) == False:

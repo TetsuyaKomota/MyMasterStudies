@@ -42,6 +42,7 @@ def generate(path, num):
         if isMoveChangable == True:
             moves = []
             moved = choice(objList, 3, False)
+            # moved = choice(objList, 2, False)
             moves.append(np.array([moved[0]]))
             moves.append(choice(objList, max(1, choice(objNum+1)), False))
             moves.append(np.array([moved[1]]))
@@ -94,6 +95,7 @@ def generate(path, num):
                     v += a
 
                 # step = 100, 300, 500 なら掴み，200, 400, 600 なら離す
+                # if step in [100, 300]:
                 if step in [100, 300, 500]:
                     pick = moves[s][0]
                 else:
