@@ -19,8 +19,8 @@ from functools import reduce
 import matplotlib.pyplot as plt
 
 dirpath  = "tmp/results/"
-# dillname = "parsed.dill"
-dillname = "matching.dill"
+dillname = "parsed.dill"
+# dillname = "matching.dill"
 
 def visualize(dirname="", isSaveImg=False):
     with open("tmp/dills/" + dirname + dillname, "rb") as f:
@@ -31,6 +31,8 @@ def visualize(dirname="", isSaveImg=False):
         bag += parsed[filename]
 
     plt.hist(bag, bins=max(bag)+1)
+    if os.path.exists(dirpath) == False:
+        os.mkdir(dirpath)
     if isSaveImg == True:
         if os.path.exists(dirpath + "img/") == False:
             os.mkdir(dirpath + "img/")
@@ -65,7 +67,10 @@ def evaluate(resultName="result", dirname="", mode="a", isSaveImg=False):
                 # temp = [np.abs(step-200*n)<e for step in parsed[filename]]
                 # 例えば 200 に対して，299 までは正解とみなすべきで，
                 # 299+e までを許容誤差とするべき
-                temp = [step>200*n-e and (step-200*n)<100+e for step in parsed[filename]]
+                # 最後の条件は「最終状態を正解としない」
+                # 400 + 100+e を許容すると 499 は許容されるが
+                # これは自明なので階としては無視
+                temp = [step>200*n-e and (step-200*n)<100+e and step != 200*numofSucc+99 for step in parsed[filename]]
                 print("step:" + str(200*n) + ":" + str(temp))
                 temp = reduce(lambda x, y : x or y, temp)
                 succDict[filename] += int(temp)
@@ -79,8 +84,6 @@ def evaluate(resultName="result", dirname="", mode="a", isSaveImg=False):
         fScore = 2.0/(1.0/precision + 1.0/recall)
     # csv 書き出し
     
-    if os.path.exists(dirpath) == False:
-        os.mkdir(dirpath)
     csvName = dillname.split(".")[0]
     filepath = dirpath + "results_" + csvName + ".csv"
     with open(filepath, mode, encoding="utf-8") as f:
