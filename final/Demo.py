@@ -40,7 +40,7 @@ ESC : 終了
 
 DIR_PATH = "tmp/DEMO_result/"
 
-colorList = ["red", "blue", "green", "yellow", "start"]
+colorList = ["red", "blue", "green", "yellow"]
 
 colors = {}
 colors["red"   ] = (  0,   0, 255)
