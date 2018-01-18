@@ -40,6 +40,8 @@ ESC : 終了
 
 DIR_PATH = "tmp/DEMO_result/"
 
+colorList = ["red", "blue", "green", "yellow", "start"]
+
 colors = {}
 colors["red"   ] = (  0,   0, 255)
 colors["blue"  ] = (255,   0,   0)
@@ -57,7 +59,7 @@ def find_rect_of_target_color(image, color):
     s = hsv[:, :, 1]
     mask = np.zeros(h.shape, dtype=np.uint8)
     if   color ==    "red":
-        mask[((h <   5) | (h > 210)) & (s > 200)] = 255
+        mask[((h <   5) | (h > 210)) & (s > 150)] = 255
     elif color ==   "blue":
         mask[((h > 150) & (h < 180)) & (s > 200)] = 255
     elif color ==  "green":
@@ -74,6 +76,25 @@ def find_rect_of_target_color(image, color):
         rect = cv2.boundingRect(approx)
         rects.append(np.array(rect))
     return rects
+
+# モデルと今の環境とサブゴールのステップを引数に，
+# 移動物体の移動先をマーキング
+def find_subgoal(model, rectDict, step):
+    # model[step] は[0:色, 1:行列] となっている想定
+    # 行列に書けるために，rectDict をベクトルに変換する
+    if len(model) <= step:
+        return ["finish", None, False]
+    b = []
+    for c in colorList:
+        b += list(rectDict[c][0:2])
+    b = np.array(b)
+    a = model[step][1].dot(b)
+    a = a[2*model[step][0]:2*model[step][0]+2]
+    a = a.astype("int")
+    b = b[2*model[step][0]:2*model[step][0]+2]
+    b = b.astype("int")
+    n = np.linalg.norm(a-b) < 80
+    return [colorList[model[step][0]], a, n]
 
 def makeModel():
     stepDict = {}
@@ -130,7 +151,7 @@ def makeModel():
     # ここまでで，各ログにおける途中状態を取得できた
 
     # 一旦表示
-    for logName in stepDict.keys():
+    for logName in sorted(list(stepDict.keys())):
         for log in stepDict[logName]:
             print(log)
 
@@ -155,10 +176,10 @@ def makeModel():
             b = a
 
     # 一旦表示させよう
-    for cList in colorDict.keys():
+    for cList in sorted(list(colorDict.keys())):
         print(cList)
         for c in colorDict[cList]:
-            print(c[0], end=", ")
+            print(colorList[c[0]], end=", ")
         print("")
 
     matchingDict = {}
@@ -199,10 +220,10 @@ def makeModel():
 
     # 一旦表示させよう
     print("---after matching---")
-    for cList in matchingDict.keys():
+    for cList in sorted(list(matchingDict.keys())):
         print(cList)
         for c in matchingDict[cList]:
-            print(c[0], end=", ")
+            print(colorList[c[0]], end=", ")
         print("")
    
     # ----------ここまでは正しいよライン--------------
@@ -226,10 +247,12 @@ def makeModel():
         model.append([matchingDict[selected[0]][i+1][0], f])
 
     # 一旦表示させよう
+    """
     print("---model---")
     for m in model:
         print(m[0])
         print(m[1])
+    """
 
     return 
 
@@ -239,10 +262,12 @@ if __name__ == "__main__":
     if os.path.exists(DIR_PATH) == False:
         os.mkdir(DIR_PATH)
 
-    step  = -1
+    time    = -1
     recFlag = False
     repFlag = False
     debug   = False
+    model   = None
+    step    = 0
 
     while True:
         key = cv2.waitKey(30)
@@ -250,7 +275,7 @@ if __name__ == "__main__":
             break
         elif key == ord("1") and recFlag == False:
             recFlag = True
-            step = -1
+            time = -1
             count = 0
             while True:
                 count += 1
@@ -261,14 +286,19 @@ if __name__ == "__main__":
         elif key == ord("2") and recFlag == True:
             recFlag = False
             f.close()
-        elif key == ord("3") and repFlag == False:
+        elif key == ord("3"):
+            # ログを用いてモデル学習を行う
+            makeModel()
+        elif key == ord("4") and repFlag == False:
             # 動作再現を開始する
             # フラグを立てて matching モデルをロードする
             repFlag = True
-            makeModel()
-        elif key == ord("4") and repFlag == True:
+            with open("tmp/dills/DEMO/model.dill", "rb") as f:
+                model = dill.load(f)
+        elif key == ord("5") and repFlag == True:
             repFlag = False
             model = None
+            step = 0
 
         elif key == ord("9"):
             debug = not debug
@@ -276,9 +306,9 @@ if __name__ == "__main__":
         _, frame = capture.read()
 
         # recFlag が立っている場合，物体位置をフレームで囲む
-        if recFlag == True:
-            step += 1
-            text = str(step) + ","
+        if (recFlag or repFlag) == True:
+            time += 1
+            text = str(time) + ","
             # ログの順番を指定するために colors.keys() ではなくこの形
             rectDict = {}
             for c in ["hand", "red", "blue", "green", "yellow"]:
@@ -299,6 +329,14 @@ if __name__ == "__main__":
             for c in ["hand", "red", "blue", "green", "yellow"]:
                     rect = rectDict[c]
                     cv2.rectangle(frame, tuple(rect[0:2]), tuple(rect[0:2] + rect[2:4]), colors[c], thickness=2)
+
+            # repFlag が立っている場合，移動物体の移動先を物体色の円で表示
+            if repFlag == True:
+                oval = find_subgoal(model, rectDict, step)
+                if oval[0] != "finish":
+                    cv2.circle(frame, tuple([oval[1][0]+15, oval[1][1]+15]), 30, colors[oval[0]], thickness=2)
+                if oval[2] == True:
+                    step += 1
 
             # recFlag が立っている場合，ログ出力する
             if recFlag == True:
