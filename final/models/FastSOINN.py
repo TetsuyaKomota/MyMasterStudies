@@ -52,7 +52,9 @@ class SOINN:
                     print("あらよっと")
                     self.removeUnnecessaryNode()
                     self.classifier()
-            
+
+            # 最後に孤立ノードを除去する            
+            self.removeUnnecessaryNode()
             self.classifier()
             if prunning == True:
                 self.prunning()
