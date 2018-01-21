@@ -143,6 +143,7 @@ def parsing(dillpath, dillname, LEN, n_iter):
     return output
 
 if __name__ == "__main__":
+"""
     filepaths = glob.glob("tmp/dills/*")
     filepaths = [p for p in filepaths if "SOINN_" in p]
     for p in filepaths:
@@ -167,4 +168,28 @@ if __name__ == "__main__":
                 parsing(dirpath, "encoded.dill", LEN, ITER)
                 # test による推定
                 parsing(dirpath, "encoded_test.dill", LEN, ITER)
+
+"""
+    filepaths = glob.glob("tmp/dills/*")
+    filepaths = [p for p in filepaths if "Kmeans_" in p]
+    for p in filepaths:
+        if p[-1] == "/":
+            kmeanspath = p
+        else:
+            kmeanspath = p + "/"
+        # 力わざでディレクトリ名からKmeansのパラメータを取得する
+        k = kmeanspath[:-1].split("_")[1]split("=")[1]
+        for LEN in [2, 5, 100]:
+            for ITER in [200]:
+                dirpath  = "NPYLM_LEN="+str(LEN)+",ITER="+str(ITER)
+                dirpath += ", k="+str(k)
+                dirpath += "/"
+                os.mkdir("tmp/dills/"+dirpath)
+                shutil.copyfile(soinnpath+"encoded.dill",      "tmp/dills/"+dirpath+"encoded.dill")
+                shutil.copyfile(soinnpath+"encoded_test.dill", "tmp/dills/"+dirpath+"encoded_test.dill")
+                # train による学習
+                parsing(dirpath, "encoded.dill", LEN, ITER)
+                # test による推定
+                parsing(dirpath, "encoded_test.dill", LEN, ITER)
+
 
