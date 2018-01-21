@@ -104,7 +104,7 @@ class SOINN:
         flag.append(winners[DISTANCE][1] <= threshold[1])
 
         # どちらかの閾値の外の場合，新たにノードを追加する
-        if flag[0] == False or flag[1] == False:
+        if flag[0] == False and flag[1] == False:
             self.nodeList.append(Node(signal))
             return
         # 両方の閾値内の場合，勝者ノード間にエッジを生成する

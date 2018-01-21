@@ -61,7 +61,7 @@ def fit(dillpath, LEN, n_iter):
             rm.append(s)
     for s in rm:
         del strDictZip[s]
-
+    print(strDictZip)
     # 学習
     result = rest.executeParsing(strDictZip, n_iter)
     
