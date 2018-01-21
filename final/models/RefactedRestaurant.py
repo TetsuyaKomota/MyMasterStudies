@@ -389,6 +389,9 @@ class Franchise:
 
     # 可能な単語分割を取得する再帰関数
     def predict_sub(self, wordSet, code):
+        # wordSet が空なら，code は未知語
+        if len(wordSet) == 0:
+            return [[code]]
         # 単語が一つも含まれていないなら code は未知語
         check = reduce(lambda x,y:x or y, [w in code for w in wordSet])
         if check == False:

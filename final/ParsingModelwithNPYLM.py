@@ -61,7 +61,7 @@ def fit(dillpath, LEN, n_iter):
             rm.append(s)
     for s in rm:
         del strDictZip[s]
-    print(strDictZip)
+
     # 学習
     result = rest.executeParsing(strDictZip, n_iter)
     
@@ -154,7 +154,8 @@ if __name__ == "__main__":
         soinnN = soinnpath[:-1].split("_")[1].split(",")[0].split("=")[1]
         soinnE = soinnpath[:-1].split("_")[1].split(",")[1].split("=")[1]
         for LEN in [2, 5, 100]:
-            for ITER in [20, 200, 2000]:
+            # for ITER in [20, 200, 2000]:
+            for ITER in [200]:
                 dirpath  = "NPYLM_LEN="+str(LEN)+",ITER="+str(ITER)
                 dirpath += ", soinnN="+str(soinnN)
                 dirpath += ", soinnE="+str(soinnE)
