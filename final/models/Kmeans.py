@@ -38,8 +38,8 @@ class Kmeans:
                 tempList = [self.distance(X[i], m) for m in self.mList]
                 y[i] = tempList.index(min(tempList))
            
+            print("[Kmeans]fit:changed:" + str(len([i for i in range(len(y)) if y[i] != oldY[i]])))
             if detail:
-                print(len([i for i in range(len(y)) if y[i] != oldY[i]]))
                 self.show(X)
 
             # Check

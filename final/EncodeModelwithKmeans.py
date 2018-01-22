@@ -111,6 +111,7 @@ if __name__ == "__main__":
     # test データによる推定
     predict("", "tmp/log_test/", 5, 5000000, 100)
     """
-    for k in [5, 20, 50, 100]:
+    # for k in [5, 20, 50, 100]:
+    for k in [50, 100]:
         predict("Kmeans_k="+str(k)+"/", "tmp/log/",k, 5)
         predict("Kmeans_k="+str(k)+"/", "tmp/log_test/", k, 5)
