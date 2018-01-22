@@ -17,7 +17,7 @@ class Kmeans:
         self.mList = np.array(self.mList)
 
 
-    def fit(self, X):
+    def fit(self, X, detail=False):
         y = [int(self.k * random()) for _ in range(len(X))]
 
         count = 0
@@ -38,17 +38,21 @@ class Kmeans:
             for i in range(len(X)):
                 tempList = [self.distance(X[i], m) for m in self.mList]
                 y[i] = tempList.index(min(tempList))
+           
+            if detail:
+                print(len([i for i in range(len(y)) if y[i] != oldY[i]]))
+                self.show(X)
 
             # Check
-            if y == oldY:
+            e = len(y)/1000
+            if len([i for i in range(len(y)) if y[i] != oldY[i]]) < e+1:
                 break
-            
-            if False and count % 10 == 0:
-                self.show(X)
+ 
         return y
 
-    def predict(self, X):
-        # self.show(X)
+    def predict(self, X, detail=False):
+        if detail:
+            self.show(X)
         y = [0 for _ in range(len(X))]
         for i in range(len(X)):
             tempList = [self.distance(X[i], m) for m in self.mList]
@@ -113,15 +117,15 @@ if __name__ == "__main__":
     a += temp
 
     temp = []
-    temp.append(np.random.randn(size) + 10)
-    temp.append(np.random.randn(size))
+    temp.append(np.random.randn(size) + 3)
+    temp.append(np.random.randn(size) + 3)
     temp = list(np.array(temp).T)
 
     a += temp
 
     temp = []
-    temp.append(np.random.randn(size) +  5)
-    temp.append(np.random.randn(size) + 10)
+    temp.append(np.random.randn(size) + 6)
+    temp.append(np.random.randn(size) + 6)
     temp = list(np.array(temp).T)
 
     a += temp
@@ -134,6 +138,6 @@ if __name__ == "__main__":
     plt.scatter(a[size*2:, 0],    a[size*2:, 1], color="yellow")
     plt.show() 
    
-    model = Kmeans(2, 0, 0) 
-    model.fit(a)
-    print(model.predict(a))
+    model = Kmeans(3, 2) 
+    model.fit(a, detail=True)
+    print(model.predict(a, detail=True))
