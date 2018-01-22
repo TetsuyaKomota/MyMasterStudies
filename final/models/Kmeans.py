@@ -32,7 +32,6 @@ class Kmeans:
                     self.mList[l] = sum(tempList)/len(tempList)
                 else:
                     self.mList[l] = np.array([random() for _ in range(self.D)])
-                    
 
             # M step
             for i in range(len(X)):
@@ -45,7 +44,7 @@ class Kmeans:
 
             # Check
             e = len(y)/1000
-            if len([i for i in range(len(y)) if y[i] != oldY[i]]) < e+1:
+            if len([i for i in range(len(y)) if y[i] != oldY[i]]) < e+count:
                 break
  
         return y
