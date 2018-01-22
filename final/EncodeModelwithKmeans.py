@@ -31,10 +31,11 @@ def fit(dillpath, k, step):
 
     model = Kmeans(k, step * 2)
 
+    X = []
     for i, filepath in enumerate(filepaths):
         print("[EncodeModel] input : " + os.path.basename(filepath))
+        dummy = len(X)
         # step ステップ幅を切り出す
-        X = []
         X.append([0 for _ in range(step*2)])
         with open(filepath, "r", encoding="utf-8") as f:
             while True:
@@ -48,15 +49,15 @@ def fit(dillpath, k, step):
                 X.append(X[-1][2:] + pos)
         
         # X[0] はダミーなので消しておく
-        X.pop(0)
+        X.pop(dummy)
 
-        # np.array に変換
-        X = [np.array(x) for x in X]
+    # np.array に変換
+    X = [np.array(x) for x in X]
 
-        # model を学習
-        model.fit(X)
-        
-        model.saveModel(path="tmp/dills/"+dillpath)
+    # model を学習
+    model.fit(X)
+    
+    model.saveModel(path="tmp/dills/"+dillpath)
 
     return model
 
