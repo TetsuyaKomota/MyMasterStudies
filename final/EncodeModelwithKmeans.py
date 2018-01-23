@@ -114,5 +114,5 @@ if __name__ == "__main__":
     """
     # for k in [5, 20, 50, 100]:
     for k in [5]:
-        predict("Kmeans_BB_k="+str(k)+"/", "tmp/log_B/",k, 5)
-        predict("Kmeans_BB_k="+str(k)+"/", "tmp/log_test_B/",k, 5)
+        predict("Kmeans_GB_k="+str(k)+"/", "tmp/log/",k, 5)
+        predict("Kmeans_GB_k="+str(k)+"/", "tmp/log_test_B/",k, 5)

@@ -21,7 +21,7 @@ import glob
 import shutil
 from models import RefactedRestaurant
 
-D      = 20
+D      =  1
 Theta  = 20
 PAD    =  3
 MIN_W  =  2
@@ -172,17 +172,18 @@ if __name__ == "__main__":
     """
     filepaths = glob.glob("tmp/dills/*")
     filepaths = [p for p in filepaths if "Kmeans_" in p]
-    for p in [filepaths[2]]:
+    for p in [filepaths[4]]:
         if p[-1] == "/":
             kmeanspath = p
         else:
             kmeanspath = p + "/"
         # 力わざでディレクトリ名からKmeansのパラメータを取得する
-        k = kmeanspath[:-1].split("_")[1].split("=")[1]
-        for LEN in [2, 5, 100]:
+        # k = kmeanspath[:-1].split("_")[1].split("=")[1]
+        k = kmeanspath[:-1].split("_")[1]
+        # for LEN in [2, 5, 100]:
+        for LEN in [2]:
             for ITER in [200]:
-                dirpath  = "NPYLM_LEN="+str(LEN)+",ITER="+str(ITER)
-                dirpath += ", k="+str(k)
+                dirpath  = "NPYLM_LEN_"+k+"="+str(LEN)+",ITER="+str(ITER)
                 dirpath += "/"
                 os.mkdir("tmp/dills/"+dirpath)
                 shutil.copyfile(kmeanspath+"encoded.dill",      "tmp/dills/"+dirpath+"encoded.dill")
