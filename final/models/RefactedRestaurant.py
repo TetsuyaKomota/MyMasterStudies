@@ -343,7 +343,8 @@ class Franchise:
                 print("[RefactedRest]executeParsing:iteration:"+str(i))
                 print("[RefactedRest]executeParsing:currentSentences:")
                 for c in sorted(list(current.keys())):
-                    print(c + ":" + str(current[c]))
+                    # print(c + ":" + str(current[c]))
+                    print(c + ":" + self.showSentence(current, c)))
         for c in current:
             current[c] = [w for w in current[c] if w != PADWORD] 
         if rev == True:
@@ -458,6 +459,26 @@ class Franchise:
             if len(cu) == 0:
                 continue
             self.sub_toPrint(cu)
+
+    # executeParsing の際に分割結果を表示する関数
+    # そのまま出力すると制御文字とか使う場合あるので変換して出す
+    def showSentence(self, sList, sName):
+        s = sList[sName]
+        text = "["
+        for w in s:
+            encW = "'"
+            for c in w:
+                if c == PADWORD:
+                    encW += c
+                else:
+                    ordC = self.retranslate(c)
+                    encC = self.translate(ordC%56)
+                    idxC = int(ordC/56)
+                    encW += encC + str(idxC) 
+            encW += "'"
+            text += encW + ","
+        text = text[:-1] + "]"
+        return text
 
     def translate(self, number):
         # 61 は 「~」, 62 ~ 95 は特殊文字なので飛ばす
