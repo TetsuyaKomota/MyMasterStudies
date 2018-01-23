@@ -21,8 +21,8 @@ import glob
 import shutil
 from models import RefactedRestaurant
 
-D      =  1
-Theta  = 10
+D      = 20
+Theta  = 20
 PAD    =  3
 MIN_W  =  2
 
@@ -172,7 +172,7 @@ if __name__ == "__main__":
     """
     filepaths = glob.glob("tmp/dills/*")
     filepaths = [p for p in filepaths if "Kmeans_" in p]
-    for p in filepaths:
+    for p in [filepaths[2]]:
         if p[-1] == "/":
             kmeanspath = p
         else:
