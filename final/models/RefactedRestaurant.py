@@ -344,7 +344,7 @@ class Franchise:
                 print("[RefactedRest]executeParsing:currentSentences:")
                 for c in sorted(list(current.keys())):
                     # print(c + ":" + str(current[c]))
-                    print(c + ":" + self.showSentence(current, c)))
+                    print(c + ":" + self.showSentence(current, c))
         for c in current:
             current[c] = [w for w in current[c] if w != PADWORD] 
         if rev == True:
