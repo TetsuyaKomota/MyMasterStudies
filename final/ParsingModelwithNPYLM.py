@@ -21,10 +21,10 @@ import glob
 import shutil
 from models import RefactedRestaurant
 
-D      = 1
-Theta  = 1
-PAD    = 3
-MIN_W  = 2
+D      =  1
+Theta  = 10
+PAD    =  3
+MIN_W  =  2
 
 
 def fit(dillpath, LEN, n_iter):
