@@ -470,9 +470,11 @@ class Franchise:
                     encW += c
                 else:
                     ordC = self.retranslate(c)
-                    encC = self.translate(ordC%56)
-                    idxC = int(ordC/56)
-                    encW += encC + str(idxC) 
+                    encC = self.translate(ordC%52)
+                    idxC = int(ordC/52)
+                    encW += encC
+                    if idxC > 0:
+                        encW += str(idxC)
             encW += "'"
             text += encW + ","
         text = text[:-1] + "]"
@@ -498,7 +500,7 @@ class Franchise:
         return pads + output + pads
 
 if __name__ == "__main__":
-    f = Franchise(1, 10, 3, 3, 2)
+    f = Franchise(1, 200, 3, 3, 2)
 
     data = {}
     """
@@ -508,11 +510,12 @@ if __name__ == "__main__":
     data["4"] = ["ばななりんごみかんももぶどう"]
     data["5"] = ["みかんももばななりんごぶどう"]
     """
-    for i in range(10):
+    for i in range(5):
         idx = "{0:02d}".format(i)
         data[idx] = [""]
-        for _ in range(5):
-            r = random.random()
+        for _ in range(3):
+            # r = random.random()
+            r = random.random()/2
             if r < 0.1:
                 data[idx][0] += "apple"
             elif r < 0.2:
@@ -521,8 +524,10 @@ if __name__ == "__main__":
                 data[idx][0] += "banana"
             elif r < 0.4:
                 data[idx][0] += "peach"
-            elif r < 0.5:
+            # elif r < 0.5:
+            else:
                 data[idx][0] += "orange"
+            """
             elif r < 0.6:
                 data[idx][0] += "melon"
             elif r < 0.7:
@@ -533,6 +538,7 @@ if __name__ == "__main__":
                 data[idx][0] += "watermelon"
             else:
                 data[idx][0] += "pineapple"
+            """
 
     for i in sorted(list(data.keys())):
         print(i + ":" + str(data[i]))

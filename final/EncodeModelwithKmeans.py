@@ -22,12 +22,12 @@ import os
 import glob
 import sys
 
-def fit(dillpath, k, step):
+def fit(dillpath, logpath, k, step):
     if os.path.exists("tmp/dills/") == False:
         os.mkdir("tmp/dills/")
     if os.path.exists("tmp/dills/"+dillpath) == False:
         os.mkdir("tmp/dills/"+dillpath)
-    filepaths = glob.glob("tmp/log/*.csv")
+    filepaths = glob.glob(logpath+"/*.csv")
 
     model = Kmeans(k, step * 2)
 
@@ -66,7 +66,7 @@ def predict(dillpath, logpath, k, step):
         model = Kmeans(k, step * 2)
         model.loadModel(path="tmp/dills/"+dillpath)
     else:
-        model = fit(dillpath, k, step * 2)
+        model = fit(dillpath, logpath, k, step * 2)
 
     output = {}
     filepaths = glob.glob(logpath + "*.csv")
@@ -113,6 +113,6 @@ if __name__ == "__main__":
     predict("", "tmp/log_test/", 5, 5000000, 100)
     """
     # for k in [5, 20, 50, 100]:
-    for k in [50, 100]:
-        predict("Kmeans_k="+str(k)+"/", "tmp/log/",k, 5)
-        predict("Kmeans_k="+str(k)+"/", "tmp/log_test/", k, 5)
+    for k in [5]:
+        predict("Kmeans_BB_k="+str(k)+"/", "tmp/log_B/",k, 5)
+        predict("Kmeans_BB_k="+str(k)+"/", "tmp/log_test_B/",k, 5)
