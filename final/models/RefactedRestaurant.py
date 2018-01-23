@@ -36,9 +36,8 @@ class Franchise:
     # PAD    : 終始端単語の数
     # LEN    : 文脈長さ
     # MIN_W  : 単語の最短長さ
-    def __init__(self, D, A, THETA, PAD, LEN, MIN_W, isBase=False):
+    def __init__(self, D, THETA, PAD, LEN, MIN_W, isBase=False):
         self.D           = D
-        self.A           = A
         self.THETA       = THETA
         self.PAD         = PAD
         self.LEN         = LEN
@@ -50,7 +49,7 @@ class Franchise:
         self.timeScore   = {}
         if isBase == False:
             # 単語HPYLM なら，文字HPYLM を持つ
-            self.base    = Franchise(D, A, THETA, 3, 2, 1, True)
+            self.base    = Franchise(D, THETA, 3, 2, 1, True)
 
     def getTheta(self, u):
         return self.THETA * (len(u) + 1.0)
@@ -238,7 +237,6 @@ class Franchise:
     # 基底測度は単語長さの正規分布
     # 短すぎる単語を無視する項を追加
     def calcProbabilityofBaseMeasure(self, w):
-        # return np.exp(-len(w) * self.A) * int(len(w)>self.MIN_W)
         if self.isBase == False:
             # 単語HPYLM なら，文字HPYLM から取得してくる
             return self.base.calcProbability(self.forBase(w))
@@ -500,14 +498,45 @@ class Franchise:
         return pads + output + pads
 
 if __name__ == "__main__":
-    f = Franchise(1, 1, 1, 3, 3)
+    f = Franchise(1, 10, 3, 3, 2)
 
     data = {}
+    """
     data["1"] = ["りんごぶどうみかんばななもも"]
     data["2"] = ["ももみかんばななりんごぶどう"]
     data["3"] = ["ぶどうばななみかんりんごもも"]
     data["4"] = ["ばななりんごみかんももぶどう"]
     data["5"] = ["みかんももばななりんごぶどう"]
+    """
+    for i in range(10):
+        idx = "{0:02d}".format(i)
+        data[idx] = [""]
+        for _ in range(5):
+            r = random.random()
+            if r < 0.1:
+                data[idx][0] += "apple"
+            elif r < 0.2:
+                data[idx][0] += "grape"
+            elif r < 0.3:
+                data[idx][0] += "banana"
+            elif r < 0.4:
+                data[idx][0] += "peach"
+            elif r < 0.5:
+                data[idx][0] += "orange"
+            elif r < 0.6:
+                data[idx][0] += "melon"
+            elif r < 0.7:
+                data[idx][0] += "strawberry"
+            elif r < 0.8:
+                data[idx][0] += "lychee"
+            elif r < 0.9:
+                data[idx][0] += "watermelon"
+            else:
+                data[idx][0] += "pineapple"
+
+    for i in sorted(list(data.keys())):
+        print(i + ":" + str(data[i]))
+        print(i + ":" + f.showSentence(data, i))
 
     # print(f.reverseSentences(data))
 

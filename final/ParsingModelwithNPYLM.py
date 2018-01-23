@@ -22,7 +22,6 @@ import shutil
 from models import RefactedRestaurant
 
 D      = 1
-A      = 5
 Theta  = 1
 PAD    = 3
 MIN_W  = 2
@@ -32,7 +31,7 @@ def fit(dillpath, LEN, n_iter):
     with open("tmp/dills/"+dillpath+"encoded.dill", "rb") as f:
         encoded = dill.load(f)
 
-    rest =RefactedRestaurant.Franchise(D, A, Theta, PAD, LEN, MIN_W)
+    rest =RefactedRestaurant.Franchise(D, Theta, PAD, LEN, MIN_W)
     
     # 文字列化
     strDict = {}
