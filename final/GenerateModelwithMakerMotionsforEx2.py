@@ -19,6 +19,8 @@ import os
 numTrain = 30
 numTest  = 30
 
+e        = 50
+
 def generate(path, num):
 
     if os.path.exists(path) == False:
@@ -92,7 +94,8 @@ def generate(path, num):
                     text += str(v[0])+","
                     text += str(v[1])+","
                     for o in objList:
-                        text += str(inits[o][0])+","+str(inits[o][1])+","
+                        text += str(inits[o][0]+e*random())+","
+                        text += str(inits[o][1]+e*random())+","
                     f.write(text+"\n") 
 
                     # ステップインクリメント

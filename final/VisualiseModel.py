@@ -19,8 +19,8 @@ from functools import reduce
 import matplotlib.pyplot as plt
 
 dirpath  = "tmp/results/"
-dillname = "parsed.dill"
-# dillname = "matching.dill"
+# dillname = "parsed.dill"
+dillname = "matching.dill"
 
 def visualize(dirname="", isSaveImg=False):
     with open("tmp/dills/" + dirname + dillname, "rb") as f:
@@ -57,8 +57,8 @@ def evaluate(resultName="result", dirname="", mode="a", isSaveImg=False):
 
     succDict  = {}
     # 700 モードなら 3, 500 モードなら 2
-    # numofSucc = 3
-    numofSucc = 2
+    numofSucc = 3
+    # numofSucc = 2
     e         = 10 # 許容ステップ誤差
     for filename in parsed.keys():
             succDict[filename] = 0

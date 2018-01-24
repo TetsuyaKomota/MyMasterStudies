@@ -126,9 +126,13 @@ def parsing(dillpath, dillname, LEN, n_iter):
                     else:
                         break
             m.append(step)
-        # 最後の境界が 500 になるっぽいので，
-        # 499 に変更
+
+        # 最後の境界が 200n+100 になるっぽいので
+        # 200n+99 に調整
         m[-1] -= 1
+        # なんか調整
+        if m[-1] != 699:
+            m.append(699)
         output[d] = m
     
     # return 
@@ -172,7 +176,7 @@ if __name__ == "__main__":
     """
     filepaths = glob.glob("tmp/dills/*")
     filepaths = [p for p in filepaths if "Kmeans_" in p]
-    for p in [filepaths[4]]:
+    for p in filepaths:
         if p[-1] == "/":
             kmeanspath = p
         else:
@@ -185,9 +189,10 @@ if __name__ == "__main__":
             for ITER in [200]:
                 dirpath  = "NPYLM_LEN_"+k+"="+str(LEN)+",ITER="+str(ITER)
                 dirpath += "/"
-                os.mkdir("tmp/dills/"+dirpath)
-                shutil.copyfile(kmeanspath+"encoded.dill",      "tmp/dills/"+dirpath+"encoded.dill")
-                shutil.copyfile(kmeanspath+"encoded_test.dill", "tmp/dills/"+dirpath+"encoded_test.dill")
+                if os.path.exists("tmp/dills/"+dirpath) == False:
+                    os.mkdir("tmp/dills/"+dirpath)
+                    shutil.copyfile(kmeanspath+"encoded.dill",      "tmp/dills/"+dirpath+"encoded.dill")
+                    shutil.copyfile(kmeanspath+"encoded_test.dill", "tmp/dills/"+dirpath+"encoded_test.dill")
                 # train による学習
                 parsing(dirpath, "encoded.dill", LEN, ITER)
                 # test による推定
