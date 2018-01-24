@@ -45,7 +45,7 @@ def matching(dillpath, n_iter):
     for filename in keys:
         datas[filename] = []
         goal = prunned[filename][-1]
-        logTestName = dillpath.split("_")[1][1]
+        logTestName = dillpath[11]
         filepath = "tmp/log_test_"+logTestName+"/" + filename + ".csv"
         with open(filepath, "r", encoding="utf-8") as f:
             while True:
