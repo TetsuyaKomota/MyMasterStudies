@@ -185,6 +185,8 @@ if __name__ ==  "__main__":
     for filepath in filepaths:
         if os.path.isdir(filepath) == False:
             continue
+        if "CHEAT" in filepath:
+            continue
         if os.path.exists(filepath + "/parsed_test.dill") == True:
             dirname = os.path.basename(filepath)
             matching(dirname+"/", 10)

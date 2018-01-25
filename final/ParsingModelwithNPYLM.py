@@ -183,10 +183,10 @@ if __name__ == "__main__":
             kmeanspath = p + "/"
         # 力わざでディレクトリ名からKmeansのパラメータを取得する
         # k = kmeanspath[:-1].split("_")[1].split("=")[1]
-        k = kmeanspath[:-1].split("_")[1]
+        k = kmeanspath[:-1].split("_")[1].split("=")[0]
         # for LEN in [2, 5, 100]:
-        for LEN in [2]:
-            for ITER in [200]:
+        for LEN in [2, 5, 1000]:
+            for ITER in [200, 2000]:
                 dirpath  = "NPYLM_LEN_"+k+"="+str(LEN)+",ITER="+str(ITER)
                 dirpath += "/"
                 if os.path.exists("tmp/dills/"+dirpath) == False:

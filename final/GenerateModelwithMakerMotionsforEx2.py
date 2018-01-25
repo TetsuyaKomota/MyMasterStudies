@@ -19,7 +19,7 @@ import os
 numTrain = 30
 numTest  = 30
 
-e        = 50
+e        = 0
 
 def generate(path, num):
 

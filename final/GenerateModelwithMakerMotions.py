@@ -12,8 +12,10 @@ from numpy.random import choice
 from random import random
 import os
 
-numTrain = 100
-numTest  = 100
+numTrain = 30
+numTest  = 30
+
+e        = 1
 
 def generate(path, num):
 
@@ -82,7 +84,8 @@ def generate(path, num):
                     text += str(v[0])+","
                     text += str(v[1])+","
                     for o in objList:
-                        text += str(inits[o][0])+","+str(inits[o][1])+","
+                        text += str(inits[o][0]+e*random())+","
+                        text += str(inits[o][1]+e*random())+","
                     f.write(text+"\n") 
 
                     # ステップインクリメント

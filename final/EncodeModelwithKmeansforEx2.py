@@ -112,6 +112,17 @@ if __name__ == "__main__":
     # test データによる推定
     predict("", "tmp/log_test/", 5, 5000000, 100)
     """
-    for k in [10]:
-        predict("Kmeans_k="+str(k)+"/", "tmp/log/",k, 10)
-        predict("Kmeans_k="+str(k)+"/", "tmp/log_test/",k, 10)
+    # for k in [5, 20, 50, 100]:
+    for s in [""]:
+        for t in ["_A", "_B"]:
+            for k in [5]:
+                n = ""
+                if s == "_A":
+                    n += "A"
+                elif s == "_B":
+                    n += "B"
+                else:
+                    n += "G"
+                n += t[1]
+                predict("Kmeans_"+n+"_k="+str(k)+"/", "tmp/log"+s+"/",k, 10)
+                predict("Kmeans_"+n+"_k="+str(k)+"/", "tmp/log_test"+t+"/",k, 10)
