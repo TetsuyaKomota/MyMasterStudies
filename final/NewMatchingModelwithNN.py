@@ -78,7 +78,7 @@ def matching(dillpath, n_iter):
         # sleep(10)
  
         # 終了条件
-        flagList = [a == goal for a in after.values()]
+        flagList = [goal-a < 50 for a in after.values()]
         flag = reduce(lambda x, y : x and y, flagList)
         if flag == True:
             # 最終結果を出力する
@@ -195,4 +195,4 @@ if __name__ ==  "__main__":
             continue
         if os.path.exists(filepath + "/parsed_test.dill") == True:
             dirname = os.path.basename(filepath)
-            matching(dirname+"/", 10)
+            matching(dirname+"/", 1000)
