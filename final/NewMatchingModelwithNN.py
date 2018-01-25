@@ -94,6 +94,9 @@ def matching(dillpath, n_iter):
         # ・predict を output に追加
         # ・before <- predict
 
+        model = np.eye(len(keys))
+        # 学習率
+        alpha = 1
         while True:
             # サンプリング学習を n_iter 回行う
             modelList = []
@@ -126,17 +129,26 @@ def matching(dillpath, n_iter):
                 modelList.append((A, 1.0/res))
 
             sumexp = sum([m[1] for m in modelList])
+            model *= 1-alpha
+            for m in modelList:
+                model += alpha * (m[1]/sumexp) * m[0]
+            alpha *= 0.9
 
             # 次を推定する
             predict = {}
             for filename in keys:
                 predict[filename] = []
+
+                beforeData = datas[filename][before[filename]]
+                """
                 for m in modelList:
                     beforeData = datas[filename][before[filename]]
                     beforeData = np.array(beforeData)
                     predict[filename].append(m[0].dot(beforeData))
                     predict[filename][-1] *= m[1]/sumexp
                 predict[filename] = sum(predict[filename])
+                """
+                predict[filename] = model.dot(beforeData)
         
             # 推定結果に最も近い状態を datas から取得
             selected = {}
