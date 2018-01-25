@@ -78,7 +78,7 @@ def matching(dillpath, n_iter):
         # sleep(10)
  
         # 終了条件
-        flagList = [goal-a < 50 for a in after.values()]
+        flagList = [goal-a < e for a in after.values()]
         flag = reduce(lambda x, y : x and y, flagList)
         if flag == True:
             # 最終結果を出力する
@@ -158,7 +158,7 @@ def matching(dillpath, n_iter):
                 d = datas[filename]
                 distList = [np.linalg.norm(np.array(l)-p) for l in d]
                 # before ステップ以降のみを対象にする
-                distList = distList[before[filename]+e:]
+                distList = distList[before[filename]+e:-e]
                 # after を選ぶ段階で else によって 499 になっている場合
                 # [before+e:] に要素が存在しない．その時は
                 # そのまま before を返す 
