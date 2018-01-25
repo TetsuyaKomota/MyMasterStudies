@@ -186,8 +186,10 @@ if __name__ == "__main__":
         k = kmeanspath[:-1].split("_")[1].split("=")[0]
         # for LEN in [2, 5, 100]:
         for ITER in [200, 2000]:
-            for LEN in [2, 5, 1000]:
+            for LEN in [2, 5, 10]:
                 if ITER == 200 and LEN == 2:
+                    continue
+                if ITER == 200 and LEN == 5:
                     continue
                 dirpath  = "NPYLM_LEN_"+k+"="+str(LEN)+",ITER="+str(ITER)
                 dirpath += "/"
