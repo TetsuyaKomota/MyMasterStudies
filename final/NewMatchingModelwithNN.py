@@ -94,7 +94,7 @@ def matching(dillpath, n_iter):
         # ・predict を output に追加
         # ・before <- predict
 
-        model = np.eye(len(keys))
+        model = np.eye(size)
         # 学習率
         alpha = 1
         while True:
