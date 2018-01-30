@@ -217,15 +217,15 @@ if __name__ == "__main__":
         # 力わざでディレクトリ名からKmeansのパラメータを取得する
         k = kmeanspath[:-1].split("_")[1].split("=")[1]
         for tRate in [0.1*r for r in range(11)]:
-            dirpath  = "NPYLM_k="+str(k)+",LEN_2=,ITER=200,tRate="+str(tRate)
+            dirpath  = "NPYLM_k="+str(k)+",LEN_2=,ITER=50,tRate="+str(tRate)
             dirpath += "/"
             if os.path.exists("tmp/dills/"+dirpath) == False:
                 os.mkdir("tmp/dills/"+dirpath)
                 shutil.copyfile(kmeanspath+"encoded.dill",      "tmp/dills/"+dirpath+"encoded.dill")
                 shutil.copyfile(kmeanspath+"encoded_test.dill", "tmp/dills/"+dirpath+"encoded_test.dill")
             # train による学習
-            parsing(dirpath, "encoded.dill", 2, 200, tRate)
+            parsing(dirpath, "encoded.dill", 2, 50, tRate)
             # test による推定
-            parsing(dirpath, "encoded_test.dill", 2, 200, tRate)
+            parsing(dirpath, "encoded_test.dill", 2, 50, tRate)
 
 

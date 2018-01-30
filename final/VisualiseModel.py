@@ -19,8 +19,8 @@ from functools import reduce
 import matplotlib.pyplot as plt
 
 dirpath  = "tmp/results/"
-# dillname = "parsed.dill"
-dillname = "matching.dill"
+dillname = "parsed.dill"
+# dillname = "matching.dill"
 
 def visualize(dirname="", isSaveImg=False):
     with open("tmp/dills/" + dirname + dillname, "rb") as f:
@@ -38,7 +38,8 @@ def visualize(dirname="", isSaveImg=False):
             os.mkdir(dirpath + "img/")
         imgname = "img_" + dillname.split(".")[0] + "_"
         plt.savefig(dirpath + "img/" + imgname + dirname[:-1] + ".jpg")
-    plt.show()
+    # plt.show()
+    plt.figure()
 
 def evaluate(resultName="result", dirname="", mode="a", isSaveImg=False):
     visualize(dirname, isSaveImg)
