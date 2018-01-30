@@ -3,7 +3,6 @@ from pydybm.base.generator import NoisySin
 from pydybm.time_series.rnn_gaussian_dybm import RNNGaussianDyBM
 from pydybm.base.sgd import RMSProp
 from sklearn.metrics import mean_squared_error
-import soundfile as sf
 import numpy as np
 
 def MSE(y_true,y_pred):
@@ -29,10 +28,13 @@ def RMSE(y_true,y_pred):
     """
     return np.sqrt(MSE(y_true,y_pred))
 
-data, samplerate = sf.read("tmp/001.wav")
-timeSeries = []
-for i in range(int(len(data)/3)):
-    timeSeries.append(np.array([data[i]]))
+# Prepare a generator of noisy sine wave time-series
+length = 60000  # length of the time-series
+period = 80   # period of the sine wave
+std = 0.1     # standard deviation of the noise
+dim = 1       # dimension of the time-series
+timeSeries = NoisySin(length,period,std,dim)
+
 
 #DyBM initialization parameters
 in_dim = 1        # dimension of the input time-series
@@ -60,61 +62,24 @@ model.set_learning_rate(learning_rate)
 for i in range(max_iter):
     #initialize the memory units in DyBM
     model.init_state() 
+    #reset the noisey sine wave time series data
+    timeSeries.reset(i)
     #learn the time-series patterns and return the predicted and actual data
     result= model.learn(timeSeries, get_result=True)
     #calculate the prediction error
     error = RMSE(result["actual"],result["prediction"])
     print ('Learning epoch RMSE : %.5f' %(error))
+    
+# Plot the time-series and prediction 
 
 plt.subplot(2, 1, 1)
-plt.title("First 900")
+plt.title("First 900 step")
 plt.plot(result["actual"][:900],label="target")
 plt.plot(result["prediction"][:900],label="prediction")
 plt.legend()
 plt.subplot(2, 1, 2)
-plt.title("Last  900")
+plt.title("Last  900 step")
 plt.plot(result["actual"][-900:],label="target")
 plt.plot(result["prediction"][-900:],label="prediction")
 plt.legend()
 plt.show()
-    
-sf.write("tmp/002.wav", [r[0] for r in result["prediction"]], samplerate)
-
-# _update_state という内部メソッドが怪しい
-# time_series_model の get_prediction の実装見ると
-# こんな感じで行けそう
-# model.init_state()
-tRange = 10
-for t, tRate in enumerate([2**i for i in range(tRange)]):
-    gen = [timeSeries[0]]
-    model.init_state()
-    for i in range(len(timeSeries)):
-        pred = model.predict_next()
-        gen.append(pred)
-        print(pred)
-        if i%tRate == 0:
-            model._update_state(timeSeries[i])
-        else:
-            model._update_state(pred)
-    plt.subplot(tRange, 1, t+1)
-    plt.title("True data in each " + str(tRate) + "step")
-    plt.plot(gen[:900],label="generated")
-    plt.legend()
-    sf.write("tmp/004_"+str(tRate)+".wav", [g[0] for g in gen], samplerate)
-
-plt.show()
-"""
-gen = [timeSeries[0]]
-for i in range(int(len(timeSeries)/2)):
-    model.init_state()
-    result = model.learn(gen, get_result=True)
-
-    print(result["prediction"][-1])
-    gen.append(result["prediction"][-1])
-plt.plot(result["actual"],label="target")
-plt.plot(result["prediction"],label="prediction")
-plt.legend()
-plt.show()
-
-sf.write("tmp/003.wav", [g[0] for g in gen], samplerate)
-"""
