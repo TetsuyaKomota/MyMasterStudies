@@ -98,7 +98,7 @@ def find_subgoal(model, rectDict, step):
 
 def makeModel():
     stepDict = {}
-    logPaths = glob.glob(DIR_PATH + "*")
+    logPaths = glob.glob(DIR_PATH + "*.csv")
     for logPath in logPaths:
         logName = os.path.basename(logPath)[:-4]
         stepDict[logName] = []
@@ -265,6 +265,7 @@ if __name__ == "__main__":
     time    = -1
     recFlag = False
     repFlag = False
+    capFlag = False
     debug   = False
     model   = None
     step    = 0
@@ -299,6 +300,8 @@ if __name__ == "__main__":
             repFlag = False
             model = None
             step = 0
+        elif key == ord("6"):
+            capFlag = True
 
         elif key == ord("9"):
             debug = not debug
@@ -336,11 +339,18 @@ if __name__ == "__main__":
                 if oval[0] != "finish":
                     cv2.circle(frame, tuple([oval[1][0]+15, oval[1][1]+15]), 30, colors[oval[0]], thickness=2)
                 if oval[2] == True:
+                    cv2.imwrite("tmp/DEMO_result/subgoal_"+str(step)+".jpg", frame)
                     step += 1
 
             # recFlag が立っている場合，ログ出力する
             if recFlag == True:
                 f.write(text + "\n") 
+            
+        # capFlag が立っている場合，画像出力する
+        if capFlag == True:
+            capFlag = False
+            cv2.imwrite("tmp/DEMO_result/cap.jpg", frame)
+            print("capped")
 
         cv2.imshow('DEMO', frame)
     capture.release()
